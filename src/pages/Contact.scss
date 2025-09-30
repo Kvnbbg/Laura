@@ -1,0 +1,142 @@
+@use '../styles/variables' as *;
+
+.contact {
+  .contact-hero {
+    text-align: center;
+    margin-bottom: $spacing-xl;
+
+    h1 {
+      margin-bottom: $spacing-md;
+    }
+
+    .lead {
+      font-size: $font-size-xl;
+    }
+  }
+
+  .contact-content {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .contact-info {
+    .info-item {
+      display: flex;
+      gap: $spacing-md;
+      margin-bottom: $spacing-lg;
+      align-items: flex-start;
+
+      .info-icon {
+        font-size: 2rem;
+        flex-shrink: 0;
+      }
+
+      h3 {
+        margin-bottom: $spacing-xs;
+        font-size: $font-size-lg;
+      }
+
+      p {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .social-links {
+    .social-icons {
+      display: flex;
+      gap: $spacing-md;
+      margin-top: $spacing-md;
+    }
+
+    .social-icon {
+      font-size: 2rem;
+      transition: $transition-base;
+      display: inline-block;
+
+      &:hover {
+        transform: scale(1.2) rotate(5deg);
+      }
+    }
+  }
+
+  .contact-form {
+    .form-group {
+      margin-bottom: $spacing-md;
+
+      label {
+        display: block;
+        margin-bottom: $spacing-xs;
+        font-weight: 500;
+        color: $text-primary;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        padding: $spacing-sm;
+        background: rgba($bg-darker, 0.5);
+        border: 1px solid rgba($cosmic-purple, 0.3);
+        border-radius: $radius-md;
+        color: $text-primary;
+        font-family: inherit;
+        font-size: $font-size-base;
+        transition: $transition-base;
+
+        &:focus {
+          outline: none;
+          border-color: $cosmic-purple;
+          box-shadow: 0 0 0 3px rgba($cosmic-purple, 0.1);
+        }
+
+        &::placeholder {
+          color: $text-secondary;
+        }
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 120px;
+      }
+    }
+
+    .btn-full {
+      width: 100%;
+    }
+  }
+
+  .success-message {
+    text-align: center;
+    padding: $spacing-xl 0;
+
+    .success-icon {
+      font-size: 4rem;
+      margin-bottom: $spacing-md;
+      animation: scaleIn 0.5s ease;
+    }
+
+    h3 {
+      color: $cosmic-purple;
+      margin-bottom: $spacing-sm;
+    }
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .contact {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}

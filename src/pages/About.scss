@@ -1,0 +1,26 @@
+@use '../styles/variables' as *;
+
+.about {
+  .about-hero {
+    text-align: center;
+    margin-bottom: $spacing-xl;
+
+    h1 {
+      margin-bottom: $spacing-md;
+    }
+
+    .lead {
+      font-size: $font-size-xl;
+    }
+  }
+
+  .about-content,
+  .tech-stack {
+    margin-bottom: $spacing-xl;
+  }
+
+  .tech-icon {
+    font-size: 3rem;
+    margin-bottom: $spacing-md;
+  }
+}
