@@ -40,9 +40,6 @@ tmp/
 temp/
 *.tmp
 
-# Build artifacts (will be regenerated)
-dist/
-
 # OS files
 .DS_Store
 Thumbs.db
