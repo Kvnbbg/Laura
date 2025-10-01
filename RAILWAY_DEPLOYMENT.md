@@ -31,9 +31,10 @@ value = "production"                          # Set production environment
 Since Vite builds a static SPA, we need a server to serve the files. We use `sirv-cli`:
 
 - **Package**: `sirv-cli` (added to production dependencies)
-- **Command**: `sirv dist --port ${PORT:-3000} --cors --single`
+- **Command**: `sirv dist --host 0.0.0.0 --port ${PORT:-3000} --cors --single`
 - **Features**:
   - Serves files from the `dist/` folder
+  - Binds to all network interfaces (`--host 0.0.0.0`) for Railway accessibility
   - Supports SPA routing (`--single` flag)
   - CORS enabled
   - Uses Railway's `PORT` environment variable (defaults to 3000 locally)
@@ -169,6 +170,9 @@ The production build creates:
 - Railway checks `/` endpoint
 - Ensure the server starts within the timeout period (100 seconds)
 - Check that the app responds on the Railway-provided PORT
+- **Important**: Make sure `sirv` is binding to `0.0.0.0` (all interfaces) not just `localhost`
+  - Use `--host 0.0.0.0` flag in the serve command
+  - This allows Railway's healthcheck to reach your application from outside the container
 
 ## Performance Optimizations
 
