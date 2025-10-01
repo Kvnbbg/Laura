@@ -63,6 +63,7 @@ npm run dev
 
 - `npm run dev` - Start development server with hot reload
 - `npm run build` - Build for production
+- `npm run serve` - Serve the production build (for Railway deployment)
 - `npm run preview` - Preview production build locally
 - `npm run lint` - Run ESLint to check code quality
 
@@ -124,6 +125,7 @@ Laura/
 ├── package.json          # Dependencies and scripts
 ├── tsconfig.json         # TypeScript configuration
 ├── vite.config.ts        # Vite configuration
+├── railway.toml          # Railway deployment config
 └── README.md            # This file
 ```
 
@@ -172,6 +174,44 @@ $cosmic-blue: #3b82f6;
 2. Create corresponding SCSS file
 3. Add route in `src/App.tsx`
 4. Add navigation link in `src/components/Navigation.tsx`
+
+## 🚢 Deployment
+
+### Deploying to Railway
+
+This project is production-ready and configured for Railway deployment with the included `railway.toml` file.
+
+**Steps to deploy:**
+
+1. **Push your code to GitHub**
+2. **Visit [railway.app](https://railway.app)** and sign in with GitHub
+3. **Click "New Project" → "Deploy from GitHub repo"**
+4. **Select this repository**
+5. Railway will automatically:
+   - Detect the `railway.toml` configuration
+   - Install dependencies with `npm install`
+   - Build the project with `npm run build`
+   - Start the server with `npm run serve`
+   - Assign a public URL to your app
+
+**What's configured:**
+- **Build command:** `npm install && npm run build`
+- **Start command:** `npm run serve` (serves the static site with sirv)
+- **Health check:** Configured on `/` path
+- **Environment:** NODE_ENV set to production
+- **Port:** Automatically provided by Railway (defaults to 3000 locally)
+
+The application uses `sirv-cli` to serve the built static files with:
+- Single Page Application (SPA) mode for client-side routing
+- CORS enabled
+- Proper caching headers
+
+### Other Deployment Options
+
+- **Vercel:** Connect your GitHub repo for automatic deployments
+- **Netlify:** Drag and drop the `dist/` folder
+- **GitHub Pages:** Use `gh-pages` package
+- **Any static host:** Upload contents of `dist/` folder
 
 ## 📄 License
 

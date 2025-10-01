@@ -21,7 +21,8 @@ Welcome to your new React application with scss-cosmic-dream integration! 🌟
 
 - `npm run dev` - Start development server with hot reload
 - `npm run build` - Build for production (outputs to `dist/`)
-- `npm run preview` - Preview production build locally
+- `npm run serve` - Serve the production build locally (for testing)
+- `npm run preview` - Preview production build locally (using Vite)
 - `npm run lint` - Check code quality with ESLint
 
 ## Project Structure
@@ -45,6 +46,7 @@ Laura/
 │   └── main.tsx        # Application entry
 ├── index.html          # HTML template
 ├── vite.config.ts      # Vite configuration
+├── railway.toml        # Railway deployment config
 └── package.json        # Dependencies
 ```
 
@@ -121,10 +123,32 @@ The `dist/` folder contains optimized production files ready to deploy.
 
 ### Deploy Options
 
+- **Railway:** Push to GitHub and connect your repo at [railway.app](https://railway.app). Railway will automatically detect the `railway.toml` configuration and deploy your app.
 - **Vercel:** Connect your GitHub repo for automatic deployments
 - **Netlify:** Drag and drop the `dist/` folder
 - **GitHub Pages:** Use `gh-pages` package
 - **Any static host:** Upload contents of `dist/` folder
+
+### Deploying to Railway
+
+This project is configured for Railway deployment with the included `railway.toml` file.
+
+1. **Push your code to GitHub**
+2. **Visit [railway.app](https://railway.app)** and sign in
+3. **Click "New Project" → "Deploy from GitHub repo"**
+4. **Select this repository**
+5. Railway will automatically:
+   - Detect the `railway.toml` configuration
+   - Install dependencies with `npm install`
+   - Build the project with `npm run build`
+   - Start the server with `npm run serve`
+   - Assign a public URL to your app
+
+The `railway.toml` file configures:
+- Build command: `npm install && npm run build`
+- Start command: `npm run serve`
+- Health check settings
+- Environment variables (NODE_ENV=production)
 
 ## Next Steps
 
