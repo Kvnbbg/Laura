@@ -1,0 +1,90 @@
+@use 'variables' as *;
+
+// Reset and base styles
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  line-height: 1.6;
+  color: $text-primary;
+  background: $gradient-dark;
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+// Cosmic background effect
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(ellipse at top, rgba($cosmic-purple, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom, rgba($cosmic-blue, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+code {
+  font-family: $font-family-mono;
+  background: rgba($cosmic-purple, 0.1);
+  padding: 0.2rem 0.4rem;
+  border-radius: $radius-sm;
+}
+
+a {
+  color: $cosmic-purple;
+  text-decoration: none;
+  transition: $transition-base;
+
+  &:hover {
+    color: $cosmic-cyan;
+  }
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: $spacing-md;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: $font-size-4xl;
+  background: $gradient-cosmic;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+h2 {
+  font-size: $font-size-3xl;
+}
+
+h3 {
+  font-size: $font-size-2xl;
+}
+
+p {
+  margin-bottom: $spacing-md;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}

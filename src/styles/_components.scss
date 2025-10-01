@@ -1,0 +1,174 @@
+@use 'variables' as *;
+
+// Button styles
+.btn {
+  display: inline-block;
+  padding: $spacing-sm $spacing-lg;
+  font-size: $font-size-base;
+  font-weight: 500;
+  border: none;
+  border-radius: $radius-md;
+  transition: $transition-base;
+  cursor: pointer;
+  text-align: center;
+
+  &-primary {
+    background: $gradient-cosmic;
+    color: $text-primary;
+    box-shadow: $shadow-cosmic;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: $shadow-cosmic, $shadow-lg;
+    }
+  }
+
+  &-secondary {
+    background: transparent;
+    border: 2px solid $cosmic-purple;
+    color: $cosmic-purple;
+
+    &:hover {
+      background: rgba($cosmic-purple, 0.1);
+      border-color: $cosmic-cyan;
+      color: $cosmic-cyan;
+    }
+  }
+
+  &-outline {
+    background: transparent;
+    border: 1px solid $text-secondary;
+    color: $text-primary;
+
+    &:hover {
+      border-color: $cosmic-purple;
+      color: $cosmic-purple;
+    }
+  }
+}
+
+// Card styles
+.card {
+  background: rgba($bg-light, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba($cosmic-purple, 0.2);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-md;
+  transition: $transition-base;
+
+  &:hover {
+    border-color: rgba($cosmic-purple, 0.4);
+    box-shadow: $shadow-cosmic;
+    transform: translateY(-4px);
+  }
+}
+
+// Container styles
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 $spacing-md;
+  width: 100%;
+}
+
+// Grid system
+.grid {
+  display: grid;
+  gap: $spacing-lg;
+
+  &-2 {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+
+  &-3 {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+}
+
+// Flex utilities
+.flex {
+  display: flex;
+
+  &-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+// Spacing utilities
+.mt {
+  &-sm { margin-top: $spacing-sm; }
+  &-md { margin-top: $spacing-md; }
+  &-lg { margin-top: $spacing-lg; }
+  &-xl { margin-top: $spacing-xl; }
+}
+
+.mb {
+  &-sm { margin-bottom: $spacing-sm; }
+  &-md { margin-bottom: $spacing-md; }
+  &-lg { margin-bottom: $spacing-lg; }
+  &-xl { margin-bottom: $spacing-xl; }
+}
+
+.py {
+  &-sm { padding-top: $spacing-sm; padding-bottom: $spacing-sm; }
+  &-md { padding-top: $spacing-md; padding-bottom: $spacing-md; }
+  &-lg { padding-top: $spacing-lg; padding-bottom: $spacing-lg; }
+  &-xl { padding-top: $spacing-xl; padding-bottom: $spacing-xl; }
+}
+
+// Text utilities
+.text {
+  &-center { text-align: center; }
+  &-left { text-align: left; }
+  &-right { text-align: right; }
+  
+  &-primary { color: $text-primary; }
+  &-secondary { color: $text-secondary; }
+  &-accent { color: $text-accent; }
+}
+
+// Gradient text
+.gradient-text {
+  background: $gradient-cosmic;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+// Cosmic glow effect
+.cosmic-glow {
+  box-shadow: $shadow-cosmic;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: $shadow-cosmic;
+  }
+  50% {
+    box-shadow: 0 0 30px rgba($cosmic-purple, 0.5), 0 0 60px rgba($cosmic-blue, 0.3);
+  }
+}
+
+// Floating animation
+.float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
