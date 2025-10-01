@@ -10,7 +10,6 @@ The `railway.toml` file configures Railway's behavior:
 
 ```toml
 [build]
-builder = "NIXPACKS"                          # Use Railway's Nixpacks builder
 buildCommand = "npm install && npm run build" # Build the production bundle
 
 [deploy]
@@ -24,6 +23,8 @@ restartPolicyMaxRetries = 10                 # Maximum restart attempts
 name = "NODE_ENV"
 value = "production"                          # Set production environment
 ```
+
+**Note:** Railway automatically detects the builder based on your project structure. The explicit `builder = "NIXPACKS"` line has been removed to use Railway's automatic detection.
 
 ### 2. Static File Server
 
@@ -76,6 +77,8 @@ Created `.railwayignore` to exclude unnecessary files from deployment:
 - Documentation files (except README.md)
 - Git files
 - Temporary files and logs
+
+**Important:** The `dist/` folder is NOT excluded from deployment, as it contains the built application that needs to be served.
 
 ## How to Deploy
 
