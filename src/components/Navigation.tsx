@@ -15,24 +15,18 @@ const Navigation = () => {
           </Link>
           <ul className="nav-links">
             <li>
-              <Link 
-                to="/" 
-                className={isActive('/') ? 'active' : ''}
-              >
+              <Link to="/" className={isActive('/') ? 'active' : ''}>
                 Home
               </Link>
             </li>
             <li>
-              <Link 
-                to="/about" 
-                className={isActive('/about') ? 'active' : ''}
-              >
+              <Link to="/about" className={isActive('/about') ? 'active' : ''}>
                 About
               </Link>
             </li>
             <li>
-              <Link 
-                to="/contact" 
+              <Link
+                to="/contact"
                 className={isActive('/contact') ? 'active' : ''}
               >
                 Contact

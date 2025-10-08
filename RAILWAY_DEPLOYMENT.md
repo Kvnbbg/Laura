@@ -49,8 +49,8 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
-    sourcemap: false,              // No sourcemaps in production
-    minify: 'esbuild',             // Fast minification
+    sourcemap: false, // No sourcemaps in production
+    minify: 'esbuild', // Fast minification
     rollupOptions: {
       output: {
         manualChunks: {
@@ -61,18 +61,19 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    host: true,                    // Expose to network
+    host: true, // Expose to network
   },
   preview: {
     port: 3000,
     host: true,
   },
-})
+});
 ```
 
 ### 4. Railway Ignore File
 
 Created `.railwayignore` to exclude unnecessary files from deployment:
+
 - Source files (`src/`) - already compiled to `dist/`
 - Development configuration
 - Documentation files (except README.md)
@@ -84,12 +85,14 @@ Created `.railwayignore` to exclude unnecessary files from deployment:
 ## How to Deploy
 
 ### Prerequisites
+
 - A GitHub account
 - A Railway account (sign up at [railway.app](https://railway.app))
 
 ### Deployment Steps
 
 1. **Push your code to GitHub**
+
    ```bash
    git add .
    git commit -m "Your commit message"
@@ -119,11 +122,13 @@ Created `.railwayignore` to exclude unnecessary files from deployment:
 You can test the production build locally:
 
 1. **Build the project:**
+
    ```bash
    npm run build
    ```
 
 2. **Serve the production build:**
+
    ```bash
    npm run serve
    ```
@@ -136,6 +141,7 @@ You can test the production build locally:
 ## Environment Variables
 
 Railway automatically provides:
+
 - `PORT` - The port your app should listen on
 - `NODE_ENV` - Set to "production" via railway.toml
 
@@ -144,6 +150,7 @@ You can add additional environment variables in the Railway dashboard if needed.
 ## Build Output
 
 The production build creates:
+
 - `dist/index.html` - Main HTML file
 - `dist/assets/` - Optimized JS and CSS files
   - Separate vendor chunk for React libraries
@@ -153,20 +160,24 @@ The production build creates:
 ## Troubleshooting
 
 ### Build Fails
+
 - Check that all dependencies are in `package.json`
 - Verify TypeScript compiles without errors: `npm run build`
 - Check Railway build logs for specific errors
 
 ### App Won't Start
+
 - Verify `npm run serve` works locally
 - Check that `dist/` folder exists and has content
 - Review Railway deployment logs
 
 ### Routes Return 404
+
 - Ensure `--single` flag is in the serve command
 - This enables SPA mode for React Router
 
 ### Health Check Fails
+
 - Railway checks `/` endpoint
 - Ensure the server starts within the timeout period (100 seconds)
 - Check that the app responds on the Railway-provided PORT
@@ -194,6 +205,7 @@ The configuration includes several optimizations:
 ## Monitoring
 
 Railway provides:
+
 - Real-time logs
 - Metrics dashboard
 - Deployment history
@@ -202,6 +214,7 @@ Railway provides:
 ## Cost
 
 Railway offers:
+
 - Free tier for hobby projects
 - Pay-as-you-go for production apps
 - No credit card required for initial deployment
@@ -211,6 +224,7 @@ For more information, visit [Railway's pricing page](https://railway.app/pricing
 ## Support
 
 For issues related to:
+
 - **The app**: Check the main README.md and GETTING_STARTED.md
 - **Railway**: Visit [Railway's documentation](https://docs.railway.app)
 - **Deployment configuration**: Review this guide and railway.toml

@@ -6,9 +6,7 @@ const Home = () => {
     <div className="home">
       <div className="container">
         <section className="hero">
-          <h1 className="hero-title float">
-            Welcome to Laura
-          </h1>
+          <h1 className="hero-title float">Welcome to Laura</h1>
           <p className="hero-subtitle">
             AI Float Cosmic Dream - Your Professional Cosmic Companion
           </p>
@@ -29,21 +27,24 @@ const Home = () => {
               <div className="feature-icon cosmic-glow">🌟</div>
               <h3>Cosmic Design</h3>
               <p className="text-secondary">
-                Experience stunning cosmic-inspired design with smooth gradients and animations.
+                Experience stunning cosmic-inspired design with smooth gradients
+                and animations.
               </p>
             </div>
             <div className="card">
               <div className="feature-icon cosmic-glow">⚡</div>
               <h3>Lightning Fast</h3>
               <p className="text-secondary">
-                Built with React and Vite for blazing-fast performance and instant hot reload.
+                Built with React and Vite for blazing-fast performance and
+                instant hot reload.
               </p>
             </div>
             <div className="card">
               <div className="feature-icon cosmic-glow">🎨</div>
               <h3>SCSS Powered</h3>
               <p className="text-secondary">
-                Fully styled with scss-cosmic-dream for maintainable and beautiful styles.
+                Fully styled with scss-cosmic-dream for maintainable and
+                beautiful styles.
               </p>
             </div>
           </div>
@@ -53,7 +54,8 @@ const Home = () => {
           <div className="card cta-card text-center">
             <h2>Ready to Start Your Journey?</h2>
             <p className="text-secondary mb-lg">
-              Explore the cosmic dream with Laura and discover endless possibilities.
+              Explore the cosmic dream with Laura and discover endless
+              possibilities.
             </p>
             <Link to="/contact" className="btn btn-primary">
               Start Now
