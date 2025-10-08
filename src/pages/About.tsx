@@ -16,25 +16,26 @@ const About = () => {
             <div className="card">
               <h2>🌌 Our Vision</h2>
               <p className="text-secondary">
-                Laura represents the fusion of artificial intelligence and cosmic inspiration. 
-                We believe in creating beautiful, functional experiences that inspire creativity 
-                and innovation.
+                Laura represents the fusion of artificial intelligence and
+                cosmic inspiration. We believe in creating beautiful, functional
+                experiences that inspire creativity and innovation.
               </p>
               <p className="text-secondary">
-                Our cosmic dream theme reflects the infinite possibilities of technology and 
-                the beauty of the universe we explore together.
+                Our cosmic dream theme reflects the infinite possibilities of
+                technology and the beauty of the universe we explore together.
               </p>
             </div>
 
             <div className="card">
               <h2>💫 Our Mission</h2>
               <p className="text-secondary">
-                To provide a professional, elegant platform that showcases the power of modern 
-                web technologies combined with stunning design aesthetics.
+                To provide a professional, elegant platform that showcases the
+                power of modern web technologies combined with stunning design
+                aesthetics.
               </p>
               <p className="text-secondary">
-                We strive to create experiences that are both visually captivating and 
-                technically excellent.
+                We strive to create experiences that are both visually
+                captivating and technically excellent.
               </p>
             </div>
           </div>
@@ -67,9 +68,7 @@ const About = () => {
             <div className="card text-center">
               <div className="tech-icon">🛣️</div>
               <h3>React Router</h3>
-              <p className="text-secondary">
-                Smooth client-side navigation
-              </p>
+              <p className="text-secondary">Smooth client-side navigation</p>
             </div>
             <div className="card text-center">
               <div className="tech-icon">📘</div>
@@ -81,9 +80,7 @@ const About = () => {
             <div className="card text-center">
               <div className="tech-icon">🎯</div>
               <h3>Modern CSS</h3>
-              <p className="text-secondary">
-                Flexbox, Grid, and animations
-              </p>
+              <p className="text-secondary">Flexbox, Grid, and animations</p>
             </div>
           </div>
         </section>

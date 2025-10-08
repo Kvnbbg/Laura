@@ -60,7 +60,7 @@
 
       &:hover {
         color: $text-primary;
-        
+
         &::after {
           width: 80%;
         }
@@ -68,7 +68,7 @@
 
       &.active {
         color: $cosmic-purple;
-        
+
         &::after {
           width: 80%;
         }
@@ -81,7 +81,7 @@
   .navigation {
     .nav-links {
       gap: $spacing-sm;
-      
+
       a {
         font-size: $font-size-base;
         padding: $spacing-xs;

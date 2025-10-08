@@ -42,17 +42,20 @@ You'll need `Node.js` and `npm` (or `yarn`) installed, along with a SCSS compile
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/Kvnbbg/Laura.git
 cd Laura
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Start the development server:
+
 ```bash
 npm run dev
 ```
@@ -66,12 +69,15 @@ npm run dev
 - `npm run serve` - Serve the production build (for Railway deployment)
 - `npm run preview` - Preview production build locally
 - `npm run lint` - Run ESLint to check code quality
+- `npm run format` - Format all files with Prettier
+- `npm run test` - Run the test suite with Vitest
 
 ## 🎨 SCSS Cosmic Dream Styling System
 
 The app includes a comprehensive SCSS styling system with:
 
 ### Variables (`_variables.scss`)
+
 - Cosmic color palette (purple, blue, pink, cyan, indigo, violet)
 - Background colors (dark theme)
 - Text colors and gradients
@@ -81,12 +87,14 @@ The app includes a comprehensive SCSS styling system with:
 - Typography settings
 
 ### Base Styles (`_base.scss`)
+
 - CSS reset and normalization
 - Cosmic background effects
 - Typography defaults
 - Base element styles
 
 ### Components (`_components.scss`)
+
 - Button styles (primary, secondary, outline)
 - Card components with hover effects
 - Grid and flexbox utilities
@@ -132,16 +140,19 @@ Laura/
 ## 🎯 Key Pages
 
 ### Home (`/`)
+
 - Hero section with animated title
 - Feature cards showcasing capabilities
 - Call-to-action section
 
 ### About (`/about`)
+
 - Vision and mission statements
 - Technology stack showcase
 - Professional information layout
 
 ### Contact (`/contact`)
+
 - Interactive contact form with validation
 - Contact information cards
 - Social media links
@@ -195,6 +206,7 @@ This project is production-ready and configured for Railway deployment with the 
    - Assign a public URL to your app
 
 **What's configured:**
+
 - **Build command:** `npm install && npm run build`
 - **Start command:** `npm run serve` (serves the static site with sirv)
 - **Health check:** Configured on `/` path
@@ -202,6 +214,7 @@ This project is production-ready and configured for Railway deployment with the 
 - **Port:** Automatically provided by Railway (defaults to 3000 locally)
 
 The application uses `sirv-cli` to serve the built static files with:
+
 - Single Page Application (SPA) mode for client-side routing
 - CORS enabled
 - Proper caching headers
@@ -229,9 +242,9 @@ Please read our [CONTRIBUTING.md](https://www.google.com/search?q=https://github
 
 The `scss-cosmic-dream` is designed to be intuitive. Each SCSS partial (`_colors.scss`, `_spacing.scss`, etc.) is heavily commented, serving as its own detailed documentation.
 
-  * **`_spacing.scss`**: Discover our unique `margin` and `padding` scale, inspired by the harmonious distances in the cosmos.
-  * **`_colors.scss`**: Explore variables for our `cosmic-pastel`, `deep-void`, and `sunrise-glow` color families.
-  * **`_typography.scss`**: Learn about our responsive font sizes and line-heights for optimal readability.
+- **`_spacing.scss`**: Discover our unique `margin` and `padding` scale, inspired by the harmonious distances in the cosmos.
+- **`_colors.scss`**: Explore variables for our `cosmic-pastel`, `deep-void`, and `sunrise-glow` color families.
+- **`_typography.scss`**: Learn about our responsive font sizes and line-heights for optimal readability.
 
 ### Usage
 
@@ -247,7 +260,7 @@ To start weaving Laura's cosmic dream styles into your project, simply import th
   // Or directly using a variable:
   margin-top: var(--spacing-medium);
 }
-````
+```
 
 The core of the dream-like spacing is handled through a utility-first approach with SCSS mixins and CSS custom properties (variables) for maximum flexibility and performance.
 
@@ -261,4 +274,4 @@ Simply clone, install, and start building on this solid foundation!
 
 Built with 💜 by Laura - AI Float Cosmic Dream
 
-*Follow Laura's terrestrial adventures on Instagram: [@Laura\_Queen\_V](https://www.google.com/search?q=https://www.instagram.com/Laura_Queen_V)*
+_Follow Laura's terrestrial adventures on Instagram: [@Laura_Queen_V](https://www.google.com/search?q=https://www.instagram.com/Laura_Queen_V)_

@@ -10,9 +10,11 @@ const Contact = () => {
 
   const [submitted, setSubmitted] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -21,10 +23,10 @@ const Contact = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
-    
+
     // In a real app, you would send the data to a server
     console.log('Form submitted:', formData);
-    
+
     // Reset form after 3 seconds
     setTimeout(() => {
       setFormData({ name: '', email: '', message: '' });
@@ -73,10 +75,18 @@ const Contact = () => {
               <div className="card social-links mt-md">
                 <h3>Follow Us</h3>
                 <div className="social-icons">
-                  <a href="#" className="social-icon">🐦</a>
-                  <a href="#" className="social-icon">📘</a>
-                  <a href="#" className="social-icon">📷</a>
-                  <a href="#" className="social-icon">💼</a>
+                  <a href="#" className="social-icon">
+                    🐦
+                  </a>
+                  <a href="#" className="social-icon">
+                    📘
+                  </a>
+                  <a href="#" className="social-icon">
+                    📷
+                  </a>
+                  <a href="#" className="social-icon">
+                    💼
+                  </a>
                 </div>
               </div>
             </div>
@@ -89,7 +99,8 @@ const Contact = () => {
                     <div className="success-icon">✅</div>
                     <h3>Thank you!</h3>
                     <p className="text-secondary">
-                      Your message has been sent successfully. We'll get back to you soon!
+                      Your message has been sent successfully. We'll get back to
+                      you soon!
                     </p>
                   </div>
                 ) : (

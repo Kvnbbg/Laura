@@ -105,35 +105,75 @@
 
 // Spacing utilities
 .mt {
-  &-sm { margin-top: $spacing-sm; }
-  &-md { margin-top: $spacing-md; }
-  &-lg { margin-top: $spacing-lg; }
-  &-xl { margin-top: $spacing-xl; }
+  &-sm {
+    margin-top: $spacing-sm;
+  }
+  &-md {
+    margin-top: $spacing-md;
+  }
+  &-lg {
+    margin-top: $spacing-lg;
+  }
+  &-xl {
+    margin-top: $spacing-xl;
+  }
 }
 
 .mb {
-  &-sm { margin-bottom: $spacing-sm; }
-  &-md { margin-bottom: $spacing-md; }
-  &-lg { margin-bottom: $spacing-lg; }
-  &-xl { margin-bottom: $spacing-xl; }
+  &-sm {
+    margin-bottom: $spacing-sm;
+  }
+  &-md {
+    margin-bottom: $spacing-md;
+  }
+  &-lg {
+    margin-bottom: $spacing-lg;
+  }
+  &-xl {
+    margin-bottom: $spacing-xl;
+  }
 }
 
 .py {
-  &-sm { padding-top: $spacing-sm; padding-bottom: $spacing-sm; }
-  &-md { padding-top: $spacing-md; padding-bottom: $spacing-md; }
-  &-lg { padding-top: $spacing-lg; padding-bottom: $spacing-lg; }
-  &-xl { padding-top: $spacing-xl; padding-bottom: $spacing-xl; }
+  &-sm {
+    padding-top: $spacing-sm;
+    padding-bottom: $spacing-sm;
+  }
+  &-md {
+    padding-top: $spacing-md;
+    padding-bottom: $spacing-md;
+  }
+  &-lg {
+    padding-top: $spacing-lg;
+    padding-bottom: $spacing-lg;
+  }
+  &-xl {
+    padding-top: $spacing-xl;
+    padding-bottom: $spacing-xl;
+  }
 }
 
 // Text utilities
 .text {
-  &-center { text-align: center; }
-  &-left { text-align: left; }
-  &-right { text-align: right; }
-  
-  &-primary { color: $text-primary; }
-  &-secondary { color: $text-secondary; }
-  &-accent { color: $text-accent; }
+  &-center {
+    text-align: center;
+  }
+  &-left {
+    text-align: left;
+  }
+  &-right {
+    text-align: right;
+  }
+
+  &-primary {
+    color: $text-primary;
+  }
+  &-secondary {
+    color: $text-secondary;
+  }
+  &-accent {
+    color: $text-accent;
+  }
 }
 
 // Gradient text
@@ -151,11 +191,14 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: $shadow-cosmic;
   }
   50% {
-    box-shadow: 0 0 30px rgba($cosmic-purple, 0.5), 0 0 60px rgba($cosmic-blue, 0.3);
+    box-shadow:
+      0 0 30px rgba($cosmic-purple, 0.5),
+      0 0 60px rgba($cosmic-blue, 0.3);
   }
 }
 
@@ -165,7 +208,8 @@
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {

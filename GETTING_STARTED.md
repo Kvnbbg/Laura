@@ -5,11 +5,13 @@ Welcome to your new React application with scss-cosmic-dream integration! 🌟
 ## Quick Start
 
 1. **Install dependencies:**
+
    ```bash
    npm install
    ```
 
 2. **Start the development server:**
+
    ```bash
    npm run dev
    ```
@@ -74,6 +76,7 @@ $cosmic-blue: #your-color;
 ### Modify the Theme
 
 All theme settings are in `src/styles/_variables.scss`:
+
 - Colors and gradients
 - Spacing and sizing
 - Typography
@@ -145,6 +148,7 @@ This project is configured for Railway deployment with the included `railway.tom
    - Assign a public URL to your app
 
 The `railway.toml` file configures:
+
 - Build command: `npm install && npm run build`
 - Start command: `npm run serve`
 - Health check settings
@@ -161,6 +165,7 @@ The `railway.toml` file configures:
 ## Support
 
 For questions or issues:
+
 - Check the [README.md](README.md) for detailed documentation
 - Review the code comments
 - Explore the existing components for examples

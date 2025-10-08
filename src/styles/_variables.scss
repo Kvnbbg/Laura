@@ -17,8 +17,18 @@ $text-secondary: #a8a8b3;
 $text-accent: $cosmic-purple;
 
 // Gradients
-$gradient-cosmic: linear-gradient(135deg, $cosmic-purple 0%, $cosmic-blue 50%, $cosmic-cyan 100%);
-$gradient-cosmic-alt: linear-gradient(135deg, $cosmic-pink 0%, $cosmic-violet 50%, $cosmic-indigo 100%);
+$gradient-cosmic: linear-gradient(
+  135deg,
+  $cosmic-purple 0%,
+  $cosmic-blue 50%,
+  $cosmic-cyan 100%
+);
+$gradient-cosmic-alt: linear-gradient(
+  135deg,
+  $cosmic-pink 0%,
+  $cosmic-violet 50%,
+  $cosmic-indigo 100%
+);
 $gradient-dark: linear-gradient(180deg, $bg-darker 0%, $bg-dark 100%);
 
 // Spacing
@@ -38,11 +48,16 @@ $radius-full: 9999px;
 $shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
 $shadow-md: 0 4px 6px rgba(0, 0, 0, 0.2);
 $shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
-$shadow-cosmic: 0 0 20px rgba($cosmic-purple, 0.3), 0 0 40px rgba($cosmic-blue, 0.2);
+$shadow-cosmic:
+  0 0 20px rgba($cosmic-purple, 0.3),
+  0 0 40px rgba($cosmic-blue, 0.2);
 
 // Typography
-$font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-$font-family-mono: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+$font-family-base:
+  -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+  'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+$font-family-mono:
+  source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 
 // Font sizes
 $font-size-xs: 0.75rem;
