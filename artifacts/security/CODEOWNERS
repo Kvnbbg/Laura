@@ -1,0 +1,18 @@
+# CODEOWNERS assigns default reviewers for path patterns.
+# Update GitHub repository settings to require review from code owners on protected branches.
+
+# Core application code
+/src/* @cosmic-dream/frontend-team
+
+# Styling system
+/src/styles/* @cosmic-dream/design-systems
+
+# Build & infrastructure configs
+/vite.config.ts @cosmic-dream/tooling
+/railway.toml @cosmic-dream/platform
+
+# Documentation
+/*.md @cosmic-dream/docs
+
+# Security sensitive files
+/artifacts/security/* @cosmic-dream/security
