@@ -1,0 +1,166 @@
+name: Modernized CI/CD
+
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+    branches: ["main", "develop"]
+  schedule:
+    - cron: "0 6 * * 1" # Weekly dependency and security scan
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  install-and-cache:
+    name: Install Dependencies & Cache
+    runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.cache-deps.outputs.cache-primary-key }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Upload build cache
+        id: cache-deps
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+
+  lint-test-build:
+    name: Lint, Test, Build
+    needs: install-and-cache
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Restore dependency cache
+        id: cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ needs.install-and-cache.outputs.cache-key }}
+
+      - name: Install dependencies (fallback)
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run unit tests with Vitest
+        run: npm run test -- --coverage
+
+      - name: Build application
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+  sast-and-dependency-scan:
+    name: SAST & Dependency Scanning
+    needs: install-and-cache
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+      - name: Audit npm dependencies
+        run: npm audit --audit-level=high
+
+  deploy-preview:
+    name: Deploy Preview to Railway
+    if: github.event_name == 'pull_request'
+    needs: [lint-test-build, sast-and-dependency-scan]
+    runs-on: ubuntu-latest
+    environment:
+      name: preview
+      url: ${{ steps.deploy.outputs.preview-url }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Deploy to Railway
+        id: deploy
+        uses: railwayapp/action-deploy@v3
+        with:
+          serviceId: ${{ secrets.RAILWAY_SERVICE_ID }}
+          apiToken: ${{ secrets.RAILWAY_API_TOKEN }}
+          environment: preview
+
+  release:
+    name: Promote to Production
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [lint-test-build, sast-and-dependency-scan]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Publish build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-dist
+          path: dist
+
+      - name: Trigger Railway production deploy
+        uses: railwayapp/action-deploy@v3
+        with:
+          serviceId: ${{ secrets.RAILWAY_SERVICE_ID }}
+          apiToken: ${{ secrets.RAILWAY_API_TOKEN }}
+          environment: production
