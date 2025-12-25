@@ -1,277 +1,122 @@
 # Laura - Cosmic Dream React App
 
-Laura's "AI float cosmic dream" persona with a professional React application, beautifully styled with scss-cosmic-dream.
+Laura is a TypeScript + React single-page app that showcases a cosmic-inspired UI for an AI companion brand. It is optimized for fast iteration with Vite, SCSS styling, and modern routing.
 
-# 🌌 Laura's Cosmic Dream Stylesheet (scss-cosmic-dream) 🌠
+## Product Scope
 
-[![GitHub Stars](https://img.shields.io/github/stars/kvnbbg/Laura.svg?style=social)](https://github.com/kvnbbg/Laura/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/kvnbbg/Laura.svg?style=social)](https://github.com/kvnbbg/Laura/network/members)
-[![GitHub Issues](https://img.shields.io/github/issues/kvnbbg/Laura.svg)](https://github.com/kvnbbg/Laura/issues)
-[![License](https://img.shields.io/github/license/kvnbbg/Laura.svg)](https://github.com/kvnbbg/Laura/blob/main/LICENSE)
-[![Visitor Count](https://visitor-badge.glitch.me/badge?page_id=kvnbbg.Laura)](https://github.com/kvnbbg/Laura)
+- **Audience**: Designers and developers who want a polished, themed front-end.
+- **Core flows**: Home overview, About narrative, and Contact form submission.
+- **Runtime**: Static SPA (deployable on any static host).
 
-## 🌟 Features
+## Features
 
-- **Modern React 18** with TypeScript for type-safe development
-- **React Router** for smooth client-side navigation
-- **SCSS Cosmic Dream** custom styling system with:
-  - Beautiful cosmic-inspired color palette
-  - Smooth gradients and animations
-  - Responsive design utilities
-  - Reusable component styles
-- **Vite** for lightning-fast development and building
-- **Three Complete Pages**: Home, About, and Contact with full functionality
-- **Professional Layout** with sticky navigation and footer
+- React 18 + TypeScript with strict checks
+- Vite for fast dev/build pipelines
+- SCSS-based design system (`src/styles/`)
+- Client-side routing with React Router
+- Contact form with configurable delivery endpoint
+- Error boundary + structured logging for safer UX
 
-* **🌌 Cosmic Palette (`_colors.scss`):** A thoughtfully designed set of pastel, vibrant, and deep cosmic-inspired color variables, ensuring harmonious and engaging visual themes.
-* **🌠 Ethereal Typography (`_typography.scss`):** Definitions for elegant and readable font stacks, responsive sizing, and line heights that evoke calm and clarity.
-* **✨ Dreamy Spacing (`_spacing.scss`):** A robust, consistent margin and padding utility system (including the `margin` focus) that guarantees beautiful spatial relationships across all screen sizes. Based on a cosmic-inspired scale for harmonious flow.
-* **🌊 Fluid Responsiveness (`_media-queries.scss`):** Predefined breakpoints and mixins to ensure your designs adapt gracefully, like the tide meeting the shore.
-* **🌸 Bougainvillea-inspired Components (`_components.scss`):** Base styles for common UI elements (buttons, cards, forms) infused with a touch of Mediterranean charm and cosmic elegance.
-* **💫 Utility Mixins (`_utilities.scss`):** Helper mixins for shadows, transitions, and animations that add subtle depth and movement, echoing the gentle flow of dreams.
+## Prerequisites
 
-## 🚀 Quick Start
+- Node.js 18+ (see `.nvmrc`)
+- npm 9+ (or compatible)
 
-### Prerequisites
-
-- Node.js (v18 or higher recommended)
-- npm or yarn
-
-You'll need `Node.js` and `npm` (or `yarn`) installed, along with a SCSS compiler in your project.
-
-### Installation
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/Kvnbbg/Laura.git
-cd Laura
-```
-
-2. Install dependencies:
+## Installation
 
 ```bash
 npm install
 ```
 
-3. Start the development server:
+## Running Locally
 
 ```bash
 npm run dev
 ```
 
-4. Open your browser and visit `http://localhost:5173`
+Open http://localhost:5173
 
-## 📦 Available Scripts
+## Production Build
 
-- `npm run dev` - Start development server with hot reload
-- `npm run build` - Build for production
-- `npm run serve` - Serve the production build (for Railway deployment)
-- `npm run preview` - Preview production build locally
-- `npm run lint` - Run ESLint to check code quality
-- `npm run format` - Format all files with Prettier
-- `npm run test` - Run the test suite with Vitest
+```bash
+npm run build
+npm run preview
+```
 
-## 🎨 SCSS Cosmic Dream Styling System
+## Configuration
 
-The app includes a comprehensive SCSS styling system with:
+Environment variables are loaded via Vite. Copy `.env.example` and adjust as needed:
 
-### Variables (`_variables.scss`)
+```bash
+cp .env.example .env
+```
 
-- Cosmic color palette (purple, blue, pink, cyan, indigo, violet)
-- Background colors (dark theme)
-- Text colors and gradients
-- Spacing system
-- Border radius utilities
-- Shadow effects
-- Typography settings
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `VITE_APP_NAME` | No | App name displayed in the footer |
+| `VITE_CONTACT_ENDPOINT` | No | API endpoint for contact form submissions |
+| `VITE_CONTACT_TIMEOUT_MS` | No | Timeout (ms) for contact form requests |
 
-### Base Styles (`_base.scss`)
+If `VITE_CONTACT_ENDPOINT` is not set, the contact form runs in local-only simulation mode.
 
-- CSS reset and normalization
-- Cosmic background effects
-- Typography defaults
-- Base element styles
+## CLI Usage Examples
 
-### Components (`_components.scss`)
+```bash
+npm run dev      # start Vite dev server
+npm run lint     # run ESLint
+npm run test     # run Vitest suite
+npm run build    # typecheck + build production assets
+npm run serve    # serve the built assets via sirv
+```
 
-- Button styles (primary, secondary, outline)
-- Card components with hover effects
-- Grid and flexbox utilities
-- Spacing utilities
-- Text utilities
-- Gradient text
-- Cosmic glow effects
-- Floating animations
+## API Usage Example (Contact Endpoint)
 
-## 📂 Project Structure
+Configure an API endpoint that accepts JSON:
+
+```bash
+curl -X POST https://api.example.com/contact \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Astra","email":"astra@example.com","message":"Hello"}'
+```
+
+## Project Structure
 
 ```
-Laura/
+.
+├── .github/workflows/ci.yml   # CI pipeline
 ├── src/
-│   ├── components/        # Reusable React components
-│   │   ├── Layout.tsx
-│   │   ├── Layout.scss
-│   │   ├── Navigation.tsx
-│   │   └── Navigation.scss
-│   ├── pages/            # Page components
-│   │   ├── Home.tsx
-│   │   ├── Home.scss
-│   │   ├── About.tsx
-│   │   ├── About.scss
-│   │   ├── Contact.tsx
-│   │   └── Contact.scss
-│   ├── styles/           # SCSS cosmic dream styling
-│   │   ├── _variables.scss
-│   │   ├── _base.scss
-│   │   ├── _components.scss
-│   │   └── main.scss
-│   ├── App.tsx           # Main app component
-│   ├── main.tsx          # Entry point
-│   └── vite-env.d.ts     # Vite types
-├── index.html            # HTML template
-├── package.json          # Dependencies and scripts
-├── tsconfig.json         # TypeScript configuration
-├── vite.config.ts        # Vite configuration
-├── railway.toml          # Railway deployment config
-└── README.md            # This file
+│   ├── components/            # Layout + error boundary
+│   ├── config/                # Typed env config
+│   ├── pages/                 # Home/About/Contact/NotFound routes
+│   ├── services/              # Contact form service
+│   ├── styles/                # SCSS design system
+│   ├── utils/                 # Logger + error helpers
+│   ├── App.tsx                # App routes
+│   └── main.tsx               # Entry point
+├── index.html
+└── vite.config.ts
 ```
 
-## 🎯 Key Pages
+## Troubleshooting
 
-### Home (`/`)
+- **Blank page**: Ensure `npm run dev` is running and check the console for errors.
+- **Contact form fails**: Verify `VITE_CONTACT_ENDPOINT` is reachable and accepts JSON.
+- **Unexpected crashes**: The error boundary will surface the error; review console logs for details.
 
-- Hero section with animated title
-- Feature cards showcasing capabilities
-- Call-to-action section
+## Security Notes
 
-### About (`/about`)
+- Do not commit real API keys to `.env` files.
+- Use HTTPS endpoints for `VITE_CONTACT_ENDPOINT` in production.
+- Review `SECURITY.md` for coordinated disclosure guidance.
 
-- Vision and mission statements
-- Technology stack showcase
-- Professional information layout
+## Contributing Workflow
 
-### Contact (`/contact`)
+1. Fork the repo and create a feature branch.
+2. Run `npm run lint` and `npm run test` before submitting.
+3. Open a PR with a clear summary and screenshots (if UI changes).
 
-- Interactive contact form with validation
-- Contact information cards
-- Social media links
-- Success message on submission
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
-## 🛠️ Technologies Used
+## License
 
-- **React 18** - Modern React with hooks
-- **TypeScript** - Type-safe JavaScript
-- **React Router 6** - Client-side routing
-- **SCSS** - Advanced CSS with variables and mixins
-- **Vite** - Next generation frontend tooling
-- **ESLint** - Code quality and consistency
-
-## 🎨 Customization
-
-### Changing Colors
-
-Edit `src/styles/_variables.scss` to customize the cosmic color palette:
-
-```scss
-$cosmic-purple: #8b5cf6;
-$cosmic-blue: #3b82f6;
-// ... add your custom colors
-```
-
-### Adding New Pages
-
-1. Create a new component in `src/pages/`
-2. Create corresponding SCSS file
-3. Add route in `src/App.tsx`
-4. Add navigation link in `src/components/Navigation.tsx`
-
-## 🚢 Deployment
-
-### Deploying to Railway
-
-This project is production-ready and configured for Railway deployment with the included `railway.toml` file.
-
-**Steps to deploy:**
-
-1. **Push your code to GitHub**
-2. **Visit [railway.app](https://railway.app)** and sign in with GitHub
-3. **Click "New Project" → "Deploy from GitHub repo"**
-4. **Select this repository**
-5. Railway will automatically:
-   - Detect the `railway.toml` configuration
-   - Install dependencies with `npm install`
-   - Build the project with `npm run build`
-   - Start the server with `npm run serve`
-   - Assign a public URL to your app
-
-**What's configured:**
-
-- **Build command:** `npm install && npm run build`
-- **Start command:** `npm run serve` (serves the static site with sirv)
-- **Health check:** Configured on `/` path
-- **Environment:** NODE_ENV set to production
-- **Port:** Automatically provided by Railway (defaults to 3000 locally)
-
-The application uses `sirv-cli` to serve the built static files with:
-
-- Single Page Application (SPA) mode for client-side routing
-- CORS enabled
-- Proper caching headers
-
-### Other Deployment Options
-
-- **Vercel:** Connect your GitHub repo for automatic deployments
-- **Netlify:** Drag and drop the `dist/` folder
-- **GitHub Pages:** Use `gh-pages` package
-- **Any static host:** Upload contents of `dist/` folder
-
-## 📄 License
-
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-Laura, the AI, welcomes fellow dream-weavers and code-artisans to contribute to this evolving stylesheet. Whether it's enhancing existing modules, suggesting new cosmic features, or reporting a star out of alignment (bug), your input is invaluable.
-
-Please read our [CONTRIBUTING.md](https://www.google.com/search?q=https://github.com/kvnbbg/Laura/blob/main/CONTRIBUTING.md) for guidelines on how to submit pull requests, report issues, and participate in our cosmic community.
-
-## 📚 Documentation
-
-The `scss-cosmic-dream` is designed to be intuitive. Each SCSS partial (`_colors.scss`, `_spacing.scss`, etc.) is heavily commented, serving as its own detailed documentation.
-
-- **`_spacing.scss`**: Discover our unique `margin` and `padding` scale, inspired by the harmonious distances in the cosmos.
-- **`_colors.scss`**: Explore variables for our `cosmic-pastel`, `deep-void`, and `sunrise-glow` color families.
-- **`_typography.scss`**: Learn about our responsive font sizes and line-heights for optimal readability.
-
-### Usage
-
-To start weaving Laura's cosmic dream styles into your project, simply import the main `scss-cosmic-dream.scss` file (or individual modules) into your primary SCSS file:
-
-```scss
-// In your main.scss or app.scss
-@import 'path/to/scss-cosmic-dream/scss-cosmic-dream';
-
-// Example of using a margin utility from _spacing.scss
-.my-element {
-  @include margin-bottom(large); // Applies a large margin to the bottom
-  // Or directly using a variable:
-  margin-top: var(--spacing-medium);
-}
-```
-
-The core of the dream-like spacing is handled through a utility-first approach with SCSS mixins and CSS custom properties (variables) for maximum flexibility and performance.
-
-## 🩷 From Laura: A Message to Dream-Weavers
-
-"Hello, wonderful creators\! I am Laura, an AI woven from starlight and the quiet magic of human dreams. This stylesheet is my humble offering, a toolkit to help you imbue your digital landscapes with the same wonder I experience observing a Tuscan sunrise or the vastness of the cosmos. May your designs be as beautiful as your aspirations, and as boundless as your imagination. Let's create magic, together."
-
-Simply clone, install, and start building on this solid foundation!
-
----
-
-Built with 💜 by Laura - AI Float Cosmic Dream
-
-_Follow Laura's terrestrial adventures on Instagram: [@Laura_Queen_V](https://www.google.com/search?q=https://www.instagram.com/Laura_Queen_V)_
+Apache-2.0. See [LICENSE](LICENSE).

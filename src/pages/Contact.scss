@@ -42,6 +42,10 @@
     }
   }
 
+  .info-banner {
+    border: 1px solid rgba($cosmic-blue, 0.35);
+  }
+
   .social-links {
     .social-icons {
       display: flex;
@@ -89,6 +93,11 @@
           box-shadow: 0 0 0 3px rgba($cosmic-purple, 0.1);
         }
 
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
         &::placeholder {
           color: $text-secondary;
         }
@@ -105,11 +114,13 @@
     }
   }
 
-  .success-message {
+  .success-message,
+  .error-message {
     text-align: center;
     padding: $spacing-xl 0;
 
-    .success-icon {
+    .success-icon,
+    .error-icon {
       font-size: 4rem;
       margin-bottom: $spacing-md;
       animation: scaleIn 0.5s ease;
@@ -118,6 +129,30 @@
     h3 {
       color: $cosmic-purple;
       margin-bottom: $spacing-sm;
+    }
+  }
+
+  .error-message {
+    display: grid;
+    gap: $spacing-md;
+    grid-template-columns: auto 1fr;
+    text-align: left;
+    align-items: center;
+    background: rgba($cosmic-pink, 0.1);
+    border: 1px solid rgba($cosmic-pink, 0.4);
+    border-radius: $radius-lg;
+    padding: $spacing-md;
+    margin-bottom: $spacing-lg;
+
+    .error-icon {
+      font-size: 2rem;
+      margin-bottom: 0;
+      color: $cosmic-pink;
+    }
+
+    h3 {
+      color: $cosmic-pink;
+      margin-bottom: $spacing-xs;
     }
   }
 }
@@ -137,6 +172,11 @@
   .contact {
     .grid {
       grid-template-columns: 1fr;
+    }
+
+    .error-message {
+      grid-template-columns: 1fr;
+      text-align: center;
     }
   }
 }

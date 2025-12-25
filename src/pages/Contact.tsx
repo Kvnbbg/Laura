@@ -1,14 +1,43 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { getConfig } from '../config/env';
+import { submitContactForm } from '../services/contactService';
+import { getErrorMessage } from '../utils/errors';
 import './Contact.scss';
 
+type FormStatus = 'idle' | 'sending' | 'success' | 'error';
+
 const Contact = () => {
+  const { contactEndpoint } = getConfig();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: '',
   });
+  const [status, setStatus] = useState<FormStatus>('idle');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const [submitted, setSubmitted] = useState(false);
+  const isSubmitting = status === 'sending';
+  const isSuccess = status === 'success';
+  const hasError = status === 'error';
+
+  useEffect(() => {
+    if (!isSuccess) {
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => {
+      setFormData({ name: '', email: '', message: '' });
+      setStatus('idle');
+    }, 3500);
+
+    return () => window.clearTimeout(timer);
+  }, [isSuccess]);
+
+  const connectionStatus = useMemo(() => {
+    return contactEndpoint
+      ? 'Contact form will send messages to your configured endpoint.'
+      : 'Contact form is running in local-only mode. Add VITE_CONTACT_ENDPOINT to enable delivery.';
+  }, [contactEndpoint]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -20,18 +49,18 @@ const Contact = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setStatus('sending');
+    setErrorMessage(null);
 
-    // In a real app, you would send the data to a server
-    console.log('Form submitted:', formData);
-
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setFormData({ name: '', email: '', message: '' });
-      setSubmitted(false);
-    }, 3000);
+    try {
+      await submitContactForm(formData);
+      setStatus('success');
+    } catch (error) {
+      setStatus('error');
+      setErrorMessage(getErrorMessage(error));
+    }
   };
 
   return (
@@ -40,7 +69,7 @@ const Contact = () => {
         <section className="contact-hero">
           <h1>Get in Touch</h1>
           <p className="lead text-secondary">
-            Have questions? We'd love to hear from you.
+            Have questions? We&apos;d love to hear from you.
           </p>
         </section>
 
@@ -72,6 +101,11 @@ const Contact = () => {
                 </div>
               </div>
 
+              <div className="card info-banner mt-md">
+                <h3>Connection status</h3>
+                <p className="text-secondary">{connectionStatus}</p>
+              </div>
+
               <div className="card social-links mt-md">
                 <h3>Follow Us</h3>
                 <div className="social-icons">
@@ -94,17 +128,26 @@ const Contact = () => {
             <div className="contact-form-wrapper">
               <div className="card">
                 <h2>Send us a Message</h2>
-                {submitted ? (
-                  <div className="success-message">
+                {isSuccess ? (
+                  <div className="success-message" role="status">
                     <div className="success-icon">✅</div>
                     <h3>Thank you!</h3>
                     <p className="text-secondary">
-                      Your message has been sent successfully. We'll get back to
-                      you soon!
+                      Your message has been sent successfully. We&apos;ll get back
+                      to you soon!
                     </p>
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="contact-form">
+                    {hasError && errorMessage ? (
+                      <div className="error-message" role="alert">
+                        <div className="error-icon">⚠️</div>
+                        <div>
+                          <h3>We couldn&apos;t send your message</h3>
+                          <p className="text-secondary">{errorMessage}</p>
+                        </div>
+                      </div>
+                    ) : null}
                     <div className="form-group">
                       <label htmlFor="name">Name</label>
                       <input
@@ -115,6 +158,7 @@ const Contact = () => {
                         onChange={handleChange}
                         required
                         placeholder="Your name"
+                        disabled={isSubmitting}
                       />
                     </div>
                     <div className="form-group">
@@ -127,6 +171,7 @@ const Contact = () => {
                         onChange={handleChange}
                         required
                         placeholder="your.email@example.com"
+                        disabled={isSubmitting}
                       />
                     </div>
                     <div className="form-group">
@@ -139,10 +184,15 @@ const Contact = () => {
                         required
                         rows={5}
                         placeholder="Tell us what's on your mind..."
+                        disabled={isSubmitting}
                       />
                     </div>
-                    <button type="submit" className="btn btn-primary btn-full">
-                      Send Message
+                    <button
+                      type="submit"
+                      className="btn btn-primary btn-full"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? 'Sending...' : 'Send Message'}
                     </button>
                   </form>
                 )}

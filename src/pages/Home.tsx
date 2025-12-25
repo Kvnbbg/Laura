@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom';
+import { getConfig } from '../config/env';
 import './Home.scss';
 
 const Home = () => {
+  const { contactEndpoint } = getConfig();
+
   return (
     <div className="home">
       <div className="container">
@@ -46,6 +49,38 @@ const Home = () => {
                 Fully styled with scss-cosmic-dream for maintainable and
                 beautiful styles.
               </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-xl">
+          <div className="card text-center">
+            <h2>First-run checklist</h2>
+            <p className="text-secondary mb-lg">
+              Launch quickly with sensible defaults, then personalize the cosmic
+              experience.
+            </p>
+            <div className="grid grid-3">
+              <div>
+                <h3>1. Start the app</h3>
+                <p className="text-secondary">
+                  Run <strong>npm run dev</strong> to open the local experience.
+                </p>
+              </div>
+              <div>
+                <h3>2. Configure contact</h3>
+                <p className="text-secondary">
+                  {contactEndpoint
+                    ? 'Contact delivery is connected.'
+                    : 'Add VITE_CONTACT_ENDPOINT to enable form delivery.'}
+                </p>
+              </div>
+              <div>
+                <h3>3. Explore the UI</h3>
+                <p className="text-secondary">
+                  Review the About + Contact pages for content and styling.
+                </p>
+              </div>
             </div>
           </div>
         </section>

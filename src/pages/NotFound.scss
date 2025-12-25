@@ -1,0 +1,16 @@
+.not-found {
+  padding: 4rem 0;
+
+  .card {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  .not-found-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+}

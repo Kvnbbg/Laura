@@ -15,12 +15,20 @@ const Navigation = () => {
           </Link>
           <ul className="nav-links">
             <li>
-              <Link to="/" className={isActive('/') ? 'active' : ''}>
+              <Link
+                to="/"
+                className={isActive('/') ? 'active' : ''}
+                aria-current={isActive('/') ? 'page' : undefined}
+              >
                 Home
               </Link>
             </li>
             <li>
-              <Link to="/about" className={isActive('/about') ? 'active' : ''}>
+              <Link
+                to="/about"
+                className={isActive('/about') ? 'active' : ''}
+                aria-current={isActive('/about') ? 'page' : undefined}
+              >
                 About
               </Link>
             </li>
@@ -28,6 +36,7 @@ const Navigation = () => {
               <Link
                 to="/contact"
                 className={isActive('/contact') ? 'active' : ''}
+                aria-current={isActive('/contact') ? 'page' : undefined}
               >
                 Contact
               </Link>
