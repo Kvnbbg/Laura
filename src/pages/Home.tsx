@@ -53,6 +53,64 @@ const Home = () => {
           </div>
         </section>
 
+        <section className="agentic-roadmap py-xl">
+          <h2 className="text-center mb-lg">Agentic Upgrade Path</h2>
+          <p className="text-secondary text-center mb-lg">
+            Laura is evolving into a full-spectrum AI companion, blending
+            agentic planning, graph orchestration, and cinematic visualization.
+          </p>
+          <div className="grid grid-3">
+            <div className="card">
+              <div className="feature-icon cosmic-glow">🧠</div>
+              <h3>BabyAGI Task Loop</h3>
+              <p className="text-secondary">
+                Continuous goal decomposition, prioritization, and execution for
+                long-running missions.
+              </p>
+            </div>
+            <div className="card">
+              <div className="feature-icon cosmic-glow">🧰</div>
+              <h3>LangChain Tooling</h3>
+              <p className="text-secondary">
+                Unified tool calling, memory, retrieval, and prompt
+                orchestration for multi-modal reasoning.
+              </p>
+            </div>
+            <div className="card">
+              <div className="feature-icon cosmic-glow">🕸️</div>
+              <h3>LangGraph Control</h3>
+              <p className="text-secondary">
+                State-aware agent graphs with checkpoints, retries, and
+                deterministic paths.
+              </p>
+            </div>
+            <div className="card">
+              <div className="feature-icon cosmic-glow">🤖</div>
+              <h3>Auto-GPT Autonomy</h3>
+              <p className="text-secondary">
+                Autonomous goal execution with self-reflection and
+                safety-aligned guardrails.
+              </p>
+            </div>
+            <div className="card">
+              <div className="feature-icon cosmic-glow">🛰️</div>
+              <h3>Mermaid Telemetry</h3>
+              <p className="text-secondary">
+                Live visual blueprints of agent flows, data lineage, and
+                decision paths.
+              </p>
+            </div>
+            <div className="card">
+              <div className="feature-icon cosmic-glow">📡</div>
+              <h3>Streamlit Ops Studio</h3>
+              <p className="text-secondary">
+                Interactive dashboards for operator oversight, metrics, and
+                scenario testing.
+              </p>
+            </div>
+          </div>
+        </section>
+
         <section className="py-xl">
           <div className="card text-center">
             <h2>First-run checklist</h2>

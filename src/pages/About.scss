@@ -15,6 +15,7 @@
   }
 
   .about-content,
+  .agentic-blueprint,
   .tech-stack {
     margin-bottom: $spacing-xl;
   }
@@ -22,5 +23,23 @@
   .tech-icon {
     font-size: 3rem;
     margin-bottom: $spacing-md;
+  }
+
+  .blueprint-list {
+    margin: $spacing-md 0 0;
+    padding-left: $spacing-lg;
+    display: grid;
+    gap: $spacing-sm;
+  }
+
+  .blueprint-code {
+    margin: $spacing-md 0;
+    padding: $spacing-md;
+    border-radius: $radius-lg;
+    background: rgba($bg-dark, 0.6);
+    color: $text-primary;
+    font-family: 'Fira Code', 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    overflow-x: auto;
   }
 }
