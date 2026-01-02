@@ -41,6 +41,56 @@ const About = () => {
           </div>
         </section>
 
+        <section className="agentic-blueprint py-lg">
+          <div className="grid grid-2">
+            <div className="card">
+              <h2>🧭 Agentic Architecture</h2>
+              <p className="text-secondary">
+                Laura is expanding into a multi-agent system with structured
+                reasoning, reliable graph execution, and observability across
+                every decision step.
+              </p>
+              <ul className="text-secondary blueprint-list">
+                <li>
+                  BabyAGI-inspired planning loop for objective expansion and
+                  dynamic reprioritization.
+                </li>
+                <li>
+                  LangChain toolchains for retrieval, memory, and action
+                  routing.
+                </li>
+                <li>
+                  LangGraph orchestration for state checkpoints and controlled
+                  autonomy.
+                </li>
+                <li>
+                  Auto-GPT-inspired feedback loops for self-critique and
+                  quality gating.
+                </li>
+              </ul>
+            </div>
+            <div className="card">
+              <h2>🗺️ Mermaid Blueprint</h2>
+              <p className="text-secondary">
+                Visualize the agent flow for explainability and alignment with
+                operator goals.
+              </p>
+              <pre className="blueprint-code">
+                <code>{`graph TD
+  Intent[User Intent] --> Plan[Planner]
+  Plan --> Tools[LangChain Tools]
+  Tools --> Graph[LangGraph Orchestrator]
+  Graph --> Review[Auto-GPT Review]
+  Review --> Output[Laura Response]`}</code>
+              </pre>
+              <p className="text-secondary">
+                Streamlit dashboards keep humans in the loop with live metrics,
+                traces, and intervention controls.
+              </p>
+            </div>
+          </div>
+        </section>
+
         <section className="tech-stack py-lg">
           <h2 className="text-center mb-lg">Built With Modern Tech</h2>
           <div className="grid grid-3">
