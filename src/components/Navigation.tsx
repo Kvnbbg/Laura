@@ -41,6 +41,15 @@ const Navigation = () => {
                 Contact
               </Link>
             </li>
+            <li>
+              <Link
+                to="/chat"
+                className={isActive('/chat') ? 'active' : ''}
+                aria-current={isActive('/chat') ? 'page' : undefined}
+              >
+                Chat
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
