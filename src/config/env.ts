@@ -4,53 +4,80 @@ export type EnvSource = {
   VITE_APP_NAME?: string;
   VITE_CONTACT_ENDPOINT?: string;
   VITE_CONTACT_TIMEOUT_MS?: string;
+  VITE_CHAT_ENDPOINT?: string;
+  VITE_CHAT_TIMEOUT_MS?: string;
 };
 
 export type AppConfig = {
   appName: string;
   contactEndpoint: string | null;
   contactTimeoutMs: number;
+  chatEndpoint: string | null;
+  chatTimeoutMs: number;
 };
 
 const DEFAULT_TIMEOUT_MS = 5000;
 
-export const createConfig = (env: EnvSource): AppConfig => {
-  const appName = env.VITE_APP_NAME?.trim() || 'Laura';
-  const contactEndpointRaw = env.VITE_CONTACT_ENDPOINT?.trim();
-
-  let contactEndpoint: string | null = null;
-  if (contactEndpointRaw) {
-    try {
-      const url = new URL(contactEndpointRaw);
-      if (!['http:', 'https:'].includes(url.protocol)) {
-        throw new Error('Contact endpoint must use http or https');
-      }
-      contactEndpoint = url.toString();
-    } catch (error) {
-      throw new AppError('CONFIG_INVALID', 'Invalid VITE_CONTACT_ENDPOINT', {
-        cause: error,
-        userMessage:
-          'Contact endpoint configuration is invalid. Please check VITE_CONTACT_ENDPOINT.',
-      });
-    }
+const parseOptionalUrl = (raw: string | undefined, key: string) => {
+  const trimmed = raw?.trim();
+  if (!trimmed) {
+    return null;
   }
 
-  const timeoutValue = env.VITE_CONTACT_TIMEOUT_MS?.trim();
-  const contactTimeoutMs = timeoutValue
-    ? Number(timeoutValue)
-    : DEFAULT_TIMEOUT_MS;
-
-  if (!Number.isFinite(contactTimeoutMs) || contactTimeoutMs <= 0) {
-    throw new AppError('CONFIG_INVALID', 'Invalid VITE_CONTACT_TIMEOUT_MS', {
-      userMessage:
-        'Contact timeout must be a positive number. Please check VITE_CONTACT_TIMEOUT_MS.',
+  try {
+    const url = new URL(trimmed);
+    if (!['http:', 'https:'].includes(url.protocol)) {
+      throw new Error('Endpoint must use http or https');
+    }
+    return url.toString();
+  } catch (error) {
+    throw new AppError('CONFIG_INVALID', `Invalid ${key}`, {
+      cause: error,
+      userMessage: `${key} configuration is invalid. Please check ${key}.`,
     });
   }
+};
+
+const parseTimeout = (raw: string | undefined, key: string) => {
+  const value = raw?.trim();
+  const timeoutMs = value ? Number(value) : DEFAULT_TIMEOUT_MS;
+
+  if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
+    throw new AppError('CONFIG_INVALID', `Invalid ${key}`, {
+      userMessage: `${key} must be a positive number. Please check ${key}.`,
+    });
+  }
+
+  return timeoutMs;
+};
+
+export const createConfig = (env: EnvSource): AppConfig => {
+  const appName = env.VITE_APP_NAME?.trim() || 'Laura';
+
+  const contactEndpoint = parseOptionalUrl(
+    env.VITE_CONTACT_ENDPOINT,
+    'VITE_CONTACT_ENDPOINT'
+  );
+  const chatEndpoint = parseOptionalUrl(
+    env.VITE_CHAT_ENDPOINT,
+    'VITE_CHAT_ENDPOINT'
+  );
+
+  const contactTimeoutMs = parseTimeout(
+    env.VITE_CONTACT_TIMEOUT_MS,
+    'VITE_CONTACT_TIMEOUT_MS'
+  );
+  const chatTimeoutMs = parseTimeout(
+    env.VITE_CHAT_TIMEOUT_MS,
+    'VITE_CHAT_TIMEOUT_MS'
+  );
 
   return {
     appName,
     contactEndpoint,
     contactTimeoutMs,
+    chatEndpoint,
+    chatTimeoutMs,
   };
 };
 

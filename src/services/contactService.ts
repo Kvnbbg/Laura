@@ -1,6 +1,7 @@
 import { getConfig, type AppConfig } from '../config/env';
 import { AppError } from '../utils/errors';
 import { logger } from '../utils/logger';
+import { fetchWithTimeout } from './http';
 
 export type ContactPayload = {
   name: string;
@@ -25,16 +26,16 @@ export const submitContactForm = async (
     return;
   }
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), config.contactTimeoutMs);
-
   try {
-    const response = await fetch(config.contactEndpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      signal: controller.signal,
-    });
+    const response = await fetchWithTimeout(
+      config.contactEndpoint,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      },
+      config.contactTimeoutMs
+    );
 
     if (!response.ok) {
       throw new AppError('CONTACT_SUBMIT_FAILED', 'Contact submission failed', {
@@ -52,7 +53,5 @@ export const submitContactForm = async (
     }
 
     throw error;
-  } finally {
-    clearTimeout(timeout);
   }
 };

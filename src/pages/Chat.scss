@@ -1,0 +1,89 @@
+@use '../styles/variables' as *;
+
+.chat {
+  padding: $spacing-xl 0;
+
+  .chat-hero {
+    text-align: center;
+    margin-bottom: $spacing-xl;
+  }
+
+  .chat-card {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  .chat-messages {
+    max-height: 420px;
+    overflow-y: auto;
+    padding-right: $spacing-sm;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  .chat-message {
+    padding: $spacing-md;
+    border-radius: $radius-md;
+    background: rgba($bg-light, 0.6);
+    border: 1px solid rgba($cosmic-purple, 0.2);
+
+    &__role {
+      font-size: $font-size-sm;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: $text-secondary;
+      margin-bottom: $spacing-xs;
+    }
+
+    &__content {
+      margin: 0;
+      line-height: 1.6;
+    }
+  }
+
+  .chat-message--assistant {
+    border-left: 3px solid $cosmic-cyan;
+  }
+
+  .chat-message--user {
+    border-left: 3px solid $cosmic-purple;
+    background: rgba($cosmic-purple, 0.08);
+  }
+
+  .chat-input {
+    display: flex;
+    gap: $spacing-sm;
+
+    input {
+      flex: 1;
+      padding: $spacing-sm $spacing-md;
+      border-radius: $radius-md;
+      border: 1px solid rgba($cosmic-purple, 0.4);
+      background: rgba($bg-light, 0.5);
+      color: $text-primary;
+
+      &:focus {
+        outline: none;
+        border-color: $cosmic-cyan;
+        box-shadow: 0 0 0 2px rgba($cosmic-cyan, 0.2);
+      }
+    }
+  }
+
+  .chat-error {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    color: $cosmic-cyan;
+    font-size: $font-size-sm;
+  }
+
+  .chat-prompts {
+    margin: $spacing-sm 0 0;
+    padding-left: $spacing-lg;
+    display: grid;
+    gap: $spacing-sm;
+  }
+}
