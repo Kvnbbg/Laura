@@ -1,0 +1,19 @@
+@use '../../styles/variables' as *;
+
+.crm-section-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+
+  h2 {
+    margin-bottom: $spacing-xs;
+  }
+}
+
+.crm-section-action {
+  display: flex;
+  gap: $spacing-sm;
+}

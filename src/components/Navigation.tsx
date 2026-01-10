@@ -50,6 +50,15 @@ const Navigation = () => {
                 Chat
               </Link>
             </li>
+            <li>
+              <Link
+                to="/dashboard"
+                className={isActive('/dashboard') ? 'active' : ''}
+                aria-current={isActive('/dashboard') ? 'page' : undefined}
+              >
+                Dashboard
+              </Link>
+            </li>
           </ul>
         </div>
       </div>

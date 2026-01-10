@@ -4,6 +4,26 @@ import './Home.scss';
 
 const Home = () => {
   const { contactEndpoint, chatEndpoint } = getConfig();
+  const crmHighlights = [
+    {
+      title: 'Unified CRM Workspace',
+      description:
+        'Centralize accounts, contacts, and pipeline intelligence in a single command view.',
+      icon: '🧭',
+    },
+    {
+      title: 'Operational Dashboards',
+      description:
+        'Monitor pipeline health, task load, and engagement signals with quick filters.',
+      icon: '📊',
+    },
+    {
+      title: 'Actionable CRUD Flows',
+      description:
+        'Create, update, and close deals quickly with reusable, consistent components.',
+      icon: '✅',
+    },
+  ];
 
   return (
     <div className="home">
@@ -154,6 +174,24 @@ const Home = () => {
             </p>
             <Link to="/chat" className="btn btn-primary">
               Start Chatting
+            </Link>
+          </div>
+        </section>
+
+        <section className="features py-xl">
+          <h2 className="text-center mb-lg">CRM-Ready Experience</h2>
+          <div className="grid grid-3">
+            {crmHighlights.map((highlight) => (
+              <div key={highlight.title} className="card">
+                <div className="feature-icon cosmic-glow">{highlight.icon}</div>
+                <h3>{highlight.title}</h3>
+                <p className="text-secondary">{highlight.description}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-lg">
+            <Link to="/dashboard" className="btn btn-secondary">
+              Explore the CRM Dashboard
             </Link>
           </div>
         </section>
