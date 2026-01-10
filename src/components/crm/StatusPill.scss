@@ -1,0 +1,32 @@
+@use '../../styles/variables' as *;
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  &--success {
+    background: rgba($cosmic-cyan, 0.2);
+    color: $cosmic-cyan;
+  }
+
+  &--warning {
+    background: rgba($cosmic-pink, 0.2);
+    color: $cosmic-pink;
+  }
+
+  &--info {
+    background: rgba($cosmic-purple, 0.2);
+    color: $cosmic-purple;
+  }
+
+  &--neutral {
+    background: rgba($text-secondary, 0.15);
+    color: $text-secondary;
+  }
+}
