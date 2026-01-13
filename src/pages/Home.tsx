@@ -1,9 +1,91 @@
+import { useState, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { getConfig } from '../config/env';
 import './Home.scss';
 
 const Home = () => {
   const { contactEndpoint, chatEndpoint } = getConfig();
+  const delayStyle = (index: number): CSSProperties =>
+    ({
+      '--delay': `${index * 0.08}s`,
+    }) as CSSProperties;
+
+  const featureCards = [
+    {
+      title: 'Cosmic Design',
+      description:
+        'Experience stunning cosmic-inspired design with smooth gradients and animations.',
+      icon: '🌟',
+    },
+    {
+      title: 'Lightning Fast',
+      description:
+        'Built with React and Vite for blazing-fast performance and instant hot reload.',
+      icon: '⚡',
+    },
+    {
+      title: 'SCSS Powered',
+      description:
+        'Fully styled with scss-cosmic-dream for maintainable and beautiful styles.',
+      icon: '🎨',
+    },
+  ];
+  const agenticCapabilities = [
+    {
+      title: 'BabyAGI Task Loop',
+      description:
+        'Continuous goal decomposition, prioritization, and execution for long-running missions.',
+      icon: '🧠',
+    },
+    {
+      title: 'LangChain Tooling',
+      description:
+        'Unified tool calling, memory, retrieval, and prompt orchestration for multi-modal reasoning.',
+      icon: '🧰',
+    },
+    {
+      title: 'LangGraph Control',
+      description:
+        'State-aware agent graphs with checkpoints, retries, and deterministic paths.',
+      icon: '🕸️',
+    },
+    {
+      title: 'Auto-GPT Autonomy',
+      description:
+        'Autonomous goal execution with self-reflection and safety-aligned guardrails.',
+      icon: '🤖',
+    },
+    {
+      title: 'Mermaid Telemetry',
+      description:
+        'Live visual blueprints of agent flows, data lineage, and decision paths.',
+      icon: '🛰️',
+    },
+    {
+      title: 'Streamlit Ops Studio',
+      description:
+        'Interactive dashboards for operator oversight, metrics, and scenario testing.',
+      icon: '📡',
+    },
+  ];
+  const checklistSteps = [
+    {
+      title: '1. Start the app',
+      description: 'Run npm run dev to open the local experience.',
+    },
+    {
+      title: '2. Configure contact',
+      description: contactEndpoint
+        ? 'Contact delivery is connected.'
+        : 'Add VITE_CONTACT_ENDPOINT to enable form delivery.',
+    },
+    {
+      title: '3. Activate chat',
+      description: chatEndpoint
+        ? 'Chat is connected to your LLM endpoint.'
+        : 'Add VITE_CHAT_ENDPOINT to enable the chat experience.',
+    },
+  ];
   const crmHighlights = [
     {
       title: 'Unified CRM Workspace',
@@ -24,6 +106,47 @@ const Home = () => {
       icon: '✅',
     },
   ];
+  const experienceModes = [
+    {
+      id: 'sales',
+      label: 'Sales Velocity',
+      summary:
+        'Auto-prioritize leads, accelerate follow-ups, and keep pipeline momentum.',
+      metrics: [
+        { label: 'Lead velocity', value: '+32%' },
+        { label: 'Follow-up SLA', value: '2 hours' },
+        { label: 'Win signals', value: 'Realtime' },
+      ],
+      actions: ['Trigger follow-up sequences', 'Draft deal notes', 'Sync calendar'],
+    },
+    {
+      id: 'service',
+      label: 'Service Assurance',
+      summary:
+        'Maintain response quality with guided playbooks, sentiment signals, and auto-tagging.',
+      metrics: [
+        { label: 'CSAT trend', value: '+14%' },
+        { label: 'Escalations', value: '-22%' },
+        { label: 'Resolution time', value: 'Same day' },
+      ],
+      actions: ['Deploy service macros', 'Surface risks', 'Recommend next steps'],
+    },
+    {
+      id: 'ops',
+      label: 'Ops Control',
+      summary:
+        'Monitor health, automate reports, and keep every team aligned daily.',
+      metrics: [
+        { label: 'Automation rate', value: '68%' },
+        { label: 'Weekly reports', value: 'Auto-ready' },
+        { label: 'Process drift', value: 'Low' },
+      ],
+      actions: ['Generate KPI digest', 'Audit workflows', 'Optimize handoffs'],
+    },
+  ];
+  const [activeModeId, setActiveModeId] = useState(experienceModes[0].id);
+  const activeMode =
+    experienceModes.find((mode) => mode.id === activeModeId) ?? experienceModes[0];
 
   return (
     <div className="home">
@@ -46,30 +169,17 @@ const Home = () => {
         <section className="features py-xl">
           <h2 className="text-center mb-lg">Cosmic Features</h2>
           <div className="grid grid-3">
-            <div className="card">
-              <div className="feature-icon cosmic-glow">🌟</div>
-              <h3>Cosmic Design</h3>
-              <p className="text-secondary">
-                Experience stunning cosmic-inspired design with smooth gradients
-                and animations.
-              </p>
-            </div>
-            <div className="card">
-              <div className="feature-icon cosmic-glow">⚡</div>
-              <h3>Lightning Fast</h3>
-              <p className="text-secondary">
-                Built with React and Vite for blazing-fast performance and
-                instant hot reload.
-              </p>
-            </div>
-            <div className="card">
-              <div className="feature-icon cosmic-glow">🎨</div>
-              <h3>SCSS Powered</h3>
-              <p className="text-secondary">
-                Fully styled with scss-cosmic-dream for maintainable and
-                beautiful styles.
-              </p>
-            </div>
+            {featureCards.map((feature, index) => (
+              <div
+                key={feature.title}
+                className="card animated-card"
+                style={delayStyle(index)}
+              >
+                <div className="feature-icon cosmic-glow">{feature.icon}</div>
+                <h3>{feature.title}</h3>
+                <p className="text-secondary">{feature.description}</p>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -80,54 +190,17 @@ const Home = () => {
             agentic planning, graph orchestration, and cinematic visualization.
           </p>
           <div className="grid grid-3">
-            <div className="card">
-              <div className="feature-icon cosmic-glow">🧠</div>
-              <h3>BabyAGI Task Loop</h3>
-              <p className="text-secondary">
-                Continuous goal decomposition, prioritization, and execution for
-                long-running missions.
-              </p>
-            </div>
-            <div className="card">
-              <div className="feature-icon cosmic-glow">🧰</div>
-              <h3>LangChain Tooling</h3>
-              <p className="text-secondary">
-                Unified tool calling, memory, retrieval, and prompt
-                orchestration for multi-modal reasoning.
-              </p>
-            </div>
-            <div className="card">
-              <div className="feature-icon cosmic-glow">🕸️</div>
-              <h3>LangGraph Control</h3>
-              <p className="text-secondary">
-                State-aware agent graphs with checkpoints, retries, and
-                deterministic paths.
-              </p>
-            </div>
-            <div className="card">
-              <div className="feature-icon cosmic-glow">🤖</div>
-              <h3>Auto-GPT Autonomy</h3>
-              <p className="text-secondary">
-                Autonomous goal execution with self-reflection and
-                safety-aligned guardrails.
-              </p>
-            </div>
-            <div className="card">
-              <div className="feature-icon cosmic-glow">🛰️</div>
-              <h3>Mermaid Telemetry</h3>
-              <p className="text-secondary">
-                Live visual blueprints of agent flows, data lineage, and
-                decision paths.
-              </p>
-            </div>
-            <div className="card">
-              <div className="feature-icon cosmic-glow">📡</div>
-              <h3>Streamlit Ops Studio</h3>
-              <p className="text-secondary">
-                Interactive dashboards for operator oversight, metrics, and
-                scenario testing.
-              </p>
-            </div>
+            {agenticCapabilities.map((capability, index) => (
+              <div
+                key={capability.title}
+                className="card animated-card"
+                style={delayStyle(index)}
+              >
+                <div className="feature-icon cosmic-glow">{capability.icon}</div>
+                <h3>{capability.title}</h3>
+                <p className="text-secondary">{capability.description}</p>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -139,28 +212,56 @@ const Home = () => {
               experience.
             </p>
             <div className="grid grid-3">
-              <div>
-                <h3>1. Start the app</h3>
-                <p className="text-secondary">
-                  Run <strong>npm run dev</strong> to open the local experience.
-                </p>
-              </div>
-              <div>
-                <h3>2. Configure contact</h3>
-                <p className="text-secondary">
-                  {contactEndpoint
-                    ? 'Contact delivery is connected.'
-                    : 'Add VITE_CONTACT_ENDPOINT to enable form delivery.'}
-                </p>
-              </div>
-              <div>
-                <h3>3. Activate chat</h3>
-                <p className="text-secondary">
-                  {chatEndpoint
-                    ? 'Chat is connected to your LLM endpoint.'
-                    : 'Add VITE_CHAT_ENDPOINT to enable the chat experience.'}
-                </p>
-              </div>
+              {checklistSteps.map((step) => (
+                <div key={step.title} className="checklist-item">
+                  <h3>{step.title}</h3>
+                  <p className="text-secondary">{step.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="experience py-xl">
+          <div className="text-center mb-lg">
+            <h2>Interactive Command Center</h2>
+            <p className="text-secondary">
+              Switch modes to preview how Laura adapts to daily workflows without
+              disrupting your display.
+            </p>
+          </div>
+          <div className="mode-switch">
+            {experienceModes.map((mode) => (
+              <button
+                key={mode.id}
+                type="button"
+                className={`mode-tab ${activeModeId === mode.id ? 'active' : ''}`}
+                onClick={() => setActiveModeId(mode.id)}
+              >
+                {mode.label}
+              </button>
+            ))}
+          </div>
+          <div className="card mode-panel animated-card">
+            <div className="mode-header">
+              <h3>{activeMode.label}</h3>
+              <span className="mode-pill">Live preview</span>
+            </div>
+            <p className="text-secondary">{activeMode.summary}</p>
+            <div className="grid grid-3 mode-metrics">
+              {activeMode.metrics.map((metric) => (
+                <div key={metric.label} className="metric">
+                  <span className="metric-value">{metric.value}</span>
+                  <span className="text-secondary">{metric.label}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mode-actions">
+              {activeMode.actions.map((action) => (
+                <span key={action} className="mode-chip">
+                  {action}
+                </span>
+              ))}
             </div>
           </div>
         </section>
@@ -181,8 +282,12 @@ const Home = () => {
         <section className="features py-xl">
           <h2 className="text-center mb-lg">CRM-Ready Experience</h2>
           <div className="grid grid-3">
-            {crmHighlights.map((highlight) => (
-              <div key={highlight.title} className="card">
+            {crmHighlights.map((highlight, index) => (
+              <div
+                key={highlight.title}
+                className="card animated-card"
+                style={delayStyle(index)}
+              >
                 <div className="feature-icon cosmic-glow">{highlight.icon}</div>
                 <h3>{highlight.title}</h3>
                 <p className="text-secondary">{highlight.description}</p>
