@@ -16,6 +16,7 @@
 
   .about-content,
   .agentic-blueprint,
+  .agentic-practices,
   .tech-stack {
     margin-bottom: $spacing-xl;
   }
@@ -41,5 +42,30 @@
     font-family: 'Fira Code', 'JetBrains Mono', monospace;
     font-size: 0.85rem;
     overflow-x: auto;
+  }
+
+  .practices-list {
+    margin: $spacing-md 0 0;
+    padding-left: $spacing-lg;
+    display: grid;
+    gap: $spacing-sm;
+  }
+
+  .practices-panel {
+    background: linear-gradient(
+      145deg,
+      rgba($bg-light, 0.04),
+      rgba($cosmic-indigo, 0.08)
+    );
+  }
+
+  .signal-grid {
+    display: grid;
+    gap: $spacing-md;
+    margin-top: $spacing-md;
+
+    h3 {
+      margin-bottom: $spacing-xs;
+    }
   }
 }

@@ -91,6 +91,70 @@ const About = () => {
           </div>
         </section>
 
+        <section className="agentic-practices py-lg">
+          <div className="grid grid-2">
+            <div className="card">
+              <h2>📘 Agentic Workflow Practices</h2>
+              <p className="text-secondary">
+                Our operating rhythm aligns with Anthropic’s guidance for
+                dependable agentic coding: keep context durable, enable
+                real-time intervention, and parallelize safely.
+              </p>
+              <ul className="text-secondary practices-list">
+                <li>
+                  Maintain persistent context with CLAUDE.md playbooks and
+                  living project notes.
+                </li>
+                <li>
+                  Support immediate human overrides using the Esc key during
+                  live sessions and streamed outputs.
+                </li>
+                <li>
+                  Dispatch focused sub-agents for research, testing, and
+                  refactoring in parallel.
+                </li>
+              </ul>
+            </div>
+            <div className="card practices-panel">
+              <h2>⚙️ Execution Signals</h2>
+              <p className="text-secondary">
+                These signals keep the system in a stable “ground state” while
+                still accelerating delivery.
+              </p>
+              <div className="signal-grid">
+                <div>
+                  <h3>Context Preservation</h3>
+                  <p className="text-secondary">
+                    Canonical documentation, versioned decisions, and reliable
+                    handoffs.
+                  </p>
+                </div>
+                <div>
+                  <h3>Human-in-the-Loop</h3>
+                  <p className="text-secondary">
+                    Interruptible workflows, rapid checkpoints, and operator
+                    visibility.
+                  </p>
+                </div>
+                <div>
+                  <h3>Parallel Execution</h3>
+                  <p className="text-secondary">
+                    Sub-agents explore solution space while we monitor risk and
+                    latency.
+                  </p>
+                </div>
+                <div>
+                  <h3>Quality Gates</h3>
+                  <p className="text-secondary">
+                    Automated checks, reviews, and merged learnings from every
+                    run.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section className="tech-stack py-lg">
           <h2 className="text-center mb-lg">Built With Modern Tech</h2>
           <div className="grid grid-3">
