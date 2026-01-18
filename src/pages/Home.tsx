@@ -106,6 +106,11 @@ const Home = () => {
       icon: '✅',
     },
   ];
+  const heroHighlights = [
+    'Adaptive UI layouts',
+    'Smart automation layers',
+    'Cosmic-grade theming',
+  ];
   const experienceModes = [
     {
       id: 'sales',
@@ -147,62 +152,91 @@ const Home = () => {
   const [activeModeId, setActiveModeId] = useState(experienceModes[0].id);
   const activeMode =
     experienceModes.find((mode) => mode.id === activeModeId) ?? experienceModes[0];
+  const cardSections = [
+    {
+      id: 'features',
+      title: 'Cosmic Features',
+      description:
+        'A curated set of UI, motion, and styling primitives designed for rapid cosmic launches.',
+      cards: featureCards,
+    },
+    {
+      id: 'agentic',
+      title: 'Agentic Upgrade Path',
+      description:
+        'Laura is evolving into a full-spectrum AI companion, blending agentic planning, graph orchestration, and cinematic visualization.',
+      cards: agenticCapabilities,
+    },
+    {
+      id: 'crm',
+      title: 'CRM-Ready Experience',
+      description:
+        'A ready-to-deploy experience layer for teams that need clarity, focus, and momentum.',
+      cards: crmHighlights,
+      cta: {
+        label: 'Explore the CRM Dashboard',
+        to: '/dashboard',
+      },
+    },
+  ];
 
   return (
     <div className="home">
       <div className="container">
         <section className="hero">
-          <h1 className="hero-title float">Welcome to Laura</h1>
-          <p className="hero-subtitle">
-            AI Float Cosmic Dream - Your Professional Cosmic Companion
-          </p>
-          <div className="hero-actions">
-            <Link to="/about" className="btn btn-primary">
-              Learn More
-            </Link>
-            <Link to="/contact" className="btn btn-secondary">
-              Get in Touch
-            </Link>
+          <div className="hero-panel">
+            <span className="hero-badge">Cosmic-grade AI Experience</span>
+            <h1 className="hero-title float">Welcome to Laura</h1>
+            <p className="hero-subtitle">
+              AI Float Cosmic Dream - Your Professional Cosmic Companion
+            </p>
+            <div className="hero-actions">
+              <Link to="/about" className="btn btn-primary">
+                Learn More
+              </Link>
+              <Link to="/contact" className="btn btn-secondary">
+                Get in Touch
+              </Link>
+            </div>
+            <ul className="hero-highlights">
+              {heroHighlights.map((highlight) => (
+                <li key={highlight}>{highlight}</li>
+              ))}
+            </ul>
           </div>
         </section>
 
-        <section className="features py-xl">
-          <h2 className="text-center mb-lg">Cosmic Features</h2>
-          <div className="grid grid-3">
-            {featureCards.map((feature, index) => (
-              <div
-                key={feature.title}
-                className="card animated-card"
-                style={delayStyle(index)}
-              >
-                <div className="feature-icon cosmic-glow">{feature.icon}</div>
-                <h3>{feature.title}</h3>
-                <p className="text-secondary">{feature.description}</p>
+        {cardSections.map((section) => (
+          <section
+            key={section.id}
+            className={`features py-xl section-shell ${section.id}-section`}
+          >
+            <div className="section-head text-center mb-lg">
+              <h2>{section.title}</h2>
+              <p className="text-secondary">{section.description}</p>
+            </div>
+            <div className="grid grid-3">
+              {section.cards.map((card, index) => (
+                <div
+                  key={card.title}
+                  className="card animated-card"
+                  style={delayStyle(index)}
+                >
+                  <div className="feature-icon cosmic-glow">{card.icon}</div>
+                  <h3>{card.title}</h3>
+                  <p className="text-secondary">{card.description}</p>
+                </div>
+              ))}
+            </div>
+            {section.cta ? (
+              <div className="text-center mt-lg">
+                <Link to={section.cta.to} className="btn btn-secondary">
+                  {section.cta.label}
+                </Link>
               </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="agentic-roadmap py-xl">
-          <h2 className="text-center mb-lg">Agentic Upgrade Path</h2>
-          <p className="text-secondary text-center mb-lg">
-            Laura is evolving into a full-spectrum AI companion, blending
-            agentic planning, graph orchestration, and cinematic visualization.
-          </p>
-          <div className="grid grid-3">
-            {agenticCapabilities.map((capability, index) => (
-              <div
-                key={capability.title}
-                className="card animated-card"
-                style={delayStyle(index)}
-              >
-                <div className="feature-icon cosmic-glow">{capability.icon}</div>
-                <h3>{capability.title}</h3>
-                <p className="text-secondary">{capability.description}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+            ) : null}
+          </section>
+        ))}
 
         <section className="py-xl">
           <div className="card text-center">
@@ -279,27 +313,6 @@ const Home = () => {
           </div>
         </section>
 
-        <section className="features py-xl">
-          <h2 className="text-center mb-lg">CRM-Ready Experience</h2>
-          <div className="grid grid-3">
-            {crmHighlights.map((highlight, index) => (
-              <div
-                key={highlight.title}
-                className="card animated-card"
-                style={delayStyle(index)}
-              >
-                <div className="feature-icon cosmic-glow">{highlight.icon}</div>
-                <h3>{highlight.title}</h3>
-                <p className="text-secondary">{highlight.description}</p>
-              </div>
-            ))}
-          </div>
-          <div className="text-center mt-lg">
-            <Link to="/dashboard" className="btn btn-secondary">
-              Explore the CRM Dashboard
-            </Link>
-          </div>
-        </section>
       </div>
     </div>
   );
