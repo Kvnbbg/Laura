@@ -1,3 +1,5 @@
+import { logger } from '../utils/logger';
+
 export type CRMContact = {
   id: string;
   name: string;
@@ -29,7 +31,10 @@ export type CRMData = {
   tasks: CRMTask[];
 };
 
-const STORAGE_KEY = 'laura-crm-data';
+const CONSTANTS = {
+  STORAGE_KEY: 'laura-crm-data',
+  ID_SUFFIX_LENGTH: 8,
+} as const;
 
 const seedData: CRMData = {
   contacts: [
@@ -84,107 +89,251 @@ const seedData: CRMData = {
   ],
 };
 
-const createId = (prefix: string) =>
-  `${prefix}-${crypto.randomUUID().slice(0, 8)}`;
+type CRMCollectionKey = keyof CRMData;
+
+const isNonEmptyString = (value: unknown): value is string =>
+  typeof value === 'string' && value.trim().length > 0;
+
+const hasRequiredStrings = (values: Array<[string, unknown]>) =>
+  values.every(([, value]) => isNonEmptyString(value));
+
+const isCRMData = (value: unknown): value is CRMData => {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const record = value as Record<string, unknown>;
+  return (
+    Array.isArray(record.contacts) &&
+    Array.isArray(record.deals) &&
+    Array.isArray(record.tasks)
+  );
+};
+
+const createIdSuffix = () => {
+  const rawUuid = typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : undefined;
+  const normalized = rawUuid ? rawUuid.replace(/-/g, '') : Math.random().toString(36).slice(2);
+  return normalized.slice(0, CONSTANTS.ID_SUFFIX_LENGTH);
+};
+
+const createId = (prefix: string) => `${prefix}-${createIdSuffix()}`;
 
 const loadData = (): CRMData => {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored) {
-    return JSON.parse(stored) as CRMData;
+  try {
+    const stored = localStorage.getItem(CONSTANTS.STORAGE_KEY);
+    if (!stored) {
+      localStorage.setItem(CONSTANTS.STORAGE_KEY, JSON.stringify(seedData));
+      return seedData;
+    }
+
+    const parsed = JSON.parse(stored) as unknown;
+    if (isCRMData(parsed)) {
+      return parsed;
+    }
+
+    logger.warn('Invalid CRM data in storage. Resetting to seed data.');
+    localStorage.setItem(CONSTANTS.STORAGE_KEY, JSON.stringify(seedData));
+    return seedData;
+  } catch (error) {
+    logger.error('Failed to load CRM data from storage.', {
+      error,
+    });
+    return seedData;
   }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(seedData));
-  return seedData;
 };
 
 const persist = (data: CRMData) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  try {
+    localStorage.setItem(CONSTANTS.STORAGE_KEY, JSON.stringify(data));
+  } catch (error) {
+    logger.error('Failed to persist CRM data.', {
+      error,
+    });
+  }
 };
+
+const updateCollection = <T extends { id: string }>(
+  data: CRMData,
+  key: CRMCollectionKey,
+  updater: (items: T[]) => T[]
+): CRMData => ({
+  ...data,
+  [key]: updater(data[key] as T[]),
+});
+
+const addItem = <T extends { id: string }>(
+  data: CRMData,
+  key: CRMCollectionKey,
+  item: Omit<T, 'id'>,
+  prefix: string
+): CRMData =>
+  updateCollection<T>(data, key, (items) => [
+    ...items,
+    { ...item, id: createId(prefix) },
+  ]);
+
+const replaceItem = <T extends { id: string }>(
+  data: CRMData,
+  key: CRMCollectionKey,
+  updatedItem: T
+): CRMData =>
+  updateCollection<T>(data, key, (items) =>
+    items.map((item) => (item.id === updatedItem.id ? updatedItem : item))
+  );
+
+const removeItem = <T extends { id: string }>(
+  data: CRMData,
+  key: CRMCollectionKey,
+  id: string
+): CRMData =>
+  updateCollection<T>(data, key, (items) =>
+    items.filter((item) => item.id !== id)
+  );
 
 export const getCRMData = (): CRMData => loadData();
 
 export const createContact = (contact: Omit<CRMContact, 'id'>) => {
+  if (
+    !hasRequiredStrings([
+      ['name', contact?.name],
+      ['company', contact?.company],
+      ['email', contact?.email],
+      ['segment', contact?.segment],
+    ])
+  ) {
+    logger.warn('Invalid contact payload received. Skipping create.');
+    return;
+  }
+
   const data = loadData();
-  const updated = {
-    ...data,
-    contacts: [...data.contacts, { ...contact, id: createId('contact') }],
-  };
+  const updated = addItem<CRMContact>(data, 'contacts', contact, 'contact');
   persist(updated);
 };
 
 export const updateContact = (updatedContact: CRMContact) => {
+  if (
+    !hasRequiredStrings([
+      ['id', updatedContact?.id],
+      ['name', updatedContact?.name],
+      ['company', updatedContact?.company],
+      ['email', updatedContact?.email],
+      ['segment', updatedContact?.segment],
+    ])
+  ) {
+    logger.warn('Invalid contact update payload received. Skipping update.');
+    return;
+  }
+
   const data = loadData();
-  const updated = {
-    ...data,
-    contacts: data.contacts.map((contact) =>
-      contact.id === updatedContact.id ? updatedContact : contact
-    ),
-  };
+  const updated = replaceItem<CRMContact>(data, 'contacts', updatedContact);
   persist(updated);
 };
 
 export const deleteContact = (id: string) => {
+  if (!isNonEmptyString(id)) {
+    logger.warn('Invalid contact id received. Skipping delete.');
+    return;
+  }
+
   const data = loadData();
-  const updated = {
-    ...data,
-    contacts: data.contacts.filter((contact) => contact.id !== id),
-  };
+  const updated = removeItem<CRMContact>(data, 'contacts', id);
   persist(updated);
 };
 
 export const createDeal = (deal: Omit<CRMDeal, 'id'>) => {
+  if (
+    !hasRequiredStrings([
+      ['name', deal?.name],
+      ['company', deal?.company],
+      ['owner', deal?.owner],
+      ['stage', deal?.stage],
+    ]) ||
+    typeof deal?.value !== 'number'
+  ) {
+    logger.warn('Invalid deal payload received. Skipping create.');
+    return;
+  }
+
   const data = loadData();
-  const updated = {
-    ...data,
-    deals: [...data.deals, { ...deal, id: createId('deal') }],
-  };
+  const updated = addItem<CRMDeal>(data, 'deals', deal, 'deal');
   persist(updated);
 };
 
 export const updateDeal = (updatedDeal: CRMDeal) => {
+  if (
+    !hasRequiredStrings([
+      ['id', updatedDeal?.id],
+      ['name', updatedDeal?.name],
+      ['company', updatedDeal?.company],
+      ['owner', updatedDeal?.owner],
+      ['stage', updatedDeal?.stage],
+    ]) ||
+    typeof updatedDeal?.value !== 'number'
+  ) {
+    logger.warn('Invalid deal update payload received. Skipping update.');
+    return;
+  }
+
   const data = loadData();
-  const updated = {
-    ...data,
-    deals: data.deals.map((deal) =>
-      deal.id === updatedDeal.id ? updatedDeal : deal
-    ),
-  };
+  const updated = replaceItem<CRMDeal>(data, 'deals', updatedDeal);
   persist(updated);
 };
 
 export const deleteDeal = (id: string) => {
+  if (!isNonEmptyString(id)) {
+    logger.warn('Invalid deal id received. Skipping delete.');
+    return;
+  }
+
   const data = loadData();
-  const updated = {
-    ...data,
-    deals: data.deals.filter((deal) => deal.id !== id),
-  };
+  const updated = removeItem<CRMDeal>(data, 'deals', id);
   persist(updated);
 };
 
 export const createTask = (task: Omit<CRMTask, 'id'>) => {
+  if (
+    !hasRequiredStrings([
+      ['title', task?.title],
+      ['owner', task?.owner],
+      ['dueDate', task?.dueDate],
+      ['status', task?.status],
+    ])
+  ) {
+    logger.warn('Invalid task payload received. Skipping create.');
+    return;
+  }
+
   const data = loadData();
-  const updated = {
-    ...data,
-    tasks: [...data.tasks, { ...task, id: createId('task') }],
-  };
+  const updated = addItem<CRMTask>(data, 'tasks', task, 'task');
   persist(updated);
 };
 
 export const updateTask = (updatedTask: CRMTask) => {
+  if (
+    !hasRequiredStrings([
+      ['id', updatedTask?.id],
+      ['title', updatedTask?.title],
+      ['owner', updatedTask?.owner],
+      ['dueDate', updatedTask?.dueDate],
+      ['status', updatedTask?.status],
+    ])
+  ) {
+    logger.warn('Invalid task update payload received. Skipping update.');
+    return;
+  }
+
   const data = loadData();
-  const updated = {
-    ...data,
-    tasks: data.tasks.map((task) =>
-      task.id === updatedTask.id ? updatedTask : task
-    ),
-  };
+  const updated = replaceItem<CRMTask>(data, 'tasks', updatedTask);
   persist(updated);
 };
 
 export const deleteTask = (id: string) => {
+  if (!isNonEmptyString(id)) {
+    logger.warn('Invalid task id received. Skipping delete.');
+    return;
+  }
+
   const data = loadData();
-  const updated = {
-    ...data,
-    tasks: data.tasks.filter((task) => task.id !== id),
-  };
+  const updated = removeItem<CRMTask>(data, 'tasks', id);
   persist(updated);
 };
