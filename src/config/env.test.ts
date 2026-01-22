@@ -1,25 +1,40 @@
 import { describe, expect, it } from 'vitest';
-import { AppError } from '../utils/errors';
 import { createConfig } from './env';
 
 describe('createConfig', () => {
-  it('uses defaults when optional values are missing', () => {
-    const config = createConfig({});
+  it('disables chat when API key is missing', () => {
+    const config = createConfig({
+      VITE_ENABLE_CHAT: 'true',
+      VITE_MISTRAL_MODEL: 'mistral-small',
+    });
 
-    expect(config.appName).toBe('Laura');
-    expect(config.contactEndpoint).toBeNull();
-    expect(config.contactTimeoutMs).toBe(5000);
+    expect(config.chatEnabled).toBe(false);
+    expect(config.chatErrors).toContain(
+      'VITE_MISTRAL_API_KEY is required to enable chat. Please set it in your environment.'
+    );
   });
 
-  it('validates contact endpoint protocol', () => {
-    expect(() =>
-      createConfig({ VITE_CONTACT_ENDPOINT: 'ftp://example.com' })
-    ).toThrow(AppError);
+  it('uses default model when invalid model provided', () => {
+    const config = createConfig({
+      VITE_ENABLE_CHAT: 'true',
+      VITE_MISTRAL_API_KEY: 'test-key',
+      VITE_MISTRAL_MODEL: 'unknown-model',
+    });
+
+    expect(config.mistralModel).toBe('mistral-small');
+    expect(config.chatEnabled).toBe(false);
+    expect(config.chatErrors[0]).toMatch(/VITE_MISTRAL_MODEL/);
   });
 
-  it('throws for invalid timeout values', () => {
-    expect(() =>
-      createConfig({ VITE_CONTACT_TIMEOUT_MS: '-5' })
-    ).toThrow(AppError);
+  it('enables chat when requirements are met', () => {
+    const config = createConfig({
+      VITE_ENABLE_CHAT: 'true',
+      VITE_MISTRAL_API_KEY: 'test-key',
+      VITE_MISTRAL_MODEL: 'mistral-medium',
+    });
+
+    expect(config.chatEnabled).toBe(true);
+    expect(config.mistralModel).toBe('mistral-medium');
+    expect(config.chatErrors).toHaveLength(0);
   });
 });

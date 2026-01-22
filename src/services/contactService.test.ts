@@ -9,6 +9,11 @@ describe('submitContactForm', () => {
       appName: 'Laura',
       contactEndpoint: null,
       contactTimeoutMs: 1000,
+      chatEndpoint: '/api/chat',
+      chatTimeoutMs: 1000,
+      chatEnabled: false,
+      chatErrors: [],
+      mistralModel: 'mistral-small',
     };
 
     vi.useFakeTimers();
@@ -27,6 +32,11 @@ describe('submitContactForm', () => {
       appName: 'Laura',
       contactEndpoint: 'https://api.example.com/contact',
       contactTimeoutMs: 1000,
+      chatEndpoint: '/api/chat',
+      chatTimeoutMs: 1000,
+      chatEnabled: false,
+      chatErrors: [],
+      mistralModel: 'mistral-small',
     };
 
     const fetchMock = vi.fn().mockResolvedValue({ ok: false, status: 500 });

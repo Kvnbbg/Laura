@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import Navigation from './Navigation';
+import ChatWidget from './ChatWidget';
 import { getConfig } from '../config/env';
 import './Layout.scss';
 
@@ -22,6 +23,7 @@ const Layout = ({ children }: LayoutProps) => {
           </p>
         </div>
       </footer>
+      <ChatWidget />
     </div>
   );
 };
