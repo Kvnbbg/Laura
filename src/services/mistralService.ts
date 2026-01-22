@@ -11,43 +11,28 @@ export type ChatMessage = {
 
 export type ChatResponse = {
   message: ChatMessage;
+  citations: string[];
 };
 
-const parseChatReply = (payload: unknown): ChatMessage => {
+type ChatPayload = {
+  messages: ChatMessage[];
+};
+
+const parseChatReply = (payload: unknown): ChatResponse => {
   if (
     payload &&
     typeof payload === 'object' &&
     'message' in payload &&
-    typeof (payload as { message?: unknown }).message === 'string'
+    typeof (payload as { message?: unknown }).message === 'object'
   ) {
-    return {
-      role: 'assistant',
-      content: (payload as { message: string }).message,
-    };
-  }
-
-  if (
-    payload &&
-    typeof payload === 'object' &&
-    'reply' in payload &&
-    typeof (payload as { reply?: unknown }).reply === 'string'
-  ) {
-    return {
-      role: 'assistant',
-      content: (payload as { reply: string }).reply,
-    };
-  }
-
-  if (
-    payload &&
-    typeof payload === 'object' &&
-    'content' in payload &&
-    typeof (payload as { content?: unknown }).content === 'string'
-  ) {
-    return {
-      role: 'assistant',
-      content: (payload as { content: string }).content,
-    };
+    const message = (payload as { message?: ChatMessage }).message;
+    if (message && typeof message.content === 'string' && message.role) {
+      const citationsRaw = (payload as { citations?: unknown }).citations;
+      const citations = Array.isArray(citationsRaw)
+        ? citationsRaw.filter((item): item is string => typeof item === 'string')
+        : [];
+      return { message, citations };
+    }
   }
 
   throw new AppError('CHAT_PARSE_FAILED', 'Invalid chat response format', {
@@ -59,14 +44,12 @@ export const sendChatMessage = async (
   messages: ChatMessage[],
   config: AppConfig = getConfig()
 ): Promise<ChatResponse> => {
-  if (!config.chatEndpoint) {
-    return {
-      message: {
-        role: 'assistant',
-        content:
-          'Chat is running in demo mode. Configure VITE_CHAT_ENDPOINT to enable live responses.',
-      },
-    };
+  if (!config.chatEnabled) {
+    throw new AppError('CHAT_DISABLED', 'Chat is disabled', {
+      userMessage:
+        config.chatErrors[0] ??
+        'Chat is currently disabled. Please enable it in your environment.',
+    });
   }
 
   try {
@@ -75,7 +58,7 @@ export const sendChatMessage = async (
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages }),
+        body: JSON.stringify({ messages } satisfies ChatPayload),
       },
       config.chatTimeoutMs
     );
@@ -89,8 +72,7 @@ export const sendChatMessage = async (
     }
 
     const payload = (await response.json()) as unknown;
-    const message = parseChatReply(payload);
-    return { message };
+    return parseChatReply(payload);
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') {
       throw new AppError('CHAT_TIMEOUT', 'Chat request timed out', {

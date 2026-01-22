@@ -4,7 +4,7 @@ import { getConfig } from '../config/env';
 import './Home.scss';
 
 const Home = () => {
-  const { contactEndpoint, chatEndpoint } = getConfig();
+  const { contactEndpoint, chatEnabled } = getConfig();
   const delayStyle = (index: number): CSSProperties =>
     ({
       '--delay': `${index * 0.08}s`,
@@ -81,9 +81,9 @@ const Home = () => {
     },
     {
       title: '3. Activate chat',
-      description: chatEndpoint
-        ? 'Chat is connected to your LLM endpoint.'
-        : 'Add VITE_CHAT_ENDPOINT to enable the chat experience.',
+      description: chatEnabled
+        ? 'Chat is enabled and ready to answer with attachments.'
+        : 'Set VITE_ENABLE_CHAT=true and add VITE_MISTRAL_API_KEY to enable the chat experience.',
     },
   ];
   const crmHighlights = [

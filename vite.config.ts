@@ -16,6 +16,7 @@ export default defineConfig({
     sourcemap: false,
     minify: 'esbuild',
     rollupOptions: {
+      external: ['fsevents'],
       output: {
         manualChunks: {
           vendor: ['vite', 'react', 'react-dom', 'react-router-dom'],
@@ -26,6 +27,12 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:4000',
+        changeOrigin: true,
+      },
+    },
   },
   preview: {
     port: 3000,

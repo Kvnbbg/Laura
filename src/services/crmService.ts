@@ -90,6 +90,12 @@ const seedData: CRMData = {
 };
 
 type CRMCollectionKey = keyof CRMData;
+type CRMCollectionMap = {
+  contacts: CRMContact;
+  deals: CRMDeal;
+  tasks: CRMTask;
+};
+type CRMCollection<K extends CRMCollectionKey> = CRMCollectionMap[K][];
 
 const isNonEmptyString = (value: unknown): value is string =>
   typeof value === 'string' && value.trim().length > 0;
@@ -152,41 +158,41 @@ const persist = (data: CRMData) => {
   }
 };
 
-const updateCollection = <T extends { id: string }>(
+const updateCollection = <K extends CRMCollectionKey>(
   data: CRMData,
-  key: CRMCollectionKey,
-  updater: (items: T[]) => T[]
+  key: K,
+  updater: (items: CRMCollection<K>) => CRMCollection<K>
 ): CRMData => ({
   ...data,
-  [key]: updater(data[key] as T[]),
+  [key]: updater(data[key] as CRMCollection<K>),
 });
 
-const addItem = <T extends { id: string }>(
+const addItem = <K extends CRMCollectionKey>(
   data: CRMData,
-  key: CRMCollectionKey,
-  item: Omit<T, 'id'>,
+  key: K,
+  item: Omit<CRMCollectionMap[K], 'id'>,
   prefix: string
 ): CRMData =>
-  updateCollection<T>(data, key, (items) => [
+  updateCollection(data, key, (items) => [
     ...items,
-    { ...item, id: createId(prefix) },
+    { ...item, id: createId(prefix) } as CRMCollectionMap[K],
   ]);
 
-const replaceItem = <T extends { id: string }>(
+const replaceItem = <K extends CRMCollectionKey>(
   data: CRMData,
-  key: CRMCollectionKey,
-  updatedItem: T
+  key: K,
+  updatedItem: CRMCollectionMap[K]
 ): CRMData =>
-  updateCollection<T>(data, key, (items) =>
+  updateCollection(data, key, (items) =>
     items.map((item) => (item.id === updatedItem.id ? updatedItem : item))
   );
 
-const removeItem = <T extends { id: string }>(
+const removeItem = <K extends CRMCollectionKey>(
   data: CRMData,
-  key: CRMCollectionKey,
+  key: K,
   id: string
 ): CRMData =>
-  updateCollection<T>(data, key, (items) =>
+  updateCollection(data, key, (items) =>
     items.filter((item) => item.id !== id)
   );
 
@@ -206,7 +212,7 @@ export const createContact = (contact: Omit<CRMContact, 'id'>) => {
   }
 
   const data = loadData();
-  const updated = addItem<CRMContact>(data, 'contacts', contact, 'contact');
+  const updated = addItem(data, 'contacts', contact, 'contact');
   persist(updated);
 };
 
@@ -225,7 +231,7 @@ export const updateContact = (updatedContact: CRMContact) => {
   }
 
   const data = loadData();
-  const updated = replaceItem<CRMContact>(data, 'contacts', updatedContact);
+  const updated = replaceItem(data, 'contacts', updatedContact);
   persist(updated);
 };
 
@@ -236,7 +242,7 @@ export const deleteContact = (id: string) => {
   }
 
   const data = loadData();
-  const updated = removeItem<CRMContact>(data, 'contacts', id);
+  const updated = removeItem(data, 'contacts', id);
   persist(updated);
 };
 
@@ -255,7 +261,7 @@ export const createDeal = (deal: Omit<CRMDeal, 'id'>) => {
   }
 
   const data = loadData();
-  const updated = addItem<CRMDeal>(data, 'deals', deal, 'deal');
+  const updated = addItem(data, 'deals', deal, 'deal');
   persist(updated);
 };
 
@@ -275,7 +281,7 @@ export const updateDeal = (updatedDeal: CRMDeal) => {
   }
 
   const data = loadData();
-  const updated = replaceItem<CRMDeal>(data, 'deals', updatedDeal);
+  const updated = replaceItem(data, 'deals', updatedDeal);
   persist(updated);
 };
 
@@ -286,7 +292,7 @@ export const deleteDeal = (id: string) => {
   }
 
   const data = loadData();
-  const updated = removeItem<CRMDeal>(data, 'deals', id);
+  const updated = removeItem(data, 'deals', id);
   persist(updated);
 };
 
@@ -304,7 +310,7 @@ export const createTask = (task: Omit<CRMTask, 'id'>) => {
   }
 
   const data = loadData();
-  const updated = addItem<CRMTask>(data, 'tasks', task, 'task');
+  const updated = addItem(data, 'tasks', task, 'task');
   persist(updated);
 };
 
@@ -323,7 +329,7 @@ export const updateTask = (updatedTask: CRMTask) => {
   }
 
   const data = loadData();
-  const updated = replaceItem<CRMTask>(data, 'tasks', updatedTask);
+  const updated = replaceItem(data, 'tasks', updatedTask);
   persist(updated);
 };
 
@@ -334,6 +340,6 @@ export const deleteTask = (id: string) => {
   }
 
   const data = loadData();
-  const updated = removeItem<CRMTask>(data, 'tasks', id);
+  const updated = removeItem(data, 'tasks', id);
   persist(updated);
 };
