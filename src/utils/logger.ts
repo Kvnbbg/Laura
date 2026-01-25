@@ -7,7 +7,19 @@ type LogPayload = {
   timestamp: string;
 };
 
+const MAX_LOG_ENTRIES = 200;
+
 const shouldLogDebug = () => import.meta.env.DEV;
+
+const getLogStore = () => {
+  const globalScope = globalThis as typeof globalThis & {
+    __appLogs?: LogPayload[];
+  };
+  if (!globalScope.__appLogs) {
+    globalScope.__appLogs = [];
+  }
+  return globalScope.__appLogs;
+};
 
 const formatPayload = (
   level: LogLevel,
@@ -30,8 +42,11 @@ const writeLog = (
   }
 
   const payload = formatPayload(level, message, meta);
-  const method = level === 'error' ? 'error' : level === 'warn' ? 'warn' : 'log';
-  console[method](payload);
+  const logStore = getLogStore();
+  logStore.push(payload);
+  if (logStore.length > MAX_LOG_ENTRIES) {
+    logStore.splice(0, logStore.length - MAX_LOG_ENTRIES);
+  }
 };
 
 export const logger = {
