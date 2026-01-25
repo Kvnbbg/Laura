@@ -11,6 +11,7 @@
   transition: $transition-base;
   cursor: pointer;
   text-align: center;
+  min-height: 44px;
 
   &-primary {
     background: $gradient-cosmic;
@@ -27,6 +28,7 @@
     background: transparent;
     border: 2px solid $cosmic-purple;
     color: $cosmic-purple;
+    min-height: 36px;
 
     &:hover {
       background: rgba($cosmic-purple, 0.1);
@@ -39,6 +41,7 @@
     background: transparent;
     border: 1px solid $text-secondary;
     color: $text-primary;
+    min-height: 36px;
 
     &:hover {
       border-color: $cosmic-purple;

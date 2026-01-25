@@ -143,11 +143,24 @@ const Dashboard = () => {
     <div className="dashboard">
       <div className="container">
         <section className="dashboard-hero">
-          <h1>CRM Command Center</h1>
-          <p className="text-secondary">
-            A unified workspace to manage contacts, revenue pipelines, and
-            mission-critical tasks with clarity.
-          </p>
+          <div className="dashboard-hero-content">
+            <div>
+              <p className="dashboard-eyebrow">Delivery Day Overview</p>
+              <h1>CRM Command Center</h1>
+              <p className="text-secondary">
+                A unified workspace to manage contacts, revenue pipelines, and
+                mission-critical tasks with clarity.
+              </p>
+            </div>
+            <div className="dashboard-hero-actions">
+              <button type="button" className="btn btn-secondary">
+                Export report
+              </button>
+              <button type="button" className="btn btn-primary">
+                Create snapshot
+              </button>
+            </div>
+          </div>
         </section>
 
         <section className="dashboard-metrics">
@@ -179,7 +192,7 @@ const Dashboard = () => {
           </div>
         </section>
 
-        <section className="dashboard-section">
+        <section className="dashboard-section dashboard-panel">
           <SectionHeader
             title="Accounts & Contacts"
             subtitle="Keep team ownership, segmentation, and outreach context in one view."
@@ -267,7 +280,7 @@ const Dashboard = () => {
           </div>
         </section>
 
-        <section className="dashboard-section">
+        <section className="dashboard-section dashboard-panel">
           <SectionHeader
             title="Revenue Pipeline"
             subtitle="Monitor deal velocity, update stages, and keep revenue forecasts accurate."
@@ -380,7 +393,7 @@ const Dashboard = () => {
           </div>
         </section>
 
-        <section className="dashboard-section">
+        <section className="dashboard-section dashboard-panel">
           <SectionHeader
             title="Execution Board"
             subtitle="Stay ahead of delivery, customer success, and follow-up actions."
