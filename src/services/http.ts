@@ -1,6 +1,6 @@
 export const fetchWithTimeout = async (
   input: RequestInfo | URL,
-  init: RequestInit,
+  init: RequestInit = {},
   timeoutMs: number
 ) => {
   const controller = new AbortController();

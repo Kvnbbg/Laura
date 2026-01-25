@@ -18,6 +18,12 @@ type ChatPayload = {
   messages: ChatMessage[];
 };
 
+const isValidChatMessage = (message: ChatMessage) =>
+  message &&
+  typeof message.content === 'string' &&
+  message.content.trim().length > 0 &&
+  Boolean(message.role);
+
 const parseChatReply = (payload: unknown): ChatResponse => {
   if (
     payload &&
@@ -44,6 +50,19 @@ export const sendChatMessage = async (
   messages: ChatMessage[],
   config: AppConfig = getConfig()
 ): Promise<ChatResponse> => {
+  if (!Array.isArray(messages) || messages.length === 0) {
+    throw new AppError('CHAT_EMPTY', 'No chat messages provided', {
+      userMessage: 'Please enter a message before sending.',
+    });
+  }
+
+  const invalidMessage = messages.find((message) => !isValidChatMessage(message));
+  if (invalidMessage) {
+    throw new AppError('CHAT_INVALID_MESSAGE', 'Invalid chat message payload', {
+      userMessage: 'Please enter a valid message before sending.',
+    });
+  }
+
   if (!config.chatEnabled) {
     throw new AppError('CHAT_DISABLED', 'Chat is disabled', {
       userMessage:

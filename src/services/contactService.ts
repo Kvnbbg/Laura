@@ -9,20 +9,36 @@ export type ContactPayload = {
   message: string;
 };
 
+const SIMULATED_DELAY_MS = 800;
+
 const simulateNetworkDelay = (durationMs: number) =>
   new Promise<void>((resolve) => {
     setTimeout(() => resolve(), durationMs);
   });
 
+const isNonEmptyString = (value: unknown): value is string =>
+  typeof value === 'string' && value.trim().length > 0;
+
+const isValidContactPayload = (payload: ContactPayload) =>
+  isNonEmptyString(payload?.name) &&
+  isNonEmptyString(payload?.email) &&
+  isNonEmptyString(payload?.message);
+
 export const submitContactForm = async (
   payload: ContactPayload,
   config: AppConfig = getConfig()
 ) => {
+  if (!isValidContactPayload(payload)) {
+    throw new AppError('CONTACT_INVALID', 'Invalid contact payload', {
+      userMessage: 'Please complete every field before submitting.',
+    });
+  }
+
   if (!config.contactEndpoint) {
     logger.info('Contact endpoint not configured. Using local simulation.', {
       contactPayload: { name: payload.name, email: payload.email },
     });
-    await simulateNetworkDelay(800);
+    await simulateNetworkDelay(SIMULATED_DELAY_MS);
     return;
   }
 
