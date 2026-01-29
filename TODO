@@ -1,0 +1,6 @@
+# TODO
+
+## ADD
+npm i lucide-react clsx tailwind-merge
+
+This architecture supports future AI agents monitoring the activities array, auto-scoring deals based on stage velocity, and suggesting next actions through the AIInsights component.
