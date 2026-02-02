@@ -177,7 +177,7 @@ const QuickContactForm: React.FC<{
             id="email"
             name="email"
             required
-            value={formData.enail}
+            value={formData.email}
             onChange={handleChange}
             disabled={isSubmitting}
             placeholder="john@example.com"
