@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { ExternalLink, Send, Mail, Clock, ArrowRight, MessageSquare, Globe } from 'lucide-react';
 import { getConfig } from '../config/env';
 import { submitContactForm } from '../services/contactService';
@@ -26,7 +26,7 @@ interface ContactFormData {
 
 const ExternalContactCard: React.FC<{
   url: string;
-  onSelect: () => void;
+  onSelect: (event: React.MouseEvent<HTMLAnchorElement>) => void;
   featured?: boolean;
 }> = ({ url, onSelect, featured = false }) => (
   <div 
@@ -303,6 +303,16 @@ const Contact: React.FC = () => {
   const [status, setStatus] = useState<FormStatus>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [redirectCountdown, setRedirectCountdown] = useState<number | null>(null);
+  const redirectTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (redirectTimerRef.current) {
+        clearInterval(redirectTimerRef.current);
+        redirectTimerRef.current = null;
+      }
+    };
+  }, []);
 
   // Auto-suggest external form for complex inquiries
   useEffect(() => {
@@ -317,16 +327,24 @@ const Contact: React.FC = () => {
   }, [activeMethod, status]);
 
   // Handle external link click with optional countdown redirect
-  const handleExternalSelect = useCallback(() => {
+  const handleExternalSelect = useCallback((event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
     // Track the click (could add analytics here)
     console.info('User directed to external contact page:', EXTERNAL_CONTACT_URL);
-    
+
+    if (redirectTimerRef.current) {
+      clearInterval(redirectTimerRef.current);
+    }
+
     // Optional: Auto-redirect after showing a brief confirmation
     setRedirectCountdown(3);
-    const interval = setInterval(() => {
+    redirectTimerRef.current = setInterval(() => {
       setRedirectCountdown(prev => {
         if (prev === 1) {
-          clearInterval(interval);
+          if (redirectTimerRef.current) {
+            clearInterval(redirectTimerRef.current);
+            redirectTimerRef.current = null;
+          }
           window.open(EXTERNAL_CONTACT_URL, '_blank');
           return null;
         }
@@ -406,6 +424,10 @@ const Contact: React.FC = () => {
               <button 
                 onClick={() => {
                   setRedirectCountdown(null);
+                  if (redirectTimerRef.current) {
+                    clearInterval(redirectTimerRef.current);
+                    redirectTimerRef.current = null;
+                  }
                   window.open(EXTERNAL_CONTACT_URL, '_blank');
                 }}
                 className="text-sm text-purple-400 hover:text-purple-300 underline"
