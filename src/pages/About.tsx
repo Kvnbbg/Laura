@@ -138,7 +138,7 @@ const ModelAvailability: React.FC = () => (
     <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
       <div>
         <h3 className="mb-2 text-xl font-bold text-white flex items-center gap-2">
-          <Brain className="h-5 w-5 text-indigo-400" />
+          <Brain className="h-5 w-5 text-indigo-400 lucide-animated" />
           GPT-2: Local Intelligence
         </h3>
         <p className="max-w-xl text-slate-400 text-sm leading-relaxed">
@@ -155,7 +155,7 @@ const ModelAvailability: React.FC = () => (
           rel="noopener noreferrer"
           className="flex items-center justify-center gap-2 rounded-lg bg-slate-800 px-6 py-3 text-sm font-medium text-white transition-all hover:bg-slate-700 hover:scale-105"
         >
-          <Github className="h-4 w-4" />
+          <Github className="h-4 w-4 lucide-animated" />
           <span>View Source</span>
         </a>
         <a
@@ -164,7 +164,7 @@ const ModelAvailability: React.FC = () => (
           rel="noopener noreferrer"
           className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-pink-600 to-purple-600 px-6 py-3 text-sm font-medium text-white transition-all hover:opacity-90 hover:scale-105 shadow-lg shadow-pink-500/20"
         >
-          <Instagram className="h-4 w-4" />
+          <Instagram className="h-4 w-4 lucide-animated" />
           <span>Try on Instagram</span>
         </a>
       </div>
@@ -172,15 +172,15 @@ const ModelAvailability: React.FC = () => (
     
     <div className="mt-6 grid gap-4 border-t border-indigo-500/20 pt-6 sm:grid-cols-3">
       <div className="flex items-center gap-3 text-sm text-slate-400">
-        <Download className="h-4 w-4 text-indigo-400" />
+        <Download className="h-4 w-4 text-indigo-400 lucide-animated" />
         <span>Downloadable weights</span>
       </div>
       <div className="flex items-center gap-3 text-sm text-slate-400">
-        <Box className="h-4 w-4 text-indigo-400" />
+        <Box className="h-4 w-4 text-indigo-400 lucide-animated" />
         <span>Private & Offline</span>
       </div>
       <div className="flex items-center gap-3 text-sm text-slate-400">
-        <Share2 className="h-4 w-4 text-indigo-400" />
+        <Share2 className="h-4 w-4 text-indigo-400 lucide-animated" />
         <span>Or social via Meta AI</span>
       </div>
     </div>
@@ -200,7 +200,7 @@ const About: React.FC = () => {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-900/20 via-slate-950 to-slate-950" />
         <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-purple-500/20 bg-purple-500/10 px-4 py-1.5 text-xs font-medium text-purple-300">
-            <Sparkles className="h-3.5 w-3.5" />
+            <Sparkles className="h-3.5 w-3.5 lucide-animated" />
             <span>Est. 2024 in the Digital Cosmic</span>
           </div>
           
@@ -237,7 +237,7 @@ const About: React.FC = () => {
           {/* Unification Theory */}
           <div className="mt-12 rounded-2xl border border-slate-800 bg-slate-900/30 p-8">
             <h3 className="mb-6 text-xl font-bold text-white flex items-center gap-2">
-              <Atom className="h-5 w-5 text-cyan-400" />
+              <Atom className="h-5 w-5 text-cyan-400 lucide-animated" />
               The Grand Unification: Physics & Intelligence
             </h3>
             
@@ -265,7 +265,7 @@ const About: React.FC = () => {
           <div className="grid gap-8 lg:grid-cols-2">
             <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-8">
               <h3 className="mb-4 text-xl font-bold text-white flex items-center gap-2">
-                <Telescope className="h-5 w-5 text-purple-400" />
+                <Telescope className="h-5 w-5 text-purple-400 lucide-animated" />
                 The Architecture
               </h3>
               <p className="mb-4 text-slate-400 text-sm leading-relaxed">
@@ -294,7 +294,7 @@ const About: React.FC = () => {
 
             <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-8">
               <h3 className="mb-4 text-xl font-bold text-white flex items-center gap-2">
-                <Cpu className="h-5 w-5 text-cyan-400" />
+                <Cpu className="h-5 w-5 text-cyan-400 lucide-animated" />
                 The Philosophy
               </h3>
               <p className="mb-4 text-slate-400 text-sm leading-relaxed">
@@ -323,7 +323,7 @@ const About: React.FC = () => {
               rel="noopener noreferrer"
               className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1"
             >
-              View on GitHub <ExternalLink className="h-3 w-3" />
+              View on GitHub <ExternalLink className="h-3 w-3 lucide-animated" />
             </a>
           </div>
 
@@ -421,7 +421,7 @@ const About: React.FC = () => {
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-900 transition-all hover:bg-slate-200 hover:scale-105"
               >
-                <Github className="h-4 w-4" />
+                <Github className="h-4 w-4 lucide-animated" />
                 <span>View on GitHub</span>
               </a>
               <a
@@ -430,7 +430,7 @@ const About: React.FC = () => {
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-pink-600 to-purple-600 px-6 py-3 text-sm font-semibold text-white transition-all hover:opacity-90 hover:scale-105"
               >
-                <Instagram className="h-4 w-4" />
+                <Instagram className="h-4 w-4 lucide-animated" />
                 <span>Try on Instagram</span>
               </a>
             </div>

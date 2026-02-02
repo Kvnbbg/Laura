@@ -561,7 +561,11 @@ function EntityForm<T extends Record<string, any>>({
         disabled={isSubmitting}
         className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+        {isSubmitting ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <Plus className="h-4 w-4 lucide-animated" />
+        )}
         {submitLabel}
       </button>
     </form>
@@ -572,7 +576,7 @@ function EntityForm<T extends Record<string, any>>({
 const ActivityFeed = memo<{ activities: ActivityLog[] }>(({ activities }) => (
   <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6">
     <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-white">
-      <Activity className="h-5 w-5 text-purple-400" />
+      <Activity className="h-5 w-5 text-purple-400 lucide-animated" />
       Live Activity Feed
     </h3>
     <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
@@ -626,7 +630,7 @@ const AIInsights = memo<{ metrics: DashboardMetrics; deals: CRMDeal[] }>(({ metr
   return (
     <div className="mb-8 rounded-2xl border border-indigo-500/20 bg-indigo-500/5 p-6 backdrop-blur-sm">
       <div className="flex items-center gap-2 mb-3">
-        <Sparkles className="h-5 w-5 text-indigo-400" />
+        <Sparkles className="h-5 w-5 text-indigo-400 lucide-animated" />
         <h3 className="text-lg font-semibold text-indigo-100">AI Insights</h3>
       </div>
       <ul className="space-y-2">
@@ -681,7 +685,7 @@ function EntityListItem<T extends CRMEntity>({
         className="ml-4 rounded-lg p-2 text-slate-500 opacity-0 transition-all hover:bg-rose-500/10 hover:text-rose-400 group-hover:opacity-100 focus:opacity-100"
         aria-label={`Delete ${getName(entity)}`}
       >
-        <Trash2 className="h-4 w-4" />
+        <Trash2 className="h-4 w-4 lucide-animated" />
       </button>
     </div>
   );
@@ -744,11 +748,11 @@ const Dashboard: React.FC = () => {
           </div>
           <div className="flex gap-3">
             <button className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-medium text-slate-300 transition-colors hover:bg-slate-800">
-              <Download className="h-4 w-4" />
+              <Download className="h-4 w-4 lucide-animated" />
               Export
             </button>
             <button className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-700">
-              <RefreshCcw className="h-4 w-4" />
+              <RefreshCcw className="h-4 w-4 lucide-animated" />
               Sync
             </button>
           </div>

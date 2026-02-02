@@ -42,7 +42,9 @@ const ExternalContactCard: React.FC<{
     
     <div className="relative">
       <div className={`mb-4 inline-flex rounded-lg ${featured ? 'bg-purple-500/20' : 'bg-slate-800'} p-3`}>
-        <Globe className={`h-6 w-6 ${featured ? 'text-purple-400' : 'text-slate-400'}`} />
+        <Globe
+          className={`h-6 w-6 lucide-animated ${featured ? 'text-purple-400' : 'text-slate-400'}`}
+        />
       </div>
       
       <h3 className={`text-xl font-bold mb-2 ${featured ? 'text-white' : 'text-slate-200'}`}>
@@ -66,7 +68,7 @@ const ExternalContactCard: React.FC<{
         }`}
       >
         <span>Go to techandstream.com</span>
-        <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+        <ExternalLink className="h-4 w-4 lucide-animated transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
       </a>
       
       <p className="mt-4 text-center text-xs text-slate-500">
@@ -121,7 +123,7 @@ const QuickContactForm: React.FC<{
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center animate-in fade-in zoom-in duration-500">
         <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400">
-          <Send className="h-8 w-8" />
+          <Send className="h-8 w-8 lucide-animated" />
         </div>
         <h3 className="mb-2 text-xl font-semibold text-white">Message Sent!</h3>
         <p className="mb-6 max-w-xs text-slate-400">
@@ -249,7 +251,7 @@ const QuickContactForm: React.FC<{
         ) : (
           <>
             <span>Send Message</span>
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            <ArrowRight className="h-4 w-4 lucide-animated transition-transform group-hover:translate-x-1" />
           </>
         )}
       </button>
@@ -271,7 +273,7 @@ const ContactMethodTabs: React.FC<{
             : 'text-slate-400 hover:text-slate-200'
         }`}
       >
-        <Globe className="h-4 w-4" />
+        <Globe className="h-4 w-4 lucide-animated" />
         Full Portal
       </button>
       <button
@@ -282,7 +284,7 @@ const ContactMethodTabs: React.FC<{
             : 'text-slate-400 hover:text-slate-200'
         }`}
       >
-        <MessageSquare className="h-4 w-4" />
+        <MessageSquare className="h-4 w-4 lucide-animated" />
         Quick Message
       </button>
     </div>
@@ -365,13 +367,13 @@ const Contact: React.FC = () => {
       return {
         type: 'warning' as const,
         message: 'Local mode active. For guaranteed delivery, please use the external contact portal.',
-        icon: <Clock className="h-4 w-4" />,
+        icon: <Clock className="h-4 w-4 lucide-animated" />,
       };
     }
     return {
       type: 'success' as const,
       message: 'Connected to messaging service',
-      icon: <Mail className="h-4 w-4" />,
+      icon: <Mail className="h-4 w-4 lucide-animated" />,
     };
   }, [contactEndpoint]);
 
@@ -396,7 +398,7 @@ const Contact: React.FC = () => {
             <div className="rounded-2xl border border-purple-500/30 bg-slate-900 p-8 text-center shadow-2xl">
               <div className="mb-4 flex justify-center">
                 <div className="h-12 w-12 animate-pulse rounded-full bg-purple-500/20 flex items-center justify-center">
-                  <ExternalLink className="h-6 w-6 text-purple-400" />
+                  <ExternalLink className="h-6 w-6 text-purple-400 lucide-animated" />
                 </div>
               </div>
               <h3 className="mb-2 text-xl font-bold text-white">Opening Contact Portal</h3>
@@ -511,7 +513,7 @@ const Contact: React.FC = () => {
                       className="group flex items-center gap-4 rounded-lg p-3 transition-colors hover:bg-slate-800"
                     >
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10 text-purple-400">
-                        <Mail className="h-5 w-5" />
+                        <Mail className="h-5 w-5 lucide-animated" />
                       </div>
                       <div>
                         <p className="font-medium text-slate-200 group-hover:text-white">Email Us</p>
@@ -521,7 +523,7 @@ const Contact: React.FC = () => {
 
                     <div className="flex items-center gap-4 rounded-lg p-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800 text-slate-400">
-                        <Clock className="h-5 w-5" />
+                        <Clock className="h-5 w-5 lucide-animated" />
                       </div>
                       <div>
                         <p className="font-medium text-slate-200">Response Time</p>
@@ -542,7 +544,7 @@ const Contact: React.FC = () => {
                     className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-600 bg-transparent px-4 py-3 text-sm font-medium text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
                   >
                     Visit External Portal
-                    <ExternalLink className="h-4 w-4" />
+                    <ExternalLink className="h-4 w-4 lucide-animated" />
                   </button>
                 </div>
               </div>
