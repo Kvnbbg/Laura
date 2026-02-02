@@ -117,10 +117,14 @@ const ReasoningChain: React.FC<{ steps: ReasoningStep[]; isVisible: boolean }> =
         className="flex w-full items-center justify-between text-xs font-medium text-indigo-300 hover:text-indigo-200"
       >
         <span className="flex items-center gap-2">
-          <Brain className="h-3.5 w-3.5" />
+          <Brain className="h-3.5 w-3.5 lucide-animated" />
           Chain-of-Thought Reasoning ({steps.length} steps)
         </span>
-        {expanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+        {expanded ? (
+          <ChevronDown className="h-3.5 w-3.5 lucide-animated" />
+        ) : (
+          <ChevronRight className="h-3.5 w-3.5 lucide-animated" />
+        )}
       </button>
       
       {expanded && (
@@ -156,7 +160,7 @@ const ReasoningChain: React.FC<{ steps: ReasoningStep[]; isVisible: boolean }> =
 const RAGContextPanel: React.FC<{ sources: RAGSource[] }> = ({ sources }) => (
   <div className="rounded-lg border border-purple-500/20 bg-purple-500/5 p-4 mb-4">
     <div className="flex items-center gap-2 mb-3 text-xs font-medium text-purple-300 uppercase tracking-wider">
-      <Database className="h-3.5 w-3.5" />
+      <Database className="h-3.5 w-3.5 lucide-animated" />
       Retrieved Context ({sources.length} sources)
     </div>
     <div className="space-y-2">
@@ -205,7 +209,7 @@ const ModelControls: React.FC<{
       >
         <div className="flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10 text-purple-400">
-            <Cpu className="h-4 w-4" />
+            <Cpu className="h-4 w-4 lucide-animated" />
           </div>
           <div>
             <h3 className="text-sm font-medium text-white">Model Configuration</h3>
@@ -217,7 +221,12 @@ const ModelControls: React.FC<{
             </p>
           </div>
         </div>
-        <Settings2 className={cn("h-4 w-4 text-slate-400 transition-transform", isOpen && "rotate-180")} />
+        <Settings2
+          className={cn(
+            "h-4 w-4 text-slate-400 transition-transform lucide-animated",
+            isOpen && "rotate-180"
+          )}
+        />
       </button>
 
       {isOpen && (
@@ -226,7 +235,7 @@ const ModelControls: React.FC<{
           <div>
             <label className="mb-2 flex items-center justify-between text-xs font-medium text-slate-300">
               <span className="flex items-center gap-1.5">
-                <Brain className="h-3.5 w-3.5 text-indigo-400" />
+                <Brain className="h-3.5 w-3.5 text-indigo-400 lucide-animated" />
                 Reasoning Depth
               </span>
               <span className="text-indigo-400">{config.reasoningMode}</span>
@@ -263,7 +272,7 @@ const ModelControls: React.FC<{
             <div>
               <div className="mb-1 flex items-center justify-between text-xs">
                 <span className="text-slate-400 flex items-center gap-1.5">
-                  <Thermometer className="h-3 w-3" />
+                  <Thermometer className="h-3 w-3 lucide-animated" />
                   Temperature (Randomness)
                 </span>
                 <span className="text-slate-200 font-mono">{config.temperature}</span>
@@ -287,7 +296,7 @@ const ModelControls: React.FC<{
             <div>
               <div className="mb-1 flex items-center justify-between text-xs">
                 <span className="text-slate-400 flex items-center gap-1.5">
-                  <Target className="h-3 w-3" />
+                  <Target className="h-3 w-3 lucide-animated" />
                   Top-p (Nucleus Sampling)
                 </span>
                 <span className="text-slate-200 font-mono">{config.topP}</span>
@@ -324,7 +333,7 @@ const ModelControls: React.FC<{
           <div className="space-y-2 pt-2 border-t border-slate-800">
             <label className="flex items-center justify-between cursor-pointer">
               <span className="text-xs text-slate-300 flex items-center gap-1.5">
-                <BookOpen className="h-3.5 w-3.5 text-purple-400" />
+                <BookOpen className="h-3.5 w-3.5 text-purple-400 lucide-animated" />
                 Enable RAG Retrieval
               </span>
               <input
@@ -337,7 +346,7 @@ const ModelControls: React.FC<{
             
             <label className="flex items-center justify-between cursor-pointer">
               <span className="text-xs text-slate-300 flex items-center gap-1.5">
-                <GitBranch className="h-3.5 w-3.5 text-indigo-400" />
+                <GitBranch className="h-3.5 w-3.5 text-indigo-400 lucide-animated" />
                 Show Thinking Process
               </span>
               <input
@@ -497,7 +506,7 @@ const Chat: React.FC = () => {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl flex items-center gap-3">
-                <Sparkles className="h-8 w-8 text-purple-400" />
+                <Sparkles className="h-8 w-8 text-purple-400 lucide-animated" />
                 Laura AI Control Center
               </h1>
               <p className="mt-2 text-slate-400 max-w-2xl">
@@ -525,25 +534,25 @@ const Chat: React.FC = () => {
                 Capability Matrix
               </h3>
               <CapabilityCard
-                icon={<Brain className="h-4 w-4" />}
+                icon={<Brain className="h-4 w-4 lucide-animated" />}
                 title="Chain-of-Thought Reasoning"
                 description="Explicit step-by-step thinking process with confidence scoring at each step."
                 deterministic={false}
               />
               <CapabilityCard
-                icon={<Database className="h-4 w-4" />}
+                icon={<Database className="h-4 w-4 lucide-animated" />}
                 title="RAG Retrieval"
                 description="Grounds responses in retrieved documents with relevance probabilities."
                 deterministic={false}
               />
               <CapabilityCard
-                icon={<BarChart3 className="h-4 w-4" />}
+                icon={<BarChart3 className="h-4 w-4 lucide-animated" />}
                 title="Uncertainty Quantification"
                 description="Top-p sampling and confidence intervals for transparent reliability."
                 deterministic={false}
               />
               <CapabilityCard
-                icon={<Layers className="h-4 w-4" />}
+                icon={<Layers className="h-4 w-4 lucide-animated" />}
                 title="Context Window Management"
                 description="Deterministic token counting and attention mechanisms."
                 deterministic={true}
@@ -558,7 +567,7 @@ const Chat: React.FC = () => {
               className="flex items-center gap-3 rounded-xl border border-pink-500/20 bg-gradient-to-r from-pink-500/10 to-purple-500/10 p-4 hover:border-pink-500/40 transition-all group"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-purple-600 text-white">
-                <MessageSquare className="h-5 w-5" />
+                <MessageSquare className="h-5 w-5 lucide-animated" />
               </div>
               <div className="flex-1">
                 <h4 className="text-sm font-medium text-white group-hover:text-pink-200 transition-colors">
@@ -566,7 +575,7 @@ const Chat: React.FC = () => {
                 </h4>
                 <p className="text-xs text-slate-400">Alternative conversational interface</p>
               </div>
-              <Zap className="h-4 w-4 text-pink-400" />
+              <Zap className="h-4 w-4 text-pink-400 lucide-animated" />
             </a>
           </div>
 
@@ -576,22 +585,37 @@ const Chat: React.FC = () => {
             {/* Configuration Status Bar */}
             <div className="flex flex-wrap items-center gap-3 rounded-lg border border-slate-800 bg-slate-900/50 p-3 text-xs">
               <span className="flex items-center gap-1.5 text-slate-400">
-                <Brain className={cn("h-3.5 w-3.5", config.reasoningMode === 'deep' && "text-indigo-400")} />
+                <Brain
+                  className={cn(
+                    "h-3.5 w-3.5 lucide-animated",
+                    config.reasoningMode === 'deep' && "text-indigo-400"
+                  )}
+                />
                 Reasoning: <span className="text-slate-200">{config.reasoningMode}</span>
               </span>
               <span className="w-px h-3 bg-slate-700" />
               <span className="flex items-center gap-1.5 text-slate-400">
-                <Thermometer className={cn("h-3.5 w-3.5", config.temperature > 1 ? "text-amber-400" : "text-blue-400")} />
+                <Thermometer
+                  className={cn(
+                    "h-3.5 w-3.5 lucide-animated",
+                    config.temperature > 1 ? "text-amber-400" : "text-blue-400"
+                  )}
+                />
                 Temp: <span className="text-slate-200">{config.temperature}</span>
               </span>
               <span className="w-px h-3 bg-slate-700" />
               <span className="flex items-center gap-1.5 text-slate-400">
-                <BookOpen className={cn("h-3.5 w-3.5", config.ragEnabled ? "text-purple-400" : "text-slate-600")} />
+                <BookOpen
+                  className={cn(
+                    "h-3.5 w-3.5 lucide-animated",
+                    config.ragEnabled ? "text-purple-400" : "text-slate-600"
+                  )}
+                />
                 RAG: <span className="text-slate-200">{config.ragEnabled ? 'ON' : 'OFF'}</span>
               </span>
               <span className="w-px h-3 bg-slate-700" />
               <span className="flex items-center gap-1.5 text-slate-400">
-                <Target className="h-3.5 w-3.5" />
+                <Target className="h-3.5 w-3.5 lucide-animated" />
                 Profile: <span className="text-slate-200 capitalize">{config.accuracyProfile}</span>
               </span>
             </div>
@@ -603,7 +627,7 @@ const Chat: React.FC = () => {
                 {messages.length === 0 && (
                   <div className="flex flex-col items-center justify-center h-full text-center text-slate-500 space-y-4">
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-800">
-                      <MessageSquare className="h-8 w-8 text-slate-600" />
+                      <MessageSquare className="h-8 w-8 text-slate-600 lucide-animated" />
                     </div>
                     <div>
                       <p className="text-lg font-medium text-slate-300">Start a conversation</p>
@@ -653,7 +677,7 @@ const Chat: React.FC = () => {
 
                     {msg.latency && (
                       <span className="mt-1 text-[10px] text-slate-600 flex items-center gap-1">
-                        <Zap className="h-3 w-3" />
+                        <Zap className="h-3 w-3 lucide-animated" />
                         {msg.latency}ms • {msg.tokensUsed?.output} tokens
                       </span>
                     )}
@@ -698,7 +722,7 @@ const Chat: React.FC = () => {
                     disabled={isProcessing}
                     className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-purple-700 disabled:opacity-50 transition-colors"
                   >
-                    <Send className="h-4 w-4" />
+                    <Send className="h-4 w-4 lucide-animated" />
                     Send
                   </button>
                 </form>
@@ -713,21 +737,21 @@ const Chat: React.FC = () => {
             {/* Educational Footer */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
               <div className="flex items-start gap-2 rounded-lg border border-slate-800 bg-slate-900/30 p-3">
-                <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+                <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5 lucide-animated" />
                 <div>
                   <span className="font-medium text-slate-300">Deterministic:</span>
                   <p className="text-slate-500 mt-0.5">Context windows, token limits, and system prompts behave predictably every time.</p>
                 </div>
               </div>
               <div className="flex items-start gap-2 rounded-lg border border-slate-800 bg-slate-900/30 p-3">
-                <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5 lucide-animated" />
                 <div>
                   <span className="font-medium text-slate-300">Probabilistic:</span>
                   <p className="text-slate-500 mt-0.5">Temperature, top-p, and reasoning paths introduce variability and creativity.</p>
                 </div>
               </div>
               <div className="flex items-start gap-2 rounded-lg border border-slate-800 bg-slate-900/30 p-3">
-                <Brain className="h-4 w-4 text-purple-400 shrink-0 mt-0.5" />
+                <Brain className="h-4 w-4 text-purple-400 shrink-0 mt-0.5 lucide-animated" />
                 <div>
                   <span className="font-medium text-slate-300">Emergent:</span>
                   <p className="text-slate-500 mt-0.5">Complex reasoning arises from simple probabilistic next-token prediction.</p>

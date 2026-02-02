@@ -223,3 +223,26 @@
     transform: translateY(-10px);
   }
 }
+
+// Lucide icon animation
+.lucide-animated {
+  animation: lucide-float 4s ease-in-out infinite;
+  transform-origin: center;
+  will-change: transform;
+}
+
+@keyframes lucide-float {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-3px) scale(1.05);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lucide-animated {
+    animation: none;
+  }
+}
