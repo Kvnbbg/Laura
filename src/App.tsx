@@ -6,6 +6,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Chat from './pages/Chat';
 import Dashboard from './pages/Dashboard';
+import Growth from './pages/Growth';
 import NotFound from './pages/NotFound';
 import './styles/main.scss';
 
@@ -20,6 +21,7 @@ const App = () => {
             <Route path="/contact" element={<Contact />} />
             <Route path="/chat" element={<Chat />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/growth" element={<Growth />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>
