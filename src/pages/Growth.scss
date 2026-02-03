@@ -1,0 +1,212 @@
+@use '../styles/variables' as *;
+
+.growth {
+  padding: $spacing-xl 0 $spacing-2xl;
+
+  .growth-hero {
+    text-align: center;
+    margin-bottom: $spacing-xl;
+
+    h1 {
+      margin-bottom: $spacing-sm;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      background: rgba($cosmic-indigo, 0.15);
+      color: $cosmic-indigo;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: $spacing-sm;
+    }
+
+    p {
+      max-width: 720px;
+      margin: 0 auto $spacing-lg;
+    }
+
+    .profile-switch {
+      display: inline-flex;
+      flex-direction: column;
+      gap: $spacing-xs;
+      align-items: center;
+
+      label {
+        font-size: 0.85rem;
+        color: $text-secondary;
+      }
+
+      select {
+        background: rgba($bg-dark, 0.5);
+        border: 1px solid rgba($border, 0.4);
+        color: $text-primary;
+        padding: 0.55rem 0.9rem;
+        border-radius: $radius-md;
+      }
+    }
+  }
+
+  .growth-panel {
+    margin-bottom: $spacing-xl;
+    background: rgba($bg-light, 0.04);
+    border: 1px solid rgba($border, 0.35);
+    border-radius: $radius-lg;
+    padding: $spacing-lg;
+
+    &__intro {
+      margin-bottom: $spacing-lg;
+
+      h2 {
+        margin-bottom: $spacing-xs;
+      }
+
+      p {
+        margin: 0;
+      }
+    }
+  }
+
+  .pipeline-grid {
+    display: grid;
+    gap: $spacing-md;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .pipeline-card {
+    background: rgba($bg-dark, 0.55);
+    border-radius: $radius-md;
+    padding: $spacing-md;
+    border: 1px solid rgba($border, 0.35);
+
+    .pipeline-index {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      background: rgba($cosmic-purple, 0.2);
+      color: $cosmic-purple;
+      font-weight: 600;
+      margin-bottom: $spacing-sm;
+    }
+  }
+
+  .recommendation-grid,
+  .booster-grid {
+    display: grid;
+    gap: $spacing-md;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  .recommendation-card {
+    background: rgba($bg-dark, 0.6);
+    border: 1px solid rgba($border, 0.35);
+    border-radius: $radius-lg;
+    padding: $spacing-md;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+
+    .handle {
+      font-size: 0.85rem;
+      color: $text-secondary;
+    }
+
+    .recommendation-header {
+      display: flex;
+      justify-content: space-between;
+      gap: $spacing-sm;
+    }
+
+    .score-pill {
+      background: rgba($cosmic-teal, 0.2);
+      color: $cosmic-teal;
+      padding: 0.35rem 0.65rem;
+      border-radius: 999px;
+      text-align: center;
+      font-size: 0.75rem;
+
+      strong {
+        display: block;
+        font-size: 1.1rem;
+      }
+    }
+
+    .recommendation-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: $spacing-sm;
+
+      span {
+        display: block;
+        font-size: 0.75rem;
+        color: $text-secondary;
+      }
+
+      strong {
+        font-size: 1rem;
+      }
+    }
+
+    .reason-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: $spacing-xs;
+
+      li {
+        padding: 0.4rem 0.6rem;
+        border-radius: $radius-sm;
+        background: rgba($cosmic-indigo, 0.12);
+        color: $text-primary;
+        font-size: 0.8rem;
+      }
+    }
+
+    .recommendation-footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: $text-secondary;
+    }
+  }
+
+  .booster-card {
+    background: rgba($bg-dark, 0.55);
+    border: 1px solid rgba($border, 0.35);
+    border-radius: $radius-lg;
+    padding: $spacing-md;
+    display: grid;
+    gap: $spacing-sm;
+
+    .booster-header {
+      display: flex;
+      justify-content: space-between;
+      gap: $spacing-sm;
+      align-items: flex-start;
+    }
+
+    .booster-lift {
+      background: rgba($cosmic-gold, 0.2);
+      color: $cosmic-gold;
+      padding: 0.25rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }
+
+    ul {
+      padding-left: 1.25rem;
+      margin: 0;
+      display: grid;
+      gap: $spacing-xs;
+      color: $text-secondary;
+      font-size: 0.85rem;
+    }
+  }
+}
