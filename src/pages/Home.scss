@@ -260,6 +260,49 @@
     }
   }
 
+  .insights {
+    .insights-card {
+      background: rgba($bg-light, 0.55);
+      border: 1px solid rgba($cosmic-purple, 0.25);
+      box-shadow: 0 12px 32px rgba($bg-dark, 0.3);
+    }
+
+    .code-block {
+      background: rgba($bg-dark, 0.8);
+      border-radius: $radius-md;
+      padding: $spacing-md;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      border: 1px solid rgba($cosmic-cyan, 0.25);
+      color: $text-primary;
+
+      code {
+        white-space: pre;
+      }
+    }
+
+    .insights-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: $spacing-md;
+
+      a {
+        color: $cosmic-cyan;
+        font-weight: 600;
+        display: inline-block;
+        margin-bottom: $spacing-xs;
+
+        &:hover,
+        &:focus-visible {
+          color: $cosmic-purple;
+        }
+      }
+    }
+  }
+
   .cta-card {
     background: rgba($bg-light, 0.8);
     padding: $spacing-xl;
