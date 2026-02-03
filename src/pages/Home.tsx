@@ -160,7 +160,7 @@ const STATIC_DATA = {
       description: 'Fully styled with scss-cosmic-dream for maintainable and beautiful styles.',
       icon: '🎨',
     },
-  ] as BaseCart[],
+  ] as BaseCard[],
 
   agenticCapabilities: [
     {
@@ -279,6 +279,100 @@ const STATIC_DATA = {
       actions: ['Generate KPI digest', 'Audit workflows', 'Optimize handoffs'],
     },
   ] as ExperienceMode[],
+
+  engineeringPrinciples: [
+    {
+      id: 'dry',
+      title: 'DRY Foundations',
+      description: 'Reusable hooks, shared UI primitives, and composable layouts keep the experience consistent.',
+      icon: '♻️',
+    },
+    {
+      id: 'crud',
+      title: 'CRUD Clarity',
+      description: 'Predictable create/update flows map cleanly to the CRM dashboard and form scaffolding.',
+      icon: '🧩',
+    },
+    {
+      id: 'solid',
+      title: 'SOLID Architecture',
+      description: 'Interface-driven components keep the UI open for extension without breaking.',
+      icon: '🧱',
+    },
+    {
+      id: 'smart',
+      title: 'SMART Delivery',
+      description: 'Specific, measurable goals keep feature rollouts reliable and sprint-ready.',
+      icon: '🎯',
+    },
+  ] as BaseCard[],
+
+  metricsHighlights: [
+    {
+      id: 'dora',
+      title: 'DORA Metrics',
+      description: 'Track deployment frequency, lead time, MTTR, and change failure rate together.',
+      icon: '📈',
+    },
+    {
+      id: 'latency',
+      title: 'Latency',
+      description: 'Measure request round-trip time to keep the chat and dashboard responsive.',
+      icon: '⏱️',
+    },
+    {
+      id: 'cash-flow',
+      title: 'Cash-Flow',
+      description: 'Monitor weighted pipeline and revenue velocity to keep operations healthy.',
+      icon: '💸',
+    },
+  ] as BaseCard[],
+
+  algorithmSpotlight: {
+    title: 'Algorithm Spotlight: Trionic Sequence',
+    description:
+      'A trionic sequence rises, falls, then rises again—useful for detecting multi-phase behavioral patterns.',
+    code: `const isTrionic = (nums: number[]): boolean => {
+  const n = nums.length;
+  let p = 0;
+
+  // Phase 1: strictly increasing
+  while (p < n - 2 && nums[p] < nums[p + 1]) p += 1;
+  if (p === 0) return false;
+
+  // Phase 2: strictly decreasing
+  let q = p;
+  while (q < n - 1 && nums[q] > nums[q + 1]) q += 1;
+  if (q === p || q === n - 1) return false;
+
+  // Phase 3: strictly increasing
+  while (q < n - 1 && nums[q] < nums[q + 1]) q += 1;
+
+  return q === n - 1;
+};`,
+    example: '[1, 3, 5, 4, 2, 6, 9] → true',
+  },
+
+  followReferences: [
+    {
+      id: 'twitter-algo',
+      label: 'X (Twitter) The Algorithm',
+      description: 'Open-source recommendation stack with follow recommendations service architecture.',
+      href: 'https://github.com/twitter/the-algorithm',
+    },
+    {
+      id: 'frs-readme',
+      label: 'Follow Recommendations Service (FRS)',
+      description: 'Detailed pipeline breakdown: candidate generation, ranking, filtering, and scoring.',
+      href: 'https://github.com/twitter/the-algorithm/blob/main/follow-recommendations-service/README.md',
+    },
+    {
+      id: 'friend-reco',
+      label: 'Friend Recommendation Blueprint',
+      description: 'Graph-based link prediction features (mutuals, PageRank, Katz scores).',
+      href: 'https://github.com/somjit101/Facebook-Friend-Recommendation',
+    },
+  ],
 };
 
 // ============================================================================
@@ -459,6 +553,69 @@ const Home: React.FC = () => {
                 </span>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* Engineering Insights Section */}
+        <section className="insights py-12 md:py-16" aria-labelledby="insights-title">
+          <SectionHeader
+            title="Engineering Insights"
+            subtitle="Operational principles, software metrics, and algorithmic patterns that keep Laura grounded."
+          />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            {STATIC_DATA.engineeringPrinciples.map((principle, index) => (
+              <FeatureCard
+                key={principle.id}
+                card={principle}
+                index={index}
+                getDelay={getDelay}
+              />
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            {STATIC_DATA.metricsHighlights.map((metric, index) => (
+              <FeatureCard
+                key={metric.id}
+                card={metric}
+                index={index}
+                getDelay={getDelay}
+              />
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <article className="card insights-card p-6 md:p-8">
+              <div className="insights-header">
+                <h3 className="text-xl md:text-2xl font-bold mb-2">
+                  {STATIC_DATA.algorithmSpotlight.title}
+                </h3>
+                <p className="text-secondary mb-4">
+                  {STATIC_DATA.algorithmSpotlight.description}
+                </p>
+              </div>
+              <pre className="code-block">
+                <code>{STATIC_DATA.algorithmSpotlight.code}</code>
+              </pre>
+              <p className="text-secondary mt-4 text-sm">
+                Example: <span className="text-primary">{STATIC_DATA.algorithmSpotlight.example}</span>
+              </p>
+            </article>
+
+            <article className="card insights-card p-6 md:p-8">
+              <h3 className="text-xl md:text-2xl font-bold mb-4">Follow Recommendation References</h3>
+              <ul className="insights-links">
+                {STATIC_DATA.followReferences.map((item) => (
+                  <li key={item.id}>
+                    <a href={item.href} target="_blank" rel="noopener noreferrer">
+                      {item.label}
+                    </a>
+                    <p className="text-secondary text-sm">{item.description}</p>
+                  </li>
+                ))}
+              </ul>
+            </article>
           </div>
         </section>
 
