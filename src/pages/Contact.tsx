@@ -82,7 +82,8 @@ const QuickContactForm: React.FC<{
   onSubmit: (data: ContactFormData) => Promise<void>;
   status: FormStatus;
   errorMessage: string | null;
-}> = ({ onSubmit, status, errorMessage }) => {
+  onReset: () => void;
+}> = ({ onSubmit, status, errorMessage, onReset }) => {
   const [formData, setFormData] = useState<ContactFormData>({
     name: '',
     email: '',
@@ -119,6 +120,11 @@ const QuickContactForm: React.FC<{
     }
   }, [isSuccess]);
 
+  const handleReset = useCallback(() => {
+    setFormData({ name: '', email: '', subject: '', message: '', priority: 'normal' });
+    onReset();
+  }, [onReset]);
+
   if (isSuccess) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center animate-in fade-in zoom-in duration-500">
@@ -130,7 +136,8 @@ const QuickContactForm: React.FC<{
           Thanks for reaching out. We'll get back to you within 24 hours.
         </p>
         <button
-          onClick={() => window.location.reload()}
+          type="button"
+          onClick={handleReset}
           className="text-sm text-purple-400 hover:text-purple-300"
         >
           Send another message
@@ -380,6 +387,11 @@ const Contact: React.FC = () => {
     }
   }, [contactEndpoint]);
 
+  const handleFormReset = useCallback(() => {
+    setStatus('idle');
+    setErrorMessage(null);
+  }, []);
+
   const connectionStatus = useMemo(() => {
     if (!contactEndpoint) {
       return {
@@ -506,6 +518,7 @@ const Contact: React.FC = () => {
                     onSubmit={handleLocalSubmit}
                     status={status}
                     errorMessage={errorMessage}
+                    onReset={handleFormReset}
                   />
 
                   {/* External Hint (appears after delay) */}
