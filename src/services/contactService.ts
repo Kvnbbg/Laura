@@ -6,6 +6,8 @@ import { fetchWithTimeout } from './http';
 export type ContactPayload = {
   name: string;
   email: string;
+  subject: string;
+  priority: 'low' | 'normal' | 'high';
   message: string;
 };
 
@@ -19,9 +21,14 @@ const simulateNetworkDelay = (durationMs: number) =>
 const isNonEmptyString = (value: unknown): value is string =>
   typeof value === 'string' && value.trim().length > 0;
 
+const isValidPriority = (value: unknown): value is ContactPayload['priority'] =>
+  value === 'low' || value === 'normal' || value === 'high';
+
 const isValidContactPayload = (payload: ContactPayload) =>
   isNonEmptyString(payload?.name) &&
   isNonEmptyString(payload?.email) &&
+  isNonEmptyString(payload?.subject) &&
+  isValidPriority(payload?.priority) &&
   isNonEmptyString(payload?.message);
 
 export const submitContactForm = async (

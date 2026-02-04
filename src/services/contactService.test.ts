@@ -18,7 +18,13 @@ describe('submitContactForm', () => {
 
     vi.useFakeTimers();
     const promise = submitContactForm(
-      { name: 'Test', email: 'test@example.com', message: 'Hello' },
+      {
+        name: 'Test',
+        email: 'test@example.com',
+        subject: 'Hello there',
+        priority: 'normal',
+        message: 'Hello',
+      },
       config
     );
 
@@ -44,7 +50,13 @@ describe('submitContactForm', () => {
 
     await expect(
       submitContactForm(
-        { name: 'Test', email: 'test@example.com', message: 'Hello' },
+        {
+          name: 'Test',
+          email: 'test@example.com',
+          subject: 'Hello there',
+          priority: 'normal',
+          message: 'Hello',
+        },
         config
       )
     ).rejects.toBeInstanceOf(AppError);
