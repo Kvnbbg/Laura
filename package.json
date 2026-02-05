@@ -14,13 +14,16 @@
     "test": "vitest"
   },
   "dependencies": {
+    "clsx": "^2.1.1",
     "cors": "^2.8.5",
     "express": "^4.19.2",
+    "lucide-react": "^0.563.0",
     "multer": "^1.4.5-lts.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.20.0",
-    "sirv-cli": "^3.0.1"
+    "sirv-cli": "^3.0.1",
+    "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",

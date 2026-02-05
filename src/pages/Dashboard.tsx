@@ -10,18 +10,18 @@ import {
   memo,
   useTransition 
 } from 'react';
-import { 
-  Loader2, 
-  Plus, 
-  Trash2, 
-  RefreshCcw, 
-  Download, 
+import {
+  Loader2,
+  Plus,
+  Trash2,
+  RefreshCcw,
+  Download,
   Activity,
   Sparkles,
-  MoreHorizontal 
-} from 'lucide-react'; // Add: npm i lucide-react
-import { clsx, type ClassValue } from 'clsx'; // Add: npm i clsx
-import { twMerge } from 'tailwind-merge'; // Add: npm i tailwind-merge
+  MoreHorizontal,
+} from 'lucide-react';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 // ============================================================================
 // UTILITY FUNCTIONS (Mobile-first & Accessibility)
