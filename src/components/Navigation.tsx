@@ -13,6 +13,7 @@ const Navigation = () => {
     { to: '/chat', label: 'Chat' },
     { to: '/dashboard', label: 'Dashboard' },
     { to: '/growth', label: 'Growth Lab' },
+    { to: '/eco-hub', label: 'Eco Hub' },
   ];
 
   const isActive = (path: string) => location.pathname === path;

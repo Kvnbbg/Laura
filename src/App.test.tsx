@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest';
 import App from './App';
 
 describe('App', () => {
-  it('renders the main navigation', () => {
+  it('renders the main navigation with eco hub access', () => {
     render(<App />);
-    const linkElement = screen.getByText(/Home/i);
-    expect(linkElement).toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: /home/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: /eco hub/i }).length).toBeGreaterThan(0);
   });
 });
