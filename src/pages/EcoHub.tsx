@@ -87,6 +87,12 @@ const coreLinks: ResourceItem[] = [
     link: 'https://github.com/Kvnbbg/Laura',
   },
   {
+    name: 'Kvnbbg GitHub',
+    description: 'Maintainer organization profile with related operational tooling repositories.',
+    keyUse: 'Discover supporting utilities (e.g., security scanners) for safer deployments.',
+    link: 'https://github.com/Kvnbbg',
+  },
+  {
     name: 'TechAndStream EarthDayCelebration',
     description: 'Current web wiring and deployment surface for the chatbot experience.',
     keyUse: 'Operational endpoint for daily eco-access and public interactions.',
