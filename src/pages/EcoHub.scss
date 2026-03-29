@@ -1,0 +1,59 @@
+@use '../styles/variables' as *;
+
+.eco-hub-page {
+  display: grid;
+  gap: $spacing-lg;
+
+  .hero {
+    .eyebrow {
+      font-size: $font-size-xs;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: $text-secondary;
+      margin-bottom: $spacing-xs;
+    }
+
+    h1 {
+      margin-bottom: $spacing-sm;
+    }
+  }
+
+  .eco-section {
+    h2 {
+      margin-bottom: $spacing-sm;
+    }
+  }
+
+  .eco-grid {
+    display: grid;
+    gap: $spacing-sm;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .eco-item {
+    padding: $spacing-sm;
+    border: 1px solid rgba($text-secondary, 0.2);
+    border-radius: $radius-lg;
+    background: rgba($bg-light, 0.25);
+
+    h3 {
+      font-size: $font-size-base;
+      margin-bottom: $spacing-xs;
+    }
+
+    p {
+      margin-bottom: $spacing-xs;
+      color: $text-secondary;
+    }
+
+    .key-use {
+      color: $text-primary;
+    }
+
+    a {
+      color: $cosmic-cyan;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  }
+}
