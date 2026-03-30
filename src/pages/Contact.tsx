@@ -310,6 +310,7 @@ const Contact: React.FC = () => {
   const [status, setStatus] = useState<FormStatus>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [redirectCountdown, setRedirectCountdown] = useState<number | null>(null);
+  const [showExternalHint, setShowExternalHint] = useState(false);
   const redirectTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -325,13 +326,23 @@ const Contact: React.FC = () => {
   useEffect(() => {
     if (activeMethod === 'local' && status === 'idle') {
       const timer = setTimeout(() => {
-        // Subtle hint to use external form after 10 seconds on local form
-        const hint = document.getElementById('external-hint');
-        hint?.classList.remove('opacity-0');
+        setShowExternalHint(true);
       }, 10000);
       return () => clearTimeout(timer);
     }
+    setShowExternalHint(false);
   }, [activeMethod, status]);
+
+  const openExternalPortal = useCallback(() => {
+    const openedWindow = window.open(EXTERNAL_CONTACT_URL, '_blank', 'noopener,noreferrer');
+    if (openedWindow) {
+      openedWindow.opener = null;
+      return;
+    }
+
+    // Fallback for popup-blocked environments.
+    window.location.assign(EXTERNAL_CONTACT_URL);
+  }, []);
 
   // Handle external link click with optional countdown redirect
   const handleExternalSelect = useCallback((event: React.MouseEvent<HTMLAnchorElement>) => {
@@ -352,13 +363,13 @@ const Contact: React.FC = () => {
             clearInterval(redirectTimerRef.current);
             redirectTimerRef.current = null;
           }
-          window.open(EXTERNAL_CONTACT_URL, '_blank');
+          openExternalPortal();
           return null;
         }
         return prev ? prev - 1 : null;
       });
     }, 1000);
-  }, []);
+  }, [openExternalPortal]);
 
   const handleLocalSubmit = useCallback(async (data: ContactFormData) => {
     setStatus('sending');
@@ -373,7 +384,7 @@ const Contact: React.FC = () => {
         // After showing success, offer to redirect to external for "more options"
         setTimeout(() => {
           if (window.confirm('Message saved locally! Would you like to visit our full contact portal for additional features?')) {
-            window.open(EXTERNAL_CONTACT_URL, '_blank');
+            openExternalPortal();
           }
         }, 2000);
         return;
@@ -385,7 +396,7 @@ const Contact: React.FC = () => {
       setStatus('error');
       setErrorMessage(getErrorMessage(error));
     }
-  }, [contactEndpoint]);
+  }, [contactEndpoint, openExternalPortal]);
 
   const handleFormReset = useCallback(() => {
     setStatus('idle');
@@ -440,7 +451,7 @@ const Contact: React.FC = () => {
                     clearInterval(redirectTimerRef.current);
                     redirectTimerRef.current = null;
                   }
-                  window.open(EXTERNAL_CONTACT_URL, '_blank');
+                  openExternalPortal();
                 }}
                 className="text-sm text-purple-400 hover:text-purple-300 underline"
               >
@@ -522,7 +533,10 @@ const Contact: React.FC = () => {
                   />
 
                   {/* External Hint (appears after delay) */}
-                  <div id="external-hint" className="mt-6 opacity-0 transition-opacity duration-500">
+                  <div
+                    id="external-hint"
+                    className={`mt-6 transition-opacity duration-500 ${showExternalHint ? 'opacity-100' : 'opacity-0'}`}
+                  >
                     <div className="rounded-lg border border-purple-500/20 bg-purple-500/5 p-4 text-center">
                       <p className="mb-2 text-sm text-slate-300">
                         Need more options or file uploads?
