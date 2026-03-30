@@ -13,7 +13,7 @@ import './styles/main.scss';
 
 const App = () => {
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <ErrorBoundary>
         <Layout>
           <Routes>
