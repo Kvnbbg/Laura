@@ -393,7 +393,7 @@ const About: React.FC = () => {
               { icon: "🛸", name: "React Router", desc: "Navigation through possibility space" },
               { icon: "📡", name: "WebSocket", desc: "Real-time quantum entanglement" },
               { icon: "🌌", name: "Vercel", desc: "Edge deployment across the galaxy" }
-            ].map((tech, i) => (
+            ].map((tech) => (
               <div 
                 key={tech.name} 
                 className="group rounded-xl border border-slate-800 bg-slate-900/20 p-4 text-center transition-all hover:border-purple-500/30 hover:bg-slate-800/30"

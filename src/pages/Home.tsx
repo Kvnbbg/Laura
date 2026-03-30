@@ -50,7 +50,7 @@ interface ChecklistStep {
 
 const useAnimatedDelay = (baseDelay: number = 0.08) => {
   return useCallback(
-    (index: number): React.CSSProperties => ({
+    (index: number): React.CSSProperties & Record<'--delay', string> => ({
       '--delay': `${index * baseDelay}s`,
       animationDelay: `${index * baseDelay}s`,
     }),

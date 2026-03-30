@@ -2,10 +2,7 @@ import {
   useState, 
   useMemo, 
   useCallback, 
-  useRef, 
   useEffect,
-  createContext, 
-  useContext, 
   ReactNode,
   memo,
   useTransition 
@@ -18,7 +15,6 @@ import {
   Download,
   Activity,
   Sparkles,
-  MoreHorizontal,
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -125,19 +121,21 @@ class CRMRepository {
   constructor() {
     // Seed data
     this.contacts = [
-      { id: '1', name: 'Alice Corp', company: 'TechStart', email: 'alice@tech.com', segment: 'Enterprise', createdAt: new Date(), updatedAt: new Date() },
+      { id: '1', type: 'contact', name: 'Alice Corp', company: 'TechStart', email: 'alice@tech.com', segment: 'Enterprise', createdAt: new Date(), updatedAt: new Date() },
     ];
     this.deals = [
-      { id: '1', name: 'Q4 Software License', company: 'TechStart', value: 50000, stage: 'Proposal', owner: 'John Doe', createdAt: new Date(), updatedAt: new Date() },
+      { id: '1', type: 'deal', name: 'Q4 Software License', company: 'TechStart', value: 50000, stage: 'Proposal', owner: 'John Doe', createdAt: new Date(), updatedAt: new Date() },
     ];
     this.tasks = [
-      { id: '1', title: 'Follow up on proposal', owner: 'John Doe', dueDate: new Date().toISOString().split('T')[0], status: 'Open', priority: 'High', createdAt: new Date(), updatedAt: new Date() },
+      { id: '1', type: 'task', title: 'Follow up on proposal', owner: 'John Doe', dueDate: new Date().toISOString().split('T')[0], status: 'Open', priority: 'High', createdAt: new Date(), updatedAt: new Date() },
     ];
   }
 
   subscribe(callback: () => void) {
     this.listeners.add(callback);
-    return () => this.listeners.delete(callback);
+    return () => {
+      this.listeners.delete(callback);
+    };
   }
 
   private notify() {
@@ -343,13 +341,13 @@ function useCRMData() {
     
     switch (type) {
       case 'contact':
-        result = crmRepo.updateContact(id, updates) as unknown as T;
+        result = crmRepo.updateContact(id, updates as Partial<CRMContact>) as unknown as T;
         break;
       case 'deal':
-        result = crmRepo.updateDeal(id, updates) as unknown as T;
+        result = crmRepo.updateDeal(id, updates as Partial<CRMDeal>) as unknown as T;
         break;
       case 'task':
-        result = crmRepo.updateTask(id, updates) as unknown as T;
+        result = crmRepo.updateTask(id, updates as Partial<CRMTask>) as unknown as T;
         break;
     }
 
@@ -380,7 +378,7 @@ function useCRMData() {
     return success;
   }, [logActivity]);
 
-  const metrics = useMemo(() => crmRepo.getMetrics(), [data]);
+  const metrics = crmRepo.getMetrics();
 
   return {
     ...data,
@@ -394,12 +392,12 @@ function useCRMData() {
 }
 
 // Generic form hook
-function useForm<T extends Record<string, any>>(initialState: T, onSubmit: (data: T) => void) {
+function useForm<T extends Record<string, unknown>>(initialState: T, onSubmit: (data: T) => void) {
   const [values, setValues] = useState<T>(initialState);
   const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleChange = useCallback((field: keyof T, value: any) => {
+  const handleChange = useCallback((field: keyof T, value: unknown) => {
     setValues(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
@@ -503,20 +501,20 @@ interface FieldConfig {
   required?: boolean;
 }
 
-function EntityForm<T extends Record<string, any>>({
+function EntityForm<T extends Record<string, unknown>>({
   fields,
   initialData,
   onSubmit,
   submitLabel = 'Save',
-  entityType,
 }: {
   fields: FieldConfig[];
   initialData: T;
   onSubmit: (data: T) => void;
   submitLabel?: string;
-  entityType: EntityType;
 }) {
   const { values, errors, isSubmitting, handleChange, handleSubmit } = useForm(initialData, onSubmit);
+  const toInputValue = (value: unknown): string | number =>
+    typeof value === 'number' ? value : (value as string | undefined) ?? '';
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -527,7 +525,7 @@ function EntityForm<T extends Record<string, any>>({
           </label>
           {field.type === 'select' ? (
             <select
-              value={values[field.name] || ''}
+              value={toInputValue(values[field.name])}
               onChange={(e) => handleChange(field.name, e.target.value)}
               className={cn(
                 "w-full rounded-lg border bg-slate-900/50 px-4 py-2.5 text-sm text-white outline-none transition-colors",
@@ -541,7 +539,7 @@ function EntityForm<T extends Record<string, any>>({
           ) : (
             <input
               type={field.type}
-              value={values[field.name] || ''}
+              value={toInputValue(values[field.name])}
               onChange={(e) => handleChange(field.name, e.target.value)}
               placeholder={field.label}
               className={cn(
@@ -704,11 +702,10 @@ const Dashboard: React.FC = () => {
     activities,
     isLoading,
     createEntity, 
-    updateEntity, 
+    updateEntity,
     deleteEntity 
   } = useCRMData();
 
-  const [activeTab, setActiveTab] = useState<'all' | 'contacts' | 'deals' | 'tasks'>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
   // Filtered views
@@ -811,7 +808,6 @@ const Dashboard: React.FC = () => {
                 <div className="rounded-2xl border border-slate-800 bg-slate-900/30 p-6">
                   <h3 className="mb-4 text-lg font-semibold text-white">New Deal</h3>
                   <EntityForm< Omit<CRMDeal, 'id' | 'createdAt' | 'updatedAt' | 'type'> >
-                    entityType="deal"
                     fields={[
                       { name: 'name', label: 'Deal Name', type: 'text', required: true },
                       { name: 'company', label: 'Company', type: 'text', required: true },
@@ -881,7 +877,6 @@ const Dashboard: React.FC = () => {
                 <SectionHeader title="Contacts" subtitle="Manage relationships" />
                 <div className="space-y-4">
                   <EntityForm< Omit<CRMContact, 'id' | 'createdAt' | 'updatedAt' | 'type'> >
-                    entityType="contact"
                     fields={[
                       { name: 'name', label: 'Full Name', type: 'text', required: true },
                       { name: 'company', label: 'Company', type: 'text', required: true },
@@ -924,7 +919,6 @@ const Dashboard: React.FC = () => {
                 <SectionHeader title="Execution Board" subtitle="Task management" />
                 <div className="space-y-4">
                   <EntityForm< Omit<CRMTask, 'id' | 'createdAt' | 'updatedAt' | 'type'> >
-                    entityType="task"
                     fields={[
                       { name: 'title', label: 'Task Title', type: 'text', required: true },
                       { name: 'owner', label: 'Owner', type: 'text', required: true },
