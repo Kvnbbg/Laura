@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { 
   Brain, 
   BookOpen, 
@@ -16,11 +16,11 @@ import {
   Database,
   Cpu,
   BarChart3,
-  Layers
+  Layers,
+  Send
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import ChatWidget from '../components/ChatWidget';
 import './Chat.scss';
 
 // Utility
@@ -34,8 +34,6 @@ function cn(...inputs: ClassValue[]) {
 
 type ReasoningMode = 'fast' | 'balanced' | 'deep'; // DeepSeek R1 style
 type AccuracyProfile = 'precise' | 'balanced' | 'creative';
-type TaskDomain = 'general' | 'code' | 'analysis' | 'research' | 'creative';
-
 interface RAGSource {
   id: string;
   title: string;
@@ -53,7 +51,7 @@ interface ReasoningStep {
   step: number;
   thought: string;
   confidence: number;
-  type: 'deduction' | 'retrieval' | 'calculation' | ' speculation';
+  type: 'deduction' | 'retrieval' | 'calculation' | 'speculation';
   timestamp: Date;
 }
 
@@ -129,7 +127,7 @@ const ReasoningChain: React.FC<{ steps: ReasoningStep[]; isVisible: boolean }> =
       
       {expanded && (
         <div className="mt-3 space-y-2 border-t border-indigo-500/10 pt-3">
-          {steps.map((step, idx) => (
+          {steps.map((step) => (
             <div key={step.id} className="flex gap-3 text-xs">
               <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-500/20 text-indigo-300 font-mono">
                 {step.step}
@@ -455,7 +453,7 @@ const Chat: React.FC = () => {
         type: 'calculation',
         timestamp: new Date(),
       },
-    ] : undefined;
+    ] : [];
 
     await new Promise(resolve => setTimeout(resolve, delay));
 
