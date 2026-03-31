@@ -273,6 +273,7 @@ const ContactMethodTabs: React.FC<{
   <div className="mb-8 flex justify-center">
     <div className="inline-flex rounded-full border border-slate-700 bg-slate-900/50 p-1">
       <button
+        type="button"
         onClick={() => onChange('external')}
         className={`flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-medium transition-all ${
           active === 'external'
@@ -284,6 +285,7 @@ const ContactMethodTabs: React.FC<{
         Full Portal
       </button>
       <button
+        type="button"
         onClick={() => onChange('local')}
         className={`flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-medium transition-all ${
           active === 'local'
@@ -542,6 +544,7 @@ const Contact: React.FC = () => {
                         Need more options or file uploads?
                       </p>
                       <button
+                        type="button"
                         onClick={() => setActiveMethod('external')}
                         className="text-sm font-medium text-purple-400 hover:text-purple-300"
                       >
