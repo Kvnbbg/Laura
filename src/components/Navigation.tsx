@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Navigation.scss';
 
@@ -18,6 +18,10 @@ const Navigation = () => {
 
   const isActive = (path: string) => location.pathname === path;
   const closeMenu = () => setIsMenuOpen(false);
+
+  useEffect(() => {
+    closeMenu();
+  }, [location.pathname]);
 
   return (
     <header className="navigation">
