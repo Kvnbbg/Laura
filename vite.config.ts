@@ -19,7 +19,7 @@ export default defineConfig({
       external: ['fsevents'],
       output: {
         manualChunks: {
-          vendor: ['vite', 'react', 'react-dom', 'react-router-dom'],
+          vendor: ['react', 'react-dom', 'react-router-dom'],
         },
       },
     },
