@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import App from './App';
 
@@ -37,5 +37,40 @@ describe('App user journeys', () => {
 
     fireEvent.click(screen.getByRole('link', { name: /return home/i }));
     expect(screen.getByRole('heading', { name: /welcome to laura/i })).toBeInTheDocument();
+  });
+
+  it('navigates through advanced routes and displays route-specific headings', () => {
+    window.history.pushState({}, '', '/');
+    render(<App />);
+
+    fireEvent.click(screen.getAllByRole('link', { name: /dashboard/i })[0]);
+    expect(screen.getByRole('heading', { name: /crm command center/i })).toBeInTheDocument();
+
+    fireEvent.click(screen.getAllByRole('link', { name: /growth lab/i })[0]);
+    expect(screen.getByRole('heading', { name: /follow & like lift lab/i })).toBeInTheDocument();
+
+    fireEvent.click(screen.getAllByRole('link', { name: /eco hub/i })[0]);
+    expect(screen.getByRole('heading', { name: /eco integration command center/i })).toBeInTheDocument();
+  });
+
+  it('keeps chat flow resilient by trimming input and unblocking after response', async () => {
+    window.history.pushState({}, '', '/chat');
+    render(<App />);
+
+    const input = screen.getByPlaceholderText(/ask anything/i);
+    const sendButton = screen.getByRole('button', { name: /send/i });
+
+    fireEvent.change(input, { target: { value: '   '} });
+    fireEvent.click(sendButton);
+    expect(screen.queryByText('   ')).not.toBeInTheDocument();
+
+    fireEvent.change(input, { target: { value: '   Quantum diagnostics   ' } });
+    fireEvent.click(sendButton);
+    expect(screen.getByText('Quantum diagnostics')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /send/i })).toBeDisabled();
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /send/i })).not.toBeDisabled();
+    }, { timeout: 4000 });
   });
 });

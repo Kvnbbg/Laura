@@ -335,6 +335,11 @@ const Contact: React.FC = () => {
     setShowExternalHint(false);
   }, [activeMethod, status]);
 
+  useEffect(() => {
+    setStatus('idle');
+    setErrorMessage(null);
+  }, [activeMethod]);
+
   const openExternalPortal = useCallback(() => {
     const openedWindow = window.open(EXTERNAL_CONTACT_URL, '_blank', 'noopener,noreferrer');
     if (openedWindow) {

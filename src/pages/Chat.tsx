@@ -695,16 +695,18 @@ const Chat: React.FC = () => {
                 <form 
                   onSubmit={(e) => {
                     e.preventDefault();
+                    if (isProcessing) return;
                     const input = (e.target as HTMLFormElement).elements.namedItem('message') as HTMLInputElement;
-                    if (!input.value.trim()) return;
+                    const trimmedMessage = input.value.trim();
+                    if (!trimmedMessage) return;
                     
                     const userMsg: Message = {
                       id: Math.random().toString(36).substr(2, 9),
                       role: 'user',
-                      content: input.value,
+                      content: trimmedMessage,
                     };
                     setMessages(prev => [...prev, userMsg]);
-                    simulateThinkingResponse(input.value);
+                    simulateThinkingResponse(trimmedMessage);
                     input.value = '';
                   }}
                   className="flex gap-2"
@@ -713,6 +715,7 @@ const Chat: React.FC = () => {
                     name="message"
                     type="text"
                     placeholder={`Ask anything (${config.accuracyProfile} mode)...`}
+                    disabled={isProcessing}
                     className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-sm text-white outline-none focus:border-purple-500 placeholder:text-slate-500"
                   />
                   <button
