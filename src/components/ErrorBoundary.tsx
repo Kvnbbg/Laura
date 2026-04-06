@@ -37,6 +37,12 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     window.location.reload();
   };
 
+  handleBackToHome = () => {
+    window.history.pushState({}, '', '/');
+    this.setState({ hasError: false, message: '' });
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  };
+
   render() {
     if (this.state.hasError) {
       return (
@@ -52,9 +58,13 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
               >
                 Reload the app
               </button>
-              <a className="btn btn-secondary" href="/">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={this.handleBackToHome}
+              >
                 Back to home
-              </a>
+              </button>
             </div>
           </div>
         </div>
