@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { 
   Brain, 
   BookOpen, 
@@ -17,7 +17,9 @@ import {
   Cpu,
   BarChart3,
   Layers,
-  Send
+  Send,
+  Mic,
+  MicOff
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -79,6 +81,20 @@ interface ModelConfig {
   showThinking: boolean;
   accuracyProfile: AccuracyProfile;
 }
+
+type SpeechRecognitionInstance = {
+  lang: string;
+  interimResults: boolean;
+  maxAlternatives: number;
+  continuous: boolean;
+  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+};
+
+type SpeechRecognitionCtor = new () => SpeechRecognitionInstance;
 
 // ============================================================================
 // COMPONENTS - AI Capability Demonstrators
@@ -419,6 +435,22 @@ const Chat: React.FC = () => {
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [messageInput, setMessageInput] = useState('');
+  const [isListening, setIsListening] = useState(false);
+  const [voiceAvailable, setVoiceAvailable] = useState(true);
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+
+  const quickReplies = useMemo(
+    () => [
+      'Bonjour Laura 👋',
+      'Fais-moi un plan pour aujourd’hui',
+      'Aide-moi à organiser mes tâches',
+      'Montre les prochaines priorités',
+      'Résume la conversation en 3 points',
+      'Je veux une réponse simple et courte',
+    ],
+    []
+  );
 
   // Simulate a reasoning response (DeepSeek/Qwen style)
   const simulateThinkingResponse = useCallback(async (userMessage: string) => {
@@ -494,6 +526,66 @@ const Chat: React.FC = () => {
     setMessages(prev => [...prev, response]);
     setIsProcessing(false);
   }, [config]);
+
+  const pushUserMessage = useCallback(
+    (rawMessage: string) => {
+      const trimmedMessage = rawMessage.trim();
+      if (!trimmedMessage || isProcessing) {
+        return;
+      }
+
+      const userMsg: Message = {
+        id: Math.random().toString(36).substr(2, 9),
+        role: 'user',
+        content: trimmedMessage,
+      };
+      setMessages((prev) => [...prev, userMsg]);
+      setMessageInput('');
+      simulateThinkingResponse(trimmedMessage);
+    },
+    [isProcessing, simulateThinkingResponse]
+  );
+
+  const startVoiceInput = useCallback(() => {
+    const speechWindow = window as Window & {
+      SpeechRecognition?: SpeechRecognitionCtor;
+      webkitSpeechRecognition?: SpeechRecognitionCtor;
+    };
+    const speechApi = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
+    if (!speechApi) {
+      setVoiceAvailable(false);
+      return;
+    }
+
+    if (!recognitionRef.current) {
+      const recognition = new speechApi();
+      recognition.lang = 'fr-FR';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      recognition.continuous = false;
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0]?.[0]?.transcript ?? '';
+        setMessageInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
+      };
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+      recognitionRef.current = recognition;
+    }
+
+    setVoiceAvailable(true);
+    setIsListening(true);
+    recognitionRef.current.start();
+  }, []);
+
+  const stopVoiceInput = useCallback(() => {
+    recognitionRef.current?.stop();
+    setIsListening(false);
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-950 pb-20">
@@ -692,35 +784,58 @@ const Chat: React.FC = () => {
 
               {/* Input Area */}
               <div className="border-t border-slate-800 p-4 bg-slate-900/50">
+                <div className="mb-3">
+                  <p className="mb-2 text-[11px] uppercase tracking-wider text-slate-500">
+                    Clavier virtuel (navigation au pouce)
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {quickReplies.map((reply) => (
+                      <button
+                        key={reply}
+                        type="button"
+                        disabled={isProcessing}
+                        onClick={() => pushUserMessage(reply)}
+                        className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-left text-xs text-slate-200 transition-colors hover:border-purple-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {reply}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <form 
                   onSubmit={(e) => {
                     e.preventDefault();
-                    if (isProcessing) return;
-                    const input = (e.target as HTMLFormElement).elements.namedItem('message') as HTMLInputElement;
-                    const trimmedMessage = input.value.trim();
-                    if (!trimmedMessage) return;
-                    
-                    const userMsg: Message = {
-                      id: Math.random().toString(36).substr(2, 9),
-                      role: 'user',
-                      content: trimmedMessage,
-                    };
-                    setMessages(prev => [...prev, userMsg]);
-                    simulateThinkingResponse(trimmedMessage);
-                    input.value = '';
+                    pushUserMessage(messageInput);
                   }}
                   className="flex gap-2"
                 >
                   <input
                     name="message"
                     type="text"
+                    value={messageInput}
+                    onChange={(event) => setMessageInput(event.target.value)}
                     placeholder={`Ask anything (${config.accuracyProfile} mode)...`}
                     disabled={isProcessing}
                     className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-sm text-white outline-none focus:border-purple-500 placeholder:text-slate-500"
                   />
                   <button
+                    type="button"
+                    onClick={isListening ? stopVoiceInput : startVoiceInput}
+                    disabled={isProcessing || (!voiceAvailable && !isListening)}
+                    className={cn(
+                      "flex items-center justify-center rounded-lg border px-3 py-2.5 text-sm transition-colors disabled:opacity-50",
+                      isListening
+                        ? "border-rose-500 bg-rose-500/20 text-rose-300 hover:bg-rose-500/30"
+                        : "border-slate-700 bg-slate-800 text-slate-200 hover:border-purple-500 hover:text-white"
+                    )}
+                    aria-label={isListening ? 'Arrêter la dictée vocale' : 'Démarrer la dictée vocale'}
+                    title={isListening ? 'Arrêter la dictée vocale' : 'Parler à Laura'}
+                  >
+                    {isListening ? <MicOff className="h-4 w-4 lucide-animated" /> : <Mic className="h-4 w-4 lucide-animated" />}
+                  </button>
+                  <button
                     type="submit"
-                    disabled={isProcessing}
+                    disabled={isProcessing || !messageInput.trim()}
                     className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-purple-700 disabled:opacity-50 transition-colors"
                   >
                     <Send className="h-4 w-4 lucide-animated" />
@@ -728,6 +843,8 @@ const Chat: React.FC = () => {
                   </button>
                 </form>
                 <p className="mt-2 text-[10px] text-center text-slate-600">
+                  {!voiceAvailable && 'Dictée vocale non disponible sur ce navigateur • '}
+                  {isListening && 'Laura t’écoute… • '}
                   {config.temperature < 0.3 ? 'High precision mode' : config.temperature > 1.0 ? 'High creativity mode' : 'Balanced mode'} 
                   {' • '}
                   Responses are probabilistic, not deterministic.
