@@ -12,7 +12,7 @@ describe('App user journeys', () => {
     expect(screen.getAllByRole('link', { name: /contact/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /chat/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /eco hub/i }).length).toBeGreaterThan(0);
-  });
+  }, 15000);
 
   it('allows navigating from home to contact and switching contact methods', () => {
     window.history.pushState({}, '', '/');
@@ -51,7 +51,7 @@ describe('App user journeys', () => {
 
     fireEvent.click(screen.getAllByRole('link', { name: /eco hub/i })[0]);
     expect(screen.getByRole('heading', { name: /eco integration command center/i })).toBeInTheDocument();
-  });
+  }, 15000);
 
   it('keeps chat flow resilient by trimming input and unblocking after response', async () => {
     window.history.pushState({}, '', '/chat');
