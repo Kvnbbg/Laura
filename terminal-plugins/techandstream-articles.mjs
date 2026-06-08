@@ -37,10 +37,19 @@ export default {
       return;
     }
 
+    // Newest first; among same-day entries, the one appended last in the
+    // registry (highest original index) is treated as the freshest — a plain
+    // stable sort would otherwise keep same-date posts in registry order and
+    // bury the most recently published one behind older same-day siblings.
     const picks = registry
-      .filter((entry) => entry?.title && entry?.url)
-      .sort((a, b) => (b?.updated || '').localeCompare(a?.updated || ''))
-      .slice(0, ARTICLE_COUNT);
+      .map((entry, index) => ({ entry, index }))
+      .filter(({ entry }) => entry?.title && entry?.url)
+      .sort((a, b) => {
+        const byDate = (b.entry.updated || '').localeCompare(a.entry.updated || '');
+        return byDate !== 0 ? byDate : b.index - a.index;
+      })
+      .slice(0, ARTICLE_COUNT)
+      .map(({ entry }) => entry);
 
     if (picks.length === 0) {
       print('No usable article entries found in the registry.');
