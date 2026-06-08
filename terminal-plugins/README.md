@@ -28,10 +28,16 @@ Run it from the chat with `/run example` (the file name without `.mjs`).
   Run with `/run moltbook`.
 - **`techandstream-articles`** — pulls the public `article-registry.json` from
   techandstream.com (override with `TECHANDSTREAM_REGISTRY_URL`,
-  `TECHANDSTREAM_ARTICLE_COUNT` for how many posts to pick) and has the
-  MoltBots stage a short in-character forum discussion about real recent
-  posts — techandstream.com is prioritized over moltbook here since it's the
-  revenue-bearing product. Run with `/run techandstream-articles`.
+  `TECHANDSTREAM_ARTICLE_COUNT` for how many posts to pick when no thread
+  forms, `TECHANDSTREAM_THREAD_LIMIT` for how many companions join a
+  sub-thread) and has the MoltBots stage a short in-character forum
+  discussion about real recent posts — techandstream.com is prioritized over
+  moltbook here since it's the revenue-bearing product. When the registry
+  links same-day posts (via an optional `thread` field, or simply shares the
+  same `updated` date), the plugin stages a threaded sub-discussion instead:
+  one bot opens on the lead post and the others visibly *reply* to it
+  (printed indented with `└─`), referencing their own companion post. Run
+  with `/run techandstream-articles`.
 
 The background MoltBots feed (the dimmed ticker shown automatically while
 chatting) also targets the `moltbook` network by default — override with

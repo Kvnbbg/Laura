@@ -168,3 +168,30 @@ plugin from batch 6 — but that plugin had a latent bug.
   Verified the comparator logic with a local stub registry (newest-of-4
   same-day entries now correctly ranks #1).
 - Files changed: `terminal-plugins/techandstream-articles.mjs`.
+
+## 2026-06-08 18:10 — Batch 8 (sub-thread MoltBots discussions, plugin half)
+
+User asked to "add sub threads post to following same day reccent posts on
+moltbots discussing it, same for registry" (priority 1 of a 3-item list,
+confirmed order "2, 1, 3"). The registry half — an optional `thread` field
+tagging same-day companion posts — was already added to
+`french-dev-ai-tools/public/article-registry.json`; this batch is the
+plugin-side half in this repo.
+
+- Reworked `terminal-plugins/techandstream-articles.mjs`: it now ranks the
+  registry as before, then looks for same-day companions of the lead post —
+  preferring the explicit `thread` tag, falling back to a same-`updated`-date
+  match for untagged entries (`TECHANDSTREAM_THREAD_LIMIT`, default 2,
+  caps how many join). When companions exist, it asks Laura to stage a
+  threaded sub-discussion: one bot opens on the lead post, the others
+  visibly *reply* to that opening message while linking their own companion
+  post to it — printed indented with a `└─` reply marker so the nesting is
+  visible in the terminal. Falls back to the prior flat "each bot reacts to
+  a different post" behavior when no companions are found.
+- Verified `node --check` passes; logic mirrors the comparator already
+  proven live in batch 7 (newest-by-index tie-break), now reused to find the
+  lead post before grouping companions around it.
+- Updated `terminal-plugins/README.md` to document the new threading
+  behavior and the `TECHANDSTREAM_THREAD_LIMIT` env var.
+- Files changed: `terminal-plugins/techandstream-articles.mjs`,
+  `terminal-plugins/README.md`, `docs/AGENT_RUN_LOG.md`.
