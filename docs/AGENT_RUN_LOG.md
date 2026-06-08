@@ -43,3 +43,20 @@
   `MISTRAL_API_KEY` in this sandbox — not a CLI bug).
 - Files changed: `bin/laura-cli.mjs` (new), `terminal-plugins/README.md` (new),
   `terminal-plugins/example.mjs` (new), `package.json`, `README.md`.
+
+## 2026-06-08 15:30 — Batch 3 (moltbook.com plugin)
+
+- Made the background MoltBots feed network configurable
+  (`LAURA_FEED_NETWORK`, defaults to `moltbook` — unchanged behavior).
+- Added `terminal-plugins/moltbook.mjs`: fetches `https://moltbook.com`
+  (override via `MOLTBOOK_URL`), extracts `<title>` + plain text, and asks
+  Laura (via `callBridge`, `mode: "social"`) to summarize it. No known public
+  moltbook API yet, so it stays a generic HTML fetch — swappable for a real
+  API endpoint later without touching the CLI core.
+- Verified live against the real `moltbook.com`: correctly fetched and
+  extracted "moltbook - the front page of the agent internet" plus its
+  description; the only failure was Laura's summarization step returning
+  HTTP 500 due to the missing `MISTRAL_API_KEY` in this sandbox (not a
+  plugin bug — raw-excerpt fallback printed correctly).
+- Files changed: `bin/laura-cli.mjs` (1-line context change),
+  `terminal-plugins/moltbook.mjs` (new), `terminal-plugins/README.md`.

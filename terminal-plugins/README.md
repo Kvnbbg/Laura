@@ -18,6 +18,19 @@ export default {
 
 Run it from the chat with `/run example` (the file name without `.mjs`).
 
+## Available plugins
+
+- **`example`** — demo plugin, asks Laura to introduce herself in agent mode.
+- **`moltbook`** — fetches [moltbook.com](https://moltbook.com) (override with
+  `MOLTBOOK_URL`) and asks Laura to summarize the MoltBook network's content.
+  Generic HTML fetch + text extraction for now (no known public API yet) —
+  swap `MOLTBOOK_URL` for a real API endpoint later without touching the CLI.
+  Run with `/run moltbook`.
+
+The background MoltBots feed (the dimmed ticker shown automatically while
+chatting) also targets the `moltbook` network by default — override with
+`LAURA_FEED_NETWORK` if you want a different one.
+
 ## Roadmap (not yet implemented)
 
 This is the extension point for connecting Laura's terminal to other tools

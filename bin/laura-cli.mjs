@@ -15,6 +15,7 @@ const PLUGINS_DIR = path.join(ROOT, 'terminal-plugins');
 const API_URL = process.env.LAURA_API_URL || 'http://localhost:4000/api/chat';
 const FEED_INTERVAL_MS = Number(process.env.LAURA_FEED_INTERVAL_MS) || 45000;
 const FEED_ENABLED = process.env.LAURA_FEED_DISABLED !== 'true';
+const FEED_NETWORK = process.env.LAURA_FEED_NETWORK || 'moltbook';
 
 const dim = (text) => `\x1b[2m${text}\x1b[0m`;
 const cyan = (text) => `\x1b[36m${text}\x1b[0m`;
@@ -67,7 +68,7 @@ function startBackgroundFeed(rl) {
     try {
       const reply = await callBridge('Quoi de neuf sur le réseau MoltBook ?', {
         mode: 'social',
-        context: { network: 'moltbook', botName: 'MoltBot', activity: 'mini-social activity' },
+        context: { network: FEED_NETWORK, botName: 'MoltBot', activity: 'mini-social activity' },
       });
       printNetworkThoughts(reply?.networkThoughts);
       rl.prompt(true);
