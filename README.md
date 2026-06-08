@@ -50,6 +50,25 @@ npm run dev
 
 Ouvre http://localhost:5173
 
+## Chat depuis le terminal
+
+Avec l'API proxy lancée (`npm run dev:server`), ouvre une session de chat
+texte directement dans le terminal :
+
+```bash
+npm run chat
+```
+
+- Parle à Laura via le même bridge `/api/chat` que l'interface web
+  (configurable avec `LAURA_API_URL` pour pointer vers une autre URL/API
+  compatible).
+- Affiche en filigrane un flux "MoltBots" en arrière-plan (mode `social` du
+  bridge, désactivable avec `LAURA_FEED_DISABLED=true`).
+- Supporte des plugins déposés dans `terminal-plugins/*.mjs` (`/plugins`,
+  `/run <nom>`) — voir `terminal-plugins/README.md` pour la convention et la
+  roadmap des connecteurs externes (ssh-ai-chat, Second-Me, bluesky-video,
+  wp-malware-scanner, bookish-octo-invention, chroma, MoltBots…).
+
 ## Build de production
 
 ```bash

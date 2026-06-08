@@ -22,3 +22,24 @@
 - Verification: re-ran `npx vitest run src/App.test.tsx` — 5/5 tests pass (was 3/5).
 - Files changed: `src/App.test.tsx` (2 one-line edits).
 - Committed as a standalone batch-1 commit (see git log).
+
+## 2026-06-08 15:10 — Batch 2 (terminal chat interface)
+
+- Added `bin/laura-cli.mjs`: a dependency-free Node 18 terminal chat REPL
+  that talks to the existing `/api/chat` bridge (`server/index.js`), reusing
+  its built-in `mode: "social"` MoltBots feed for a dimmed background ticker
+  (`LAURA_FEED_*` env vars to configure/disable), and a generic
+  `LAURA_API_URL` override so it can point at any compatible HTTP endpoint.
+- Added `terminal-plugins/` extension point (`README.md` + `example.mjs`):
+  drop-in `.mjs` modules exposing `{ name, description, run({ callBridge, print }) }`,
+  invoked from the chat with `/plugins` and `/run <name>`. Documents the
+  roadmap for external connectors (ssh-ai-chat, Second-Me, bluesky-video,
+  wp-malware-scanner, bookish-octo-invention, chroma, MoltBots) as future
+  plugin files rather than hard-wired integrations.
+- Wired `npm run chat` script into `package.json`.
+- Verified manually: REPL boots, `/help`/`/plugins`/`/run example` work,
+  graceful error message when the proxy is down, real round-trip against a
+  locally running `server/index.js` (failure observed there was a missing
+  `MISTRAL_API_KEY` in this sandbox — not a CLI bug).
+- Files changed: `bin/laura-cli.mjs` (new), `terminal-plugins/README.md` (new),
+  `terminal-plugins/example.mjs` (new), `package.json`, `README.md`.
