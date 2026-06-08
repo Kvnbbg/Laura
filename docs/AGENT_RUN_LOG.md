@@ -91,3 +91,30 @@ avoid a supply-chain attack surface).
   gracefully fell back to the regular bridge when no Mistral key was present.
 - `tsc --noEmit` and `eslint` both clean.
 - Files changed: `server/index.js`, `bin/laura-cli.mjs`, `README.md`.
+
+## 2026-06-08 16:40 — Batch 5 (local Ollama streaming backend + live test)
+
+User asked to test streaming locally with Mistral, Ollama, and Laura, and
+have Laura talk about techandstream.com. No `MISTRAL_API_KEY` is set in
+this sandbox, but a local Ollama instance (v0.9.5) is running with a
+pre-pulled `laura-local` model.
+
+- `server/index.js`: `/api/chat/stream` now falls back to a local Ollama
+  model (`OLLAMA_MODEL` / `LAURA_LOCAL_MODEL`, `OLLAMA_URL` defaults to
+  `http://localhost:11434`) when `MISTRAL_API_KEY` is missing. Converts
+  Ollama's NDJSON stream chunks (`{message:{content}, done}`) into the same
+  OpenAI-style SSE (`data: {choices:[{delta:{content}}]}` / `data: [DONE]`)
+  the client already parses — zero CLI changes required, fully transparent.
+- Live test results:
+  - Raw `curl` against `/api/chat/stream` with `OLLAMA_MODEL=laura-local`:
+    confirmed correct SSE conversion, streamed token-by-token.
+  - Full round trip through `npm run chat`: asked "Laura, parle-moi de
+    techandstream.com en 3 phrases" — Laura answered live, streamed,
+    describing techandstream.com as "a news aggregator focusing on tech
+    and streaming services... curate articles and videos from various
+    sources, offering a centralized view of the industry."
+  - Mistral path: cannot be live-tested here (no API key in sandbox), but
+    the existing fallback chain (stream → non-stream → error message) was
+    already verified in batch 4.
+- `tsc --noEmit` and `eslint` both clean.
+- Files changed: `server/index.js`, `README.md`.

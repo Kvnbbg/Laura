@@ -29,6 +29,12 @@ const MISTRAL_MODEL = CHAT_MODELS.has(process.env.MISTRAL_MODEL ?? '')
     ? process.env.VITE_MISTRAL_MODEL
     : DEFAULT_CHAT_MODEL;
 
+// Local Ollama fallback for streaming: lets the terminal chat work fully
+// offline (no Mistral key needed) by pointing at a locally pulled model,
+// e.g. `ollama pull laura-local` then OLLAMA_MODEL=laura-local.
+const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || process.env.LAURA_LOCAL_MODEL || '';
+
 const logger = {
   info: (message, meta = {}) => {
     process.stdout.write(
@@ -456,12 +462,68 @@ app.post('/api/chat/stream', async (req, res) => {
     if (!Array.isArray(messages) || !messages.every((message) => typeof message?.content === 'string')) {
       return res.status(400).json({ message: 'Messages payload is required.' });
     }
-    if (!MISTRAL_API_KEY) {
-      return res.status(500).json({ message: 'Mistral API key missing.' });
-    }
 
     const systemPrompt =
       'You are Laura, a cosmic dream companion. Be concise and terminal-first.';
+    const fullMessages = [{ role: 'system', content: systemPrompt }, ...messages];
+
+    // Prefer the local Ollama model when no Mistral key is configured (or
+    // when explicitly requested) — keeps the terminal chat usable offline.
+    if (!MISTRAL_API_KEY && OLLAMA_MODEL) {
+      const upstream = await fetch(`${OLLAMA_URL}/api/chat`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ model: OLLAMA_MODEL, messages: fullMessages, stream: true }),
+      });
+
+      if (!upstream.ok || !upstream.body) {
+        const details = await upstream.text().catch(() => '');
+        logger.error('Ollama stream failed', { status: upstream.status, details });
+        return res.status(upstream.status || 502).json({ message: 'Local Ollama stream failed.' });
+      }
+
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.flushHeaders?.();
+
+      const reader = upstream.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      try {
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() ?? '';
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed) continue;
+            let chunk;
+            try {
+              chunk = JSON.parse(trimmed);
+            } catch {
+              continue;
+            }
+            const content = chunk?.message?.content;
+            if (typeof content === 'string' && content) {
+              res.write(`data: ${JSON.stringify({ choices: [{ delta: { content } }] })}\n\n`);
+            }
+            if (chunk?.done) {
+              res.write('data: [DONE]\n\n');
+            }
+          }
+        }
+      } finally {
+        res.end();
+      }
+      return;
+    }
+
+    if (!MISTRAL_API_KEY) {
+      return res.status(500).json({ message: 'Mistral API key missing.' });
+    }
 
     const upstream = await fetch('https://api.mistral.ai/v1/chat/completions', {
       method: 'POST',
@@ -471,7 +533,7 @@ app.post('/api/chat/stream', async (req, res) => {
       },
       body: JSON.stringify({
         model: MISTRAL_MODEL,
-        messages: [{ role: 'system', content: systemPrompt }, ...messages],
+        messages: fullMessages,
         temperature: DEFAULT_TEMPERATURE,
         stream: true,
       }),

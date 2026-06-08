@@ -69,6 +69,12 @@ npm run chat
   localement (`LAURA_CACHE_TTL_MS`, 60s par défaut). Pour la revue de code,
   configure `MISTRAL_MODEL=codestral-latest` côté serveur (ajouté à la liste
   des modèles autorisés).
+- **Mode 100% local avec Ollama** : si `MISTRAL_API_KEY` n'est pas défini,
+  configure `OLLAMA_MODEL=<modèle>` (ex: `laura-local`, voir `ollama list`)
+  côté serveur — `/api/chat/stream` bascule alors automatiquement sur ton
+  instance Ollama locale (`OLLAMA_URL`, défaut `http://localhost:11434`),
+  conversion NDJSON → SSE transparente pour le client. Chat 100% hors-ligne,
+  zéro clé API, zéro latence réseau.
 - `/install <nom>` : recherche en lecture seule (registre npm + GitHub) puis
   Laura propose la commande d'installation exacte — **elle ne télécharge ni
   n'exécute jamais rien elle-même**, c'est toi qui valides et lances.
