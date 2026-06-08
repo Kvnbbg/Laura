@@ -60,3 +60,34 @@
   plugin bug — raw-excerpt fallback printed correctly).
 - Files changed: `bin/laura-cli.mjs` (1-line context change),
   `terminal-plugins/moltbook.mjs` (new), `terminal-plugins/README.md`.
+
+## 2026-06-08 16:05 — Batch 4 (speed: streaming + cache + codestral; safe install-suggest)
+
+User asked to (a) speed up the terminal chat and (b) let Laura "download
+external packages" to self-improve on unknown commands — scoped down via
+AskUserQuestion to: research-and-suggest only (Laura proposes the install
+command, user reviews and runs it — no autonomous downloads/execution, to
+avoid a supply-chain attack surface).
+
+- `server/index.js`: added `codestral-latest` to `CHAT_MODELS` (set
+  `MISTRAL_MODEL=codestral-latest` for code-heavy review sessions), and a
+  new `POST /api/chat/stream` endpoint that skips the RAG/embeddings lookup
+  and proxies Mistral's SSE chunks directly — additive, doesn't change the
+  existing `/api/chat` behavior.
+- `bin/laura-cli.mjs`:
+  - Streams replies token-by-token via `/api/chat/stream`
+    (`LAURA_STREAM_DISABLED=true` to opt out), with automatic fallback to
+    the non-streaming bridge call if the stream endpoint/key isn't available
+    — verified the fallback path live (no Mistral key in this sandbox).
+  - Added a short-lived response cache (`LAURA_CACHE_TTL_MS`, default 60s)
+    for non-`chat` bridge calls (feed ticks, plugin look-ups) — conversational
+    `chat` turns are never cached since they depend on history.
+  - Added `/install <name>`: read-only lookups against the public npm
+    registry and GitHub search API (no auth, no downloads), then asks Laura
+    to propose the exact install command. Always prints a "review before
+    running — Laura never installs anything automatically" notice.
+- Verified live: `/install lodash` correctly found `lodash@4.18.1` on npm
+  and `lodash/lodash` on GitHub and printed the safety notice; streaming
+  gracefully fell back to the regular bridge when no Mistral key was present.
+- `tsc --noEmit` and `eslint` both clean.
+- Files changed: `server/index.js`, `bin/laura-cli.mjs`, `README.md`.

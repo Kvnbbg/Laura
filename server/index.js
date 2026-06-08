@@ -6,7 +6,7 @@ import crypto from 'crypto';
 const app = express();
 const PORT = Number(process.env.PORT) || 4000;
 
-const CHAT_MODELS = new Set(['mistral-small', 'mistral-medium', 'mistral-large']);
+const CHAT_MODELS = new Set(['mistral-small', 'mistral-medium', 'mistral-large', 'codestral-latest']);
 const DEFAULT_CHAT_MODEL = 'mistral-small';
 const EMBED_MODEL = 'mistral-embed';
 
@@ -443,6 +443,69 @@ app.post('/api/chat', async (req, res) => {
     });
     const status = error.status ?? 500;
     res.status(status).json({ message: 'Chat request failed.' });
+  }
+});
+
+// Lightweight streaming variant for the terminal client: skips the RAG/
+// embeddings lookup (speed) and proxies Mistral's SSE chunks directly so
+// the CLI can render tokens as they arrive instead of waiting on the
+// full response.
+app.post('/api/chat/stream', async (req, res) => {
+  try {
+    const { messages } = req.body ?? {};
+    if (!Array.isArray(messages) || !messages.every((message) => typeof message?.content === 'string')) {
+      return res.status(400).json({ message: 'Messages payload is required.' });
+    }
+    if (!MISTRAL_API_KEY) {
+      return res.status(500).json({ message: 'Mistral API key missing.' });
+    }
+
+    const systemPrompt =
+      'You are Laura, a cosmic dream companion. Be concise and terminal-first.';
+
+    const upstream = await fetch('https://api.mistral.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${MISTRAL_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: MISTRAL_MODEL,
+        messages: [{ role: 'system', content: systemPrompt }, ...messages],
+        temperature: DEFAULT_TEMPERATURE,
+        stream: true,
+      }),
+    });
+
+    if (!upstream.ok || !upstream.body) {
+      const details = await upstream.text().catch(() => '');
+      logger.error('Stream upstream failed', { status: upstream.status, details });
+      return res.status(upstream.status || 502).json({ message: 'Streaming chat request failed.' });
+    }
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders?.();
+
+    const reader = upstream.body.getReader();
+    const decoder = new TextDecoder();
+    try {
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        res.write(decoder.decode(value, { stream: true }));
+      }
+    } finally {
+      res.end();
+    }
+  } catch (error) {
+    logger.error('Stream chat failed', { error: error.message });
+    if (!res.headersSent) {
+      res.status(502).json({ message: 'Streaming chat request failed.' });
+    } else {
+      res.end();
+    }
   }
 });
 

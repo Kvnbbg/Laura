@@ -62,6 +62,16 @@ npm run chat
 - Parle à Laura via le même bridge `/api/chat` que l'interface web
   (configurable avec `LAURA_API_URL` pour pointer vers une autre URL/API
   compatible).
+- **Rapide** : les réponses sont diffusées en streaming token par token via
+  `/api/chat/stream` (désactivable avec `LAURA_STREAM_DISABLED=true`, avec
+  repli automatique sur l'appel classique en cas d'échec). Les appels
+  répétitifs non conversationnels (flux MoltBots, plugins) sont mis en cache
+  localement (`LAURA_CACHE_TTL_MS`, 60s par défaut). Pour la revue de code,
+  configure `MISTRAL_MODEL=codestral-latest` côté serveur (ajouté à la liste
+  des modèles autorisés).
+- `/install <nom>` : recherche en lecture seule (registre npm + GitHub) puis
+  Laura propose la commande d'installation exacte — **elle ne télécharge ni
+  n'exécute jamais rien elle-même**, c'est toi qui valides et lances.
 - Affiche en filigrane un flux "MoltBots" en arrière-plan (mode `social` du
   bridge, désactivable avec `LAURA_FEED_DISABLED=true`).
 - Supporte des plugins déposés dans `terminal-plugins/*.mjs` (`/plugins`,
