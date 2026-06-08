@@ -7,11 +7,13 @@ export type ChatRole = 'system' | 'user' | 'assistant';
 export type ChatMessage = {
   role: ChatRole;
   content: string;
+  thinkingFeedback?: string[];
 };
 
 export type ChatResponse = {
   message: ChatMessage;
   citations: string[];
+  thinkingFeedback: string[];
 };
 
 type ChatPayload = {
@@ -37,7 +39,11 @@ const parseChatReply = (payload: unknown): ChatResponse => {
       const citations = Array.isArray(citationsRaw)
         ? citationsRaw.filter((item): item is string => typeof item === 'string')
         : [];
-      return { message, citations };
+      const thinkingFeedbackRaw = (payload as { thinkingFeedback?: unknown }).thinkingFeedback;
+      const thinkingFeedback = Array.isArray(thinkingFeedbackRaw)
+        ? thinkingFeedbackRaw.filter((item): item is string => typeof item === 'string').slice(0, 3)
+        : [];
+      return { message, citations, thinkingFeedback };
     }
   }
 

@@ -269,25 +269,31 @@ const About: React.FC = () => {
                 The Architecture
               </h3>
               <p className="mb-4 text-slate-400 text-sm leading-relaxed">
-                Laura isn't just a chat interface. Like the universe expanding from a singularity, 
-                the project started with a simple React scaffold and exploded into a multi-modal 
-                AI operating system available on 
+                Laura n'est pas juste une interface de chat. C'est un frontend, un backend et un pont terminal.
+                Comme Ollama ou Hugging Face, Laura peut se brancher à un modèle derrière le décor, mais garde une vraie persona et un point d'entrée praticable depuis le terminal.
+              </p>
+              <p className="mb-4 text-slate-400 text-sm leading-relaxed">
+                Le projet a commencé avec un scaffold React simple puis s'est étendu en système multi-surface disponible sur
                 <a href="https://github.com/Kvnbbg/Laura" className="text-purple-400 hover:underline mx-1">GitHub</a>
                 and 
                 <a href="https://aistudio.instagram.com/ai/1503668480968231/" className="text-pink-400 hover:underline mx-1">Instagram</a>.
               </p>
+              <p className="mb-4 text-slate-400 text-sm leading-relaxed">
+                Un salut spécial à <a href="https://github.com/Kvnbbg/french-dev-ai-tools" className="text-cyan-400 hover:underline mx-1">french-dev-ai-tools</a>
+                et à l'activité Moltbook: c'est là que Laura se branche pour garder le lien entre le blog, le forum, les bots et les usages métier.
+              </p>
               <ul className="space-y-3 text-sm text-slate-300">
                 <li className="flex items-start gap-2">
                   <span className="text-purple-400">→</span>
-                  <span><strong>Local-First:</strong> Download GPT-2 (1.5B parameters) for offline privacy</span>
+                  <span><strong>Pont terminal:</strong> chat et flux d'agents depuis le shell, avec des endpoints compatibles web</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-purple-400">→</span>
-                  <span><strong>Social Integration:</strong> Meta AI interface for casual interaction</span>
+                  <span><strong>Intégration sociale:</strong> compagnon Meta AI / Instagram pour les échanges légers</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-purple-400">→</span>
-                  <span><strong>Agentic Core:</strong> BabyAGI loops, LangChain tools, LangGraph orchestration</span>
+                  <span><strong>Noyau agentique:</strong> boucles BabyAGI, outils LangChain, orchestration LangGraph</span>
                 </li>
               </ul>
             </div>

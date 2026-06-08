@@ -1,0 +1,516 @@
+{
+  "role": "corps_humain",
+  "challenges": [
+    {
+      "level": "easy",
+      "question": "How do you say 'head' in French?",
+      "answer": "la tête",
+      "english": "head",
+      "french": "la tête"
+    },
+    {
+      "level": "easy",
+      "question": "How do you say 'face' in French?",
+      "answer": "le visage",
+      "english": "face",
+      "french": "le visage"
+    },
+    {
+      "level": "easy",
+      "question": "How do you say 'hair' in French?",
+      "answer": "les cheveux",
+      "english": "hair",
+      "french": "les cheveux"
+    },
+    {
+      "level": "easy",
+      "question": "How do you say 'eye (singular)' in French?",
+      "answer": "un œil",
+      "english": "eye (singular)",
+      "french": "un œil"
+    },
+    {
+      "level": "easy",
+      "question": "How do you say 'eyes (plural)' in French?",
+      "answer": "les yeux",
+      "english": "eyes (plural)",
+      "french": "les yeux"
+    },
+    {
+      "level": "easy",
+      "question": "How do you say 'nose' in French?",
+      "answer": "le nez",
+      "english": "nose",
+      "french": "le nez"
+    },
+    {
+      "level": "easy",
+      "question": "How do you say 'mouth' in French?",
+      "answer": "la bouche",
+      "english": "mouth",
+      "french": "la bouche"
+    },
+    {
+      "level": "easy",
+      "question": "How do you say 'tooth' in French?",
+      "answer": "la dent",
+      "english": "tooth",
+      "french": "la dent"
+    },
+    {
+      "level": "easy",
+      "question": "How do you say 'neck' in French?",
+      "answer": "le cou",
+      "english": "neck",
+      "french": "le cou"
+    },
+    {
+      "level": "easy",
+      "question": "How do you say 'shoulder' in French?",
+      "answer": "l’épaule",
+      "english": "shoulder",
+      "french": "l’épaule"
+    },
+    {
+      "level": "easy",
+      "question": "How do you say 'arm' in French?",
+      "answer": "le bras",
+      "english": "arm",
+      "french": "le bras"
+    },
+    {
+      "level": "easy",
+      "question": "How do you say 'hand' in French?",
+      "answer": "la main",
+      "english": "hand",
+      "french": "la main"
+    },
+    {
+      "level": "easy",
+      "question": "How do you say 'finger' in French?",
+      "answer": "le doigt",
+      "english": "finger",
+      "french": "le doigt"
+    },
+    {
+      "level": "easy",
+      "question": "How do you say 'leg' in French?",
+      "answer": "la jambe",
+      "english": "leg",
+      "french": "la jambe"
+    },
+    {
+      "level": "easy",
+      "question": "How do you say 'knee' in French?",
+      "answer": "le genou",
+      "english": "knee",
+      "french": "le genou"
+    },
+    {
+      "level": "easy",
+      "question": "How do you say 'foot' in French?",
+      "answer": "le pied",
+      "english": "foot",
+      "french": "le pied"
+    },
+    {
+      "level": "medium",
+      "question": "How do you say 'forehead' in French?",
+      "answer": "le front",
+      "english": "forehead",
+      "french": "le front"
+    },
+    {
+      "level": "medium",
+      "question": "How do you say 'eyebrow' in French?",
+      "answer": "le sourcil",
+      "english": "eyebrow",
+      "french": "le sourcil"
+    },
+    {
+      "level": "medium",
+      "question": "How do you say 'cheek' in French?",
+      "answer": "la joue",
+      "english": "cheek",
+      "french": "la joue"
+    },
+    {
+      "level": "medium",
+      "question": "How do you say 'lip' in French?",
+      "answer": "la lèvre",
+      "english": "lip",
+      "french": "la lèvre"
+    },
+    {
+      "level": "medium",
+      "question": "How do you say 'chin' in French?",
+      "answer": "le menton",
+      "english": "chin",
+      "french": "le menton"
+    },
+    {
+      "level": "medium",
+      "question": "How do you say 'ear' in French?",
+      "answer": "l’oreille",
+      "english": "ear",
+      "french": "l’oreille"
+    },
+    {
+      "level": "medium",
+      "question": "How do you say 'wrist' in French?",
+      "answer": "le poignet",
+      "english": "wrist",
+      "french": "le poignet"
+    },
+    {
+      "level": "medium",
+      "question": "How do you say 'elbow' in French?",
+      "answer": "le coude",
+      "english": "elbow",
+      "french": "le coude"
+    },
+    {
+      "level": "medium",
+      "question": "How do you say 'thumb' in French?",
+      "answer": "le pouce",
+      "english": "thumb",
+      "french": "le pouce"
+    },
+    {
+      "level": "medium",
+      "question": "How do you say 'palm' in French?",
+      "answer": "la paume",
+      "english": "palm",
+      "french": "la paume"
+    },
+    {
+      "level": "medium",
+      "question": "How do you say 'back' in French?",
+      "answer": "le dos",
+      "english": "back",
+      "french": "le dos"
+    },
+    {
+      "level": "medium",
+      "question": "How do you say 'chest' in French?",
+      "answer": "la poitrine",
+      "english": "chest",
+      "french": "la poitrine"
+    },
+    {
+      "level": "medium",
+      "question": "How do you say 'belly' in French?",
+      "answer": "le ventre",
+      "english": "belly",
+      "french": "le ventre"
+    },
+    {
+      "level": "medium",
+      "question": "How do you say 'hip' in French?",
+      "answer": "la hanche",
+      "english": "hip",
+      "french": "la hanche"
+    },
+    {
+      "level": "medium",
+      "question": "How do you say 'waist' in French?",
+      "answer": "la taille",
+      "english": "waist",
+      "french": "la taille"
+    },
+    {
+      "level": "medium",
+      "question": "How do you say 'rib' in French?",
+      "answer": "la côte",
+      "english": "rib",
+      "french": "la côte"
+    },
+    {
+      "level": "medium",
+      "question": "How do you say 'ankle' in French?",
+      "answer": "la cheville",
+      "english": "ankle",
+      "french": "la cheville"
+    },
+    {
+      "level": "medium",
+      "question": "How do you say 'thigh' in French?",
+      "answer": "la cuisse",
+      "english": "thigh",
+      "french": "la cuisse"
+    },
+    {
+      "level": "medium",
+      "question": "How do you say 'buttock' in French?",
+      "answer": "la fesse",
+      "english": "buttock",
+      "french": "la fesse"
+    },
+    {
+      "level": "medium",
+      "question": "How do you say 'shin' in French?",
+      "answer": "le tibia",
+      "english": "shin",
+      "french": "le tibia"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'heart' in French?",
+      "answer": "le cœur",
+      "english": "heart",
+      "french": "le cœur"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'lungs' in French?",
+      "answer": "les poumons",
+      "english": "lungs",
+      "french": "les poumons"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'stomach' in French?",
+      "answer": "l’estomac",
+      "english": "stomach",
+      "french": "l’estomac"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'liver' in French?",
+      "answer": "le foie",
+      "english": "liver",
+      "french": "le foie"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'kidneys' in French?",
+      "answer": "les reins",
+      "english": "kidneys",
+      "french": "les reins"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'intestines' in French?",
+      "answer": "les intestins",
+      "english": "intestines",
+      "french": "les intestins"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'bladder' in French?",
+      "answer": "la vessie",
+      "english": "bladder",
+      "french": "la vessie"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'pancreas' in French?",
+      "answer": "le pancréas",
+      "english": "pancreas",
+      "french": "le pancréas"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'spleen' in French?",
+      "answer": "la rate",
+      "english": "spleen",
+      "french": "la rate"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'brain' in French?",
+      "answer": "le cerveau",
+      "english": "brain",
+      "french": "le cerveau"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'throat' in French?",
+      "answer": "la gorge",
+      "english": "throat",
+      "french": "la gorge"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'muscle' in French?",
+      "answer": "le muscle",
+      "english": "muscle",
+      "french": "le muscle"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'bones' in French?",
+      "answer": "des os",
+      "english": "bones",
+      "french": "des os"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'skeleton' in French?",
+      "answer": "le squelette",
+      "english": "skeleton",
+      "french": "le squelette"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'skin' in French?",
+      "answer": "la peau",
+      "english": "skin",
+      "french": "la peau"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'tendon' in French?",
+      "answer": "le tendon",
+      "english": "tendon",
+      "french": "le tendon"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'cartilage' in French?",
+      "answer": "le cartilage",
+      "english": "cartilage",
+      "french": "le cartilage"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'nerve' in French?",
+      "answer": "le nerf",
+      "english": "nerve",
+      "french": "le nerf"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'vein' in French?",
+      "answer": "la veine",
+      "english": "vein",
+      "french": "la veine"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'artery' in French?",
+      "answer": "l’artère",
+      "english": "artery",
+      "french": "l’artère"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'blood' in French?",
+      "answer": "le sang",
+      "english": "blood",
+      "french": "le sang"
+    },
+    {
+      "level": "hard",
+      "question": "How do you say 'joint' in French?",
+      "answer": "l’articulation",
+      "english": "joint",
+      "french": "l’articulation"
+    },
+    {
+      "level": "expert",
+      "question": "How do you say 'clavicle' in French?",
+      "answer": "la clavicule",
+      "english": "clavicle",
+      "french": "la clavicule"
+    },
+    {
+      "level": "expert",
+      "question": "How do you say 'scapula' in French?",
+      "answer": "l’omoplate",
+      "english": "scapula",
+      "french": "l’omoplate"
+    },
+    {
+      "level": "expert",
+      "question": "How do you say 'radius' in French?",
+      "answer": "le radius",
+      "english": "radius",
+      "french": "le radius"
+    },
+    {
+      "level": "expert",
+      "question": "How do you say 'ulna' in French?",
+      "answer": "le cubitus",
+      "english": "ulna",
+      "french": "le cubitus"
+    },
+    {
+      "level": "expert",
+      "question": "How do you say 'femur' in French?",
+      "answer": "le fémur",
+      "english": "femur",
+      "french": "le fémur"
+    },
+    {
+      "level": "expert",
+      "question": "How do you say 'fibula' in French?",
+      "answer": "le péroné",
+      "english": "fibula",
+      "french": "le péroné"
+    },
+    {
+      "level": "expert",
+      "question": "How do you say 'metacarpal' in French?",
+      "answer": "le métacarpe",
+      "english": "metacarpal",
+      "french": "le métacarpe"
+    },
+    {
+      "level": "expert",
+      "question": "How do you say 'phalange' in French?",
+      "answer": "la phalange",
+      "english": "phalange",
+      "french": "la phalange"
+    },
+    {
+      "level": "expert",
+      "question": "How do you say 'sternum' in French?",
+      "answer": "le sternum",
+      "english": "sternum",
+      "french": "le sternum"
+    },
+    {
+      "level": "expert",
+      "question": "How do you say 'ribcage' in French?",
+      "answer": "la cage thoracique",
+      "english": "ribcage",
+      "french": "la cage thoracique"
+    },
+    {
+      "level": "expert",
+      "question": "How do you say 'small intestine' in French?",
+      "answer": "l’intestin grêle",
+      "english": "small intestine",
+      "french": "l’intestin grêle"
+    },
+    {
+      "level": "expert",
+      "question": "How do you say 'large intestine' in French?",
+      "answer": "le gros intestin",
+      "english": "large intestine",
+      "french": "le gros intestin"
+    },
+    {
+      "level": "expert",
+      "question": "How do you say 'colon' in French?",
+      "answer": "le côlon",
+      "english": "colon",
+      "french": "le côlon"
+    },
+    {
+      "level": "expert",
+      "question": "How do you say 'gallbladder' in French?",
+      "answer": "la vésicule biliaire",
+      "english": "gallbladder",
+      "french": "la vésicule biliaire"
+    },
+    {
+      "level": "expert",
+      "question": "How do you say 'appendix' in French?",
+      "answer": "l’appendice",
+      "english": "appendix",
+      "french": "l’appendice"
+    }
+  ]
+}

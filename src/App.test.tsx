@@ -70,7 +70,12 @@ describe('App user journeys', () => {
     expect(screen.getByRole('button', { name: /send/i })).toBeDisabled();
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /send/i })).not.toBeDisabled();
+      expect(screen.getByPlaceholderText(/ask anything/i)).not.toBeDisabled();
     }, { timeout: 4000 });
-  });
+
+    fireEvent.change(screen.getByPlaceholderText(/ask anything/i), {
+      target: { value: 'Next check' },
+    });
+    expect(screen.getByRole('button', { name: /send/i })).not.toBeDisabled();
+  }, 10000);
 });

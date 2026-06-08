@@ -1,0 +1,317 @@
+{
+  "role": "corps_humain",
+  "levels": [
+    {
+      "level": "easy",
+      "items": [
+        {
+          "english": "head",
+          "french": "la tête"
+        },
+        {
+          "english": "face",
+          "french": "le visage"
+        },
+        {
+          "english": "hair",
+          "french": "les cheveux"
+        },
+        {
+          "english": "eye (singular)",
+          "french": "un œil"
+        },
+        {
+          "english": "eyes (plural)",
+          "french": "les yeux"
+        },
+        {
+          "english": "nose",
+          "french": "le nez"
+        },
+        {
+          "english": "mouth",
+          "french": "la bouche"
+        },
+        {
+          "english": "tooth",
+          "french": "la dent"
+        },
+        {
+          "english": "neck",
+          "french": "le cou"
+        },
+        {
+          "english": "shoulder",
+          "french": "l’épaule"
+        },
+        {
+          "english": "arm",
+          "french": "le bras"
+        },
+        {
+          "english": "hand",
+          "french": "la main"
+        },
+        {
+          "english": "finger",
+          "french": "le doigt"
+        },
+        {
+          "english": "leg",
+          "french": "la jambe"
+        },
+        {
+          "english": "knee",
+          "french": "le genou"
+        },
+        {
+          "english": "foot",
+          "french": "le pied"
+        }
+      ]
+    },
+    {
+      "level": "medium",
+      "items": [
+        {
+          "english": "forehead",
+          "french": "le front"
+        },
+        {
+          "english": "eyebrow",
+          "french": "le sourcil"
+        },
+        {
+          "english": "cheek",
+          "french": "la joue"
+        },
+        {
+          "english": "lip",
+          "french": "la lèvre"
+        },
+        {
+          "english": "chin",
+          "french": "le menton"
+        },
+        {
+          "english": "ear",
+          "french": "l’oreille"
+        },
+        {
+          "english": "wrist",
+          "french": "le poignet"
+        },
+        {
+          "english": "elbow",
+          "french": "le coude"
+        },
+        {
+          "english": "thumb",
+          "french": "le pouce"
+        },
+        {
+          "english": "palm",
+          "french": "la paume"
+        },
+        {
+          "english": "back",
+          "french": "le dos"
+        },
+        {
+          "english": "chest",
+          "french": "la poitrine"
+        },
+        {
+          "english": "belly",
+          "french": "le ventre"
+        },
+        {
+          "english": "hip",
+          "french": "la hanche"
+        },
+        {
+          "english": "waist",
+          "french": "la taille"
+        },
+        {
+          "english": "rib",
+          "french": "la côte"
+        },
+        {
+          "english": "ankle",
+          "french": "la cheville"
+        },
+        {
+          "english": "thigh",
+          "french": "la cuisse"
+        },
+        {
+          "english": "buttock",
+          "french": "la fesse"
+        },
+        {
+          "english": "shin",
+          "french": "le tibia"
+        }
+      ]
+    },
+    {
+      "level": "hard",
+      "items": [
+        {
+          "english": "heart",
+          "french": "le cœur"
+        },
+        {
+          "english": "lungs",
+          "french": "les poumons"
+        },
+        {
+          "english": "stomach",
+          "french": "l’estomac"
+        },
+        {
+          "english": "liver",
+          "french": "le foie"
+        },
+        {
+          "english": "kidneys",
+          "french": "les reins"
+        },
+        {
+          "english": "intestines",
+          "french": "les intestins"
+        },
+        {
+          "english": "bladder",
+          "french": "la vessie"
+        },
+        {
+          "english": "pancreas",
+          "french": "le pancréas"
+        },
+        {
+          "english": "spleen",
+          "french": "la rate"
+        },
+        {
+          "english": "brain",
+          "french": "le cerveau"
+        },
+        {
+          "english": "throat",
+          "french": "la gorge"
+        },
+        {
+          "english": "muscle",
+          "french": "le muscle"
+        },
+        {
+          "english": "bones",
+          "french": "des os"
+        },
+        {
+          "english": "skeleton",
+          "french": "le squelette"
+        },
+        {
+          "english": "skin",
+          "french": "la peau"
+        },
+        {
+          "english": "tendon",
+          "french": "le tendon"
+        },
+        {
+          "english": "cartilage",
+          "french": "le cartilage"
+        },
+        {
+          "english": "nerve",
+          "french": "le nerf"
+        },
+        {
+          "english": "vein",
+          "french": "la veine"
+        },
+        {
+          "english": "artery",
+          "french": "l’artère"
+        },
+        {
+          "english": "blood",
+          "french": "le sang"
+        },
+        {
+          "english": "joint",
+          "french": "l’articulation"
+        }
+      ]
+    },
+    {
+      "level": "expert",
+      "items": [
+        {
+          "english": "clavicle",
+          "french": "la clavicule"
+        },
+        {
+          "english": "scapula",
+          "french": "l’omoplate"
+        },
+        {
+          "english": "radius",
+          "french": "le radius"
+        },
+        {
+          "english": "ulna",
+          "french": "le cubitus"
+        },
+        {
+          "english": "femur",
+          "french": "le fémur"
+        },
+        {
+          "english": "fibula",
+          "french": "le péroné"
+        },
+        {
+          "english": "metacarpal",
+          "french": "le métacarpe"
+        },
+        {
+          "english": "phalange",
+          "french": "la phalange"
+        },
+        {
+          "english": "sternum",
+          "french": "le sternum"
+        },
+        {
+          "english": "ribcage",
+          "french": "la cage thoracique"
+        },
+        {
+          "english": "small intestine",
+          "french": "l’intestin grêle"
+        },
+        {
+          "english": "large intestine",
+          "french": "le gros intestin"
+        },
+        {
+          "english": "colon",
+          "french": "le côlon"
+        },
+        {
+          "english": "gallbladder",
+          "french": "la vésicule biliaire"
+        },
+        {
+          "english": "appendix",
+          "french": "l’appendice"
+        }
+      ]
+    }
+  ]
+}

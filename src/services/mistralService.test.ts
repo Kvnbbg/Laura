@@ -21,6 +21,7 @@ describe('sendChatMessage', () => {
       json: async () => ({
         message: { role: 'assistant', content: 'Hello there' },
         citations: ['Doc • chunk 1'],
+        thinkingFeedback: ['Signal recu', 'Contexte trie'],
       }),
     });
     vi.stubGlobal('fetch', fetchMock);
@@ -32,6 +33,7 @@ describe('sendChatMessage', () => {
 
     expect(response.message.content).toBe('Hello there');
     expect(response.citations).toHaveLength(1);
+    expect(response.thinkingFeedback).toEqual(['Signal recu', 'Contexte trie']);
 
     vi.unstubAllGlobals();
   });

@@ -1,12 +1,13 @@
-# Laura - Cosmic Dream React App
+# Laura - Application React cosmique + pont terminal
 
-Laura is a TypeScript + React single-page app that showcases a cosmic-inspired UI for an AI companion brand. It is optimized for fast iteration with Vite, SCSS styling, and modern routing. This version includes an embedded Mistral AI chat widget with attachments + RAG.
+Laura est une application single-page en TypeScript + React qui présente une UI inspirée du cosmos pour une IA compagnon. Elle est optimisée pour itérer vite avec Vite, du SCSS et un routage moderne. Cette version inclut un chat Mistral avec pièces jointes + RAG, et un pont terminal capable de parler au même backend ou à toute API compatible.
 
 ## Product Scope
 
-- **Audience**: Designers and developers who want a polished, themed front-end.
-- **Core flows**: Home overview, About narrative, Contact form submission, and Mistral chat.
-- **Runtime**: Static SPA plus a lightweight Node API proxy for Mistral + document retrieval.
+- **Audience**: Designers et développeurs qui veulent une interface soignée et cohérente.
+- **Core flows**: Vue d'accueil, récit About, formulaire Contact et chat Mistral.
+- **Runtime**: SPA statique plus un proxy Node léger pour Mistral + récupération de documents.
+- **Terminal mode**: `go run laura_quest_main.go`, `go build -o laura laura_quest_main.go && ./laura`, or install a local `laura` command
 
 ## Features
 
@@ -30,6 +31,14 @@ Laura is a TypeScript + React single-page app that showcases a cosmic-inspired U
 npm install
 ```
 
+Si tu veux aussi le moteur terminal et le pont, installe Go 1.22+ puis lance-le directement:
+
+```bash
+go run laura_quest_main.go
+go build -o laura laura_quest_main.go
+./laura
+```
+
 ## Running Locally
 
 Start the API proxy (port 4000) and the Vite dev server (port 5173):
@@ -39,16 +48,91 @@ npm run dev:server
 npm run dev
 ```
 
-Open http://localhost:5173
+Ouvre http://localhost:5173
 
-## Production Build
+## Build de production
 
 ```bash
 npm run build
 npm run serve
 ```
 
-The static site will be served on port 3000. You must run the API server separately (and reverse-proxy `/api` to it) when you need chat + RAG in production.
+Le site statique est servi sur le port 3000. Il faut lancer le serveur API séparément et reverse-proxy `/api` vers lui quand tu veux le chat + RAG en production.
+
+## Laura Quest CLI
+
+Commande de prod:
+
+```bash
+go run ./cmd/laura
+```
+
+Binaire local:
+
+```bash
+go build -o bin/laura ./cmd/laura
+./bin/laura
+```
+
+Installation locale:
+
+```bash
+go build -o ~/.local/bin/laura ./cmd/laura
+laura
+```
+
+Ou via `go install`:
+
+```bash
+go install github.com/Kvnbbg/Laura/cmd/laura@latest
+```
+
+Flags disponibles:
+
+```bash
+laura --world css
+laura --stats
+laura --reset
+laura --no-color
+laura --version
+laura --help
+```
+
+## Pont terminal
+
+Laura inclut aussi un mode compagnon en terminal. Il réutilise le même format de payload que la web app et peut pointer vers n'importe quel backend compatible.
+
+```bash
+go run laura_quest_main.go
+go run laura_quest_main.go chat
+```
+
+Commande locale optionnelle:
+
+```bash
+mkdir -p ~/.local/bin
+go build -o ~/.local/bin/laura laura_quest_main.go
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+laura
+```
+
+Variables d'environnement:
+
+| Variable | Purpose |
+| --- | --- |
+| `LAURA_BASE_URL` | Base URL pour un endpoint relatif (par défaut `http://localhost:4000`) |
+| `LAURA_CHAT_ENDPOINT` | Chemin ou URL complète du chat (par défaut `/api/chat`) |
+| `LAURA_WEB_URL` | Surface web référencée dans le prompt système |
+| `LAURA_PERSONA` | Persona personnalisée pour le pont terminal |
+
+Examples:
+
+```bash
+go run laura_quest_main.go chat
+LAURA_BASE_URL=https://techandstream.com LAURA_CHAT_ENDPOINT=/api/chat go run laura_quest_main.go chat
+LAURA_WEB_URL=https://techandstream.com LAURA_PERSONA="Laura is a professional AI companion..." go run laura_quest_main.go chat
+```
 
 ## Configuration
 
@@ -71,14 +155,23 @@ cp .env.example .env
 | `MISTRAL_API_KEY` | Yes (server) | Server-side Mistral API key (preferred) |
 | `MISTRAL_MODEL` | No (server) | Server-side chat model override |
 
-If `VITE_ENABLE_CHAT=true` but `VITE_MISTRAL_API_KEY` is missing or the model is invalid, the UI will show a friendly error and keep chat disabled.
+Si `VITE_ENABLE_CHAT=true` mais que `VITE_MISTRAL_API_KEY` manque ou que le modèle est invalide, l'interface affiche une erreur claire et laisse le chat désactivé.
 
-## Attachments + RAG
+## Pièces jointes + RAG
 
 - Upload TXT or Markdown files in the chat widget.
-- The server chunks content, builds embeddings, and retrieves top matches for each user prompt.
-- Laura will cite sources in the format `[DocName • chunk 3]`.
-- Use **Delete my documents** to clear stored data.
+- Le serveur découpe le contenu, construit les embeddings et récupère les passages les plus pertinents pour chaque prompt.
+- Laura cite les sources au format `[DocName • chunk 3]`.
+- Utilise **Delete my documents** pour effacer les données stockées.
+
+## Activité Moltbook et `french-dev-ai-tools`
+
+Laura reçoit aussi des clins d'œil à l'activité Moltbook de `french-dev-ai-tools`. Le terminal bridge peut mentionner cette activité dans ses réponses pour garder le lien entre:
+
+- le blog
+- le forum
+- les chats
+- les bots de l'écosystème Laura
 
 ## CLI Usage Examples
 
@@ -125,6 +218,7 @@ curl -X POST https://api.example.com/contact \
 - **No citations**: Upload files and ensure the server is running on port 4000.
 - **Contact form fails**: Verify `VITE_CONTACT_ENDPOINT` is reachable and accepts JSON.
 - **Unexpected crashes**: The error boundary will surface the error; review console logs for details.
+- **Terminal bridge fails**: Confirm the endpoint returns the same `{ message, citations }` shape as `/api/chat`.
 
 ## Security Notes
 

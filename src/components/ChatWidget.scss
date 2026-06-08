@@ -91,6 +91,25 @@
     opacity: 0.8;
   }
 
+  &__thinking {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.6rem;
+  }
+
+  &__thinking-pill {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 0.28rem 0.6rem;
+    font-size: 0.72rem;
+    line-height: 1;
+    background: rgba(116, 176, 255, 0.14);
+    color: #d7e9ff;
+    border: 1px solid rgba(116, 176, 255, 0.2);
+  }
+
   &__error {
     background: rgba(255, 99, 120, 0.2);
     color: #ffe7ec;

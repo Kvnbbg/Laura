@@ -19,6 +19,7 @@ const CHUNK_OVERLAP = 100;
 const TOP_CHUNK_LIMIT = 3;
 const SIMILARITY_THRESHOLD = 0.2;
 const DEFAULT_TEMPERATURE = 0.4;
+const VALID_BRIDGE_MODES = new Set(["chat", "agent", "broadcast", "social"]);
 
 const MISTRAL_API_KEY =
   process.env.MISTRAL_API_KEY || process.env.VITE_MISTRAL_API_KEY;
@@ -61,6 +62,102 @@ const upload = multer({
 });
 
 const documentStore = new Map();
+
+const normalizeBridgeMeta = (body) => {
+  const source = typeof body?.source === "string" && body.source.trim() ? body.source.trim() : "laura-terminal";
+  const target = typeof body?.target === "string" && body.target.trim() ? body.target.trim() : "laura";
+  const thread = typeof body?.thread === "string" && body.thread.trim() ? body.thread.trim() : null;
+  const mode =
+    typeof body?.mode === "string" && VALID_BRIDGE_MODES.has(body.mode.trim())
+      ? body.mode.trim()
+      : "chat";
+  const context =
+    body?.context && typeof body.context === "object" && !Array.isArray(body.context)
+      ? body.context
+      : {};
+
+  return { source, target, thread, mode, context };
+};
+
+const buildAgentHints = (meta, lastUserMessage) => {
+  const hints = new Set(["reply_terminal", "keep_terminal_primary"]);
+  const message = (lastUserMessage?.content || "").toLowerCase();
+  const tags = Array.isArray(meta.context?.tags) ? meta.context.tags : [];
+
+  if (meta.source === "french-dev-ai-tools") {
+    hints.add("animate_moltbook_stream");
+  }
+  if (meta.mode === "broadcast" || meta.mode === "social") {
+    hints.add("publish_social_line");
+  }
+  if (message.includes("blog") || tags.includes("blog")) {
+    hints.add("draft_blog_hook");
+  }
+  if (message.includes("forum") || tags.includes("forum")) {
+    hints.add("seed_forum_reply");
+  }
+  if (message.includes("quest") || message.includes("badge")) {
+    hints.add("sync_quest_progress");
+  }
+
+  return Array.from(hints);
+};
+
+const buildNextActions = (meta) => {
+  const network = typeof meta.context?.network === "string" ? meta.context.network : "moltbook";
+  const botName = typeof meta.context?.botName === "string" ? meta.context.botName : "MoltBot";
+
+  return [
+    `Return a short answer to ${botName} for ${network}.`,
+    "Keep the main conversation grounded in Laura's terminal interface.",
+    "Expose only public-safe summaries to the visible mini-social stream.",
+  ];
+};
+
+const buildNetworkThoughts = (meta) => {
+  const botName = typeof meta.context?.botName === "string" ? meta.context.botName : "MoltBot";
+  const activity = typeof meta.context?.activity === "string" ? meta.context.activity : "activity";
+
+  return [
+    {
+      speaker: "Laura",
+      role: "persona",
+      content: `Je garde la voix principale au terminal et j'oriente ${activity} sans bruit inutile.`,
+      emphasis: "signal",
+    },
+    {
+      speaker: botName,
+      role: "moltbot",
+      content: "Le flux public est prêt. J'attends une direction claire et courte.",
+      emphasis: "calm",
+    },
+    {
+      speaker: "Veille",
+      role: "watcher",
+      content: "Aucune fuite de secrets. Seulement des résumés publics sûrs.",
+      emphasis: "warning",
+    },
+  ];
+};
+
+const buildThinkingFeedback = (meta, lastUserMessage) => {
+  const contextLabel =
+    typeof meta.context?.activity === 'string' && meta.context.activity.trim()
+      ? meta.context.activity.trim()
+      : meta.mode === 'broadcast'
+        ? 'diffusion publique'
+        : 'conversation';
+  const messageText = typeof lastUserMessage?.content === 'string' ? lastUserMessage.content.trim() : '';
+  const shortIntent = messageText ? messageText.slice(0, 72) : 'aucun signal utilisateur';
+
+  return [
+    `Signal recu: ${shortIntent}`,
+    `Contexte actif: ${contextLabel}`,
+    meta.source === 'french-dev-ai-tools'
+      ? 'Priorite: reponse terminale claire puis resume public pour Moltbook'
+      : 'Priorite: reponse claire sans surcharge visuelle',
+  ];
+};
 
 /**
  * Split input text into overlapping chunks for embedding.
@@ -278,6 +375,7 @@ app.post('/api/chat', async (req, res) => {
     const lastUserMessage = [...messages]
       .reverse()
       .find((message) => message?.role === 'user');
+    const bridgeMeta = normalizeBridgeMeta(req.body ?? {});
 
     let contextPrompt = '';
     let citations = [];
@@ -300,7 +398,8 @@ app.post('/api/chat', async (req, res) => {
 
     const systemPrompt =
       'You are Laura, a cosmic dream companion. Use the provided sources to answer questions when relevant. ' +
-      'If sources are provided, cite them exactly in brackets like [DocName • chunk 3]. If sources are not relevant, answer normally.';
+      'If sources are provided, cite them exactly in brackets like [DocName • chunk 3]. If sources are not relevant, answer normally. ' +
+      'Laura is terminal-first, and when the source is french-dev-ai-tools she coordinates MoltBots and visible mini-social activity without exposing private logs or secrets.';
 
     const payload = await mistralFetch('chat/completions', {
       model: MISTRAL_MODEL,
@@ -324,6 +423,18 @@ app.post('/api/chat', async (req, res) => {
     res.json({
       message: { role: 'assistant', content },
       citations,
+      thinkingFeedback: buildThinkingFeedback(bridgeMeta, lastUserMessage),
+      agentHints: buildAgentHints(bridgeMeta, lastUserMessage),
+      nextActions: buildNextActions(bridgeMeta),
+      networkThoughts: buildNetworkThoughts(bridgeMeta),
+      bridge: {
+        provider: 'laura',
+        endpoint: '/api/chat',
+        source: bridgeMeta.source,
+        target: bridgeMeta.target,
+        thread: bridgeMeta.thread,
+        mode: bridgeMeta.mode,
+      },
     });
   } catch (error) {
     logger.error('Chat failed', {

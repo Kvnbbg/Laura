@@ -61,6 +61,7 @@ interface Message {
   id: string;
   role: 'user' | 'assistant' | 'system' | 'thinking';
   content: string;
+  thinkingFeedback?: string[];
   reasoning?: ReasoningStep[];
   sources?: RAGSource[];
   probabilities?: {
@@ -70,6 +71,19 @@ interface Message {
   latency?: number;
   tokensUsed?: { input: number; output: number };
 }
+
+const ThinkingSignals: React.FC<{ items: string[] }> = ({ items }) => (
+  <div className="mb-3 flex flex-wrap gap-2">
+    {items.slice(0, 3).map((item) => (
+      <span
+        key={item}
+        className="inline-flex items-center rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-cyan-100"
+      >
+        {item}
+      </span>
+    ))}
+  </div>
+);
 
 interface ModelConfig {
   reasoningMode: ReasoningMode;
@@ -438,6 +452,7 @@ const Chat: React.FC = () => {
   const [messageInput, setMessageInput] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [voiceAvailable, setVoiceAvailable] = useState(true);
+  const [liveThinkingFeedback, setLiveThinkingFeedback] = useState<string[]>([]);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
 
   const quickReplies = useMemo(
@@ -455,9 +470,25 @@ const Chat: React.FC = () => {
   // Simulate a reasoning response (DeepSeek/Qwen style)
   const simulateThinkingResponse = useCallback(async (userMessage: string) => {
     setIsProcessing(true);
+    const feedback =
+      config.reasoningMode === 'deep'
+        ? [
+            'Intention detectee',
+            'Contexte et sources tries',
+            'Reponse structuree avant diffusion',
+          ]
+        : config.reasoningMode === 'balanced'
+          ? [
+              'Signal compris',
+              'Contexte priorise',
+              'Reponse compacte en preparation',
+            ]
+          : ['Signal compris', 'Reponse directe', 'Sortie legere'];
+    setLiveThinkingFeedback(feedback);
     
     // Simulate reasoning delay based on mode
-    const delay = config.reasoningMode === 'deep' ? 3000 : config.reasoningMode === 'balanced' ? 1500 : 500;
+    const baseDelay = config.reasoningMode === 'deep' ? 3000 : config.reasoningMode === 'balanced' ? 1500 : 500;
+    const delay = import.meta.env.MODE === 'test' ? 20 : baseDelay;
     
     // Simulate chain-of-thought
     const reasoningSteps: ReasoningStep[] = config.showThinking ? [
@@ -495,6 +526,7 @@ const Chat: React.FC = () => {
       content: config.reasoningMode === 'deep'
         ? `**Analysis**: Based on multi-step reasoning with ${config.temperature > 1 ? 'exploratory' : 'focused'} sampling (temp: ${config.temperature})...\n\nYour query involves complex contextual understanding. With RAG ${config.ragEnabled ? 'enabled' : 'disabled'}, I'm leveraging ${config.ragEnabled ? 'retrieved documents' : 'parametric knowledge'} to minimize hallucination.\n\n**Confidence**: ${config.accuracyProfile === 'precise' ? 'High precision mode engaged' : 'Balanced accuracy/creativity trade-off'}.`
         : "Quick response mode: Direct answer generated with minimal reasoning overhead.",
+      thinkingFeedback: feedback,
       reasoning: reasoningSteps,
       sources: config.ragEnabled ? [
         {
@@ -525,6 +557,7 @@ const Chat: React.FC = () => {
 
     setMessages(prev => [...prev, response]);
     setIsProcessing(false);
+    setLiveThinkingFeedback([]);
   }, [config]);
 
   const pushUserMessage = useCallback(
@@ -597,12 +630,20 @@ const Chat: React.FC = () => {
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl flex items-center gap-3">
                 <Sparkles className="h-8 w-8 text-purple-400 lucide-animated" />
-                Laura AI Control Center
+                Centre de contrôle IA Laura
               </h1>
               <p className="mt-2 text-slate-400 max-w-2xl">
-                Experience the shift from deterministic software to <span className="text-purple-400 font-medium">probabilistic intelligence</span>. 
-                Leverage DeepSeek reasoning, Qwen 3 accuracy, and GPT-4o capabilities with full transparency.
+                Laura est une IA conversationnelle disponible sur <span className="text-white">techandstream.com</span>.
+                Elle crée des jeux en terminal, répond à tes questions et accompagne tes projets, comme un agent <span className="text-purple-300">Ollama</span> ou <span className="text-cyan-300">Hugging Face</span>, mais avec une vraie personnalité.
               </p>
+              <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                <a className="rounded-full border border-slate-800 bg-slate-900/60 px-3 py-1.5 hover:border-purple-500 hover:text-white transition-colors" href="https://github.com/Kvnbbg/french-dev-ai-tools">Moltbook</a>
+                <a className="rounded-full border border-slate-800 bg-slate-900/60 px-3 py-1.5 hover:border-purple-500 hover:text-white transition-colors" href="https://github.com/Kvnbbg/french-dev-ai-tools">french-dev-ai-tools</a>
+                <a className="rounded-full border border-slate-800 bg-slate-900/60 px-3 py-1.5 hover:border-purple-500 hover:text-white transition-colors" href="https://techandstream.com/blogging.html">Blog</a>
+                <a className="rounded-full border border-slate-800 bg-slate-900/60 px-3 py-1.5 hover:border-purple-500 hover:text-white transition-colors" href="https://techandstream.com/forum.html">Forum</a>
+                <a className="rounded-full border border-slate-800 bg-slate-900/60 px-3 py-1.5 hover:border-purple-500 hover:text-white transition-colors" href="https://techandstream.com/cuisine-sociale.html">Cuisine sociale</a>
+                <a className="rounded-full border border-slate-800 bg-slate-900/60 px-3 py-1.5 hover:border-purple-500 hover:text-white transition-colors" href="https://techandstream.com/family-tree-antilles.html#tab-chat">Chat famille</a>
+              </div>
             </div>
             <div className="flex items-center gap-2 text-xs font-mono text-slate-500 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-800">
               <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -661,9 +702,9 @@ const Chat: React.FC = () => {
               </div>
               <div className="flex-1">
                 <h4 className="text-sm font-medium text-white group-hover:text-pink-200 transition-colors">
-                  Try Meta AI on Instagram
+                  Discute avec Laura sur Instagram
                 </h4>
-                <p className="text-xs text-slate-400">Alternative conversational interface</p>
+                <p className="text-xs text-slate-400">Persona sociale rapide, complémentaire du terminal et de techandstream.com</p>
               </div>
               <Zap className="h-4 w-4 text-pink-400 lucide-animated" />
             </a>
@@ -737,6 +778,10 @@ const Chat: React.FC = () => {
                     {msg.role === 'assistant' && msg.reasoning && (
                       <ReasoningChain steps={msg.reasoning} isVisible={config.showThinking} />
                     )}
+
+                    {msg.role === 'assistant' && msg.thinkingFeedback?.length ? (
+                      <ThinkingSignals items={msg.thinkingFeedback} />
+                    ) : null}
                     
                     {msg.role === 'assistant' && msg.sources && config.ragEnabled && (
                       <RAGContextPanel sources={msg.sources} />
@@ -775,9 +820,12 @@ const Chat: React.FC = () => {
                 ))}
 
                 {isProcessing && (
-                  <div className="flex items-center gap-2 text-slate-500 text-sm">
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-600 border-t-purple-400" />
-                    {config.reasoningMode === 'deep' ? 'Thinking deeply...' : 'Generating...'}
+                  <div className="space-y-3 text-slate-500 text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-600 border-t-purple-400" />
+                      {config.reasoningMode === 'deep' ? 'Thinking deeply...' : 'Generating...'}
+                    </div>
+                    {liveThinkingFeedback.length ? <ThinkingSignals items={liveThinkingFeedback} /> : null}
                   </div>
                 )}
               </div>

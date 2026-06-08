@@ -25,6 +25,12 @@ const INITIAL_MESSAGES: ChatMessage[] = [
   },
 ];
 
+const DEFAULT_THINKING_FEEDBACK = [
+  'Analyse du signal utilisateur',
+  'Filtrage du contexte utile',
+  'Preparation d\'une reponse compacte',
+];
+
 const ChatWidget = ({ variant = 'floating' }: ChatWidgetProps) => {
   const config = getConfig();
   const [isOpen, setIsOpen] = useState(variant === 'page');
@@ -34,6 +40,7 @@ const ChatWidget = ({ variant = 'floating' }: ChatWidgetProps) => {
   const [inputValue, setInputValue] = useState('');
   const [documents, setDocuments] = useState<DocumentSummary[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [thinkingFeedback, setThinkingFeedback] = useState<string[]>([]);
   const listRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -87,6 +94,7 @@ const ChatWidget = ({ variant = 'floating' }: ChatWidgetProps) => {
     setMessages(nextMessages);
     setInputValue('');
     setStatus('sending');
+    setThinkingFeedback(DEFAULT_THINKING_FEEDBACK);
 
     try {
       const response = await sendChatMessage(nextMessages);
@@ -100,11 +108,14 @@ const ChatWidget = ({ variant = 'floating' }: ChatWidgetProps) => {
         {
           ...response.message,
           content: `${response.message.content}${citationSuffix}`,
+          thinkingFeedback: response.thinkingFeedback,
         },
       ]);
       setStatus('idle');
+      setThinkingFeedback([]);
     } catch (error) {
       setStatus('error');
+      setThinkingFeedback([]);
       if (error instanceof AppError) {
         setErrorMessage(error.userMessage ?? error.message);
       } else if (error instanceof Error) {
@@ -119,6 +130,7 @@ const ChatWidget = ({ variant = 'floating' }: ChatWidgetProps) => {
     setMessages(INITIAL_MESSAGES);
     setErrorMessage(null);
     setStatus('idle');
+    setThinkingFeedback([]);
   };
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -217,14 +229,32 @@ const ChatWidget = ({ variant = 'floating' }: ChatWidgetProps) => {
                   {message.role === 'assistant' ? 'Laura' : 'You'}
                 </span>
                 <p>{message.content}</p>
+                {message.role === 'assistant' && message.thinkingFeedback?.length ? (
+                  <div className="chat-widget__thinking">
+                    {message.thinkingFeedback.map((item) => (
+                      <span key={item} className="chat-widget__thinking-pill">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
               </div>
             ))}
             {status === 'sending' && (
               <div className="chat-widget__message chat-widget__message--assistant">
                 <span className="chat-widget__role">Laura</span>
                 <p className="chat-widget__typing" aria-live="assertive">
-                  Laura is typing…
+                  Laura prepare sa reponse…
                 </p>
+                {thinkingFeedback.length ? (
+                  <div className="chat-widget__thinking">
+                    {thinkingFeedback.map((item) => (
+                      <span key={item} className="chat-widget__thinking-pill">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
               </div>
             )}
           </div>
