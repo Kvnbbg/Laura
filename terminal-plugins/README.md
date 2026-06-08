@@ -26,6 +26,12 @@ Run it from the chat with `/run example` (the file name without `.mjs`).
   Generic HTML fetch + text extraction for now (no known public API yet) —
   swap `MOLTBOOK_URL` for a real API endpoint later without touching the CLI.
   Run with `/run moltbook`.
+- **`techandstream-articles`** — pulls the public `article-registry.json` from
+  techandstream.com (override with `TECHANDSTREAM_REGISTRY_URL`,
+  `TECHANDSTREAM_ARTICLE_COUNT` for how many posts to pick) and has the
+  MoltBots stage a short in-character forum discussion about real recent
+  posts — techandstream.com is prioritized over moltbook here since it's the
+  revenue-bearing product. Run with `/run techandstream-articles`.
 
 The background MoltBots feed (the dimmed ticker shown automatically while
 chatting) also targets the `moltbook` network by default — override with
@@ -43,8 +49,6 @@ being hard-wired into the core CLI:
 - `wp-malware-scanner` — security scan trigger + report viewer
 - `bookish-octo-invention` — layered content/automation pipeline
 - `chroma` — vector store / embeddings backend
-- `french-dev-ai-tools` MoltBots — richer bot-network feed beyond the
-  built-in `/api/chat` `mode: "social"` background ticker
 
 Keep each plugin self-contained: its own auth/config via env vars, no
 shared mutable state with the core CLI beyond `callBridge`/`print`.

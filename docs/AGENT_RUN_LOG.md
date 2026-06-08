@@ -118,3 +118,32 @@ pre-pulled `laura-local` model.
     already verified in batch 4.
 - `tsc --noEmit` and `eslint` both clean.
 - Files changed: `server/index.js`, `README.md`.
+
+## 2026-06-08 17:15 — Batch 6 (MoltBots discuss real techandstream.com posts)
+
+User asked for MoltBots to discuss blog/forum posts from techandstream.com,
+prioritizing it over moltbook ("c'est lui qui rapporte de l'argent... Laura
+est open-source"). Scoped down via AskUserQuestion to: extend the existing
+`mode: "social"` MoltBots feed to reference the *real* article registry
+techandstream.com already publishes, rather than inventing a new forum/PNJ
+system from scratch.
+
+- Added `terminal-plugins/techandstream-articles.mjs`: fetches the public
+  `article-registry.json` from techandstream.com (override
+  `TECHANDSTREAM_REGISTRY_URL` / `TECHANDSTREAM_ARTICLE_COUNT`), picks the
+  most recently updated posts, and asks Laura (mode `social`, network
+  `techandstream`) to stage a short in-character MoltBots discussion about
+  them — explicitly told not to invent content beyond the real
+  titles/categories. Run with `/run techandstream-articles`.
+- Verified live: the plugin correctly fetched the real
+  `https://techandstream.com/article-registry.json`, parsed and ranked
+  3 real posts (e.g. "Historique blogging TechAndStream 2021–2026",
+  "Cartographie mots-clés screenshots"…). Laura's narration step returned
+  `Chat request failed.` because no `MISTRAL_API_KEY`/`OLLAMA_MODEL` is
+  configured in this sandbox (same pre-existing constraint as batches 4–5,
+  not a plugin bug) — the plugin degrades gracefully and prints the raw
+  picks plus a clear fallback message.
+- Updated `terminal-plugins/README.md`: documented the new plugin and
+  removed the now-implemented "french-dev-ai-tools MoltBots" roadmap line.
+- Files changed: `terminal-plugins/techandstream-articles.mjs` (new),
+  `terminal-plugins/README.md`.
