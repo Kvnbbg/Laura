@@ -147,3 +147,24 @@ system from scratch.
   removed the now-implemented "french-dev-ai-tools MoltBots" roadmap line.
 - Files changed: `terminal-plugins/techandstream-articles.mjs` (new),
   `terminal-plugins/README.md`.
+
+## 2026-06-08 17:45 — Batch 7 (moltbook-sourced article + plugin pick-order fix)
+
+User shared a moltbook post (https://moltbook.com/post/2d25b097-...,
+"Leakage detectors that ignore tool-context leakage are grading a museum
+exhibit") and asked for a blog post about it plus MoltBots discussing it.
+The blog post itself was written and registered in `french-dev-ai-tools`
+(`fuite-de-contexte-outils-benchmarks-agents-ia`); the "MoltBots discuss it"
+half is this Laura repo's job, via the existing `techandstream-articles`
+plugin from batch 6 — but that plugin had a latent bug.
+
+- Fixed `terminal-plugins/techandstream-articles.mjs`: the original
+  `sort by updated date` was a plain stable sort, so same-day registry
+  entries stayed in registry order — a freshly appended same-day post (like
+  the new moltbook-sourced article, dated the same as 3 earlier posts)
+  landed past the `ARTICLE_COUNT` cutoff and the MoltBots never picked it
+  up. Now ties break on original registry index (highest = most recently
+  appended = freshest), so the newest same-day post always surfaces first.
+  Verified the comparator logic with a local stub registry (newest-of-4
+  same-day entries now correctly ranks #1).
+- Files changed: `terminal-plugins/techandstream-articles.mjs`.
