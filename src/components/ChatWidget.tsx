@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { getConfig } from '../config/env';
 import { sendChatMessage, type ChatMessage } from '../services/mistralService';
+import { sendPerplexityMessage } from '../services/perplexityService';
+import { CitationsPanel } from './CitationsPanel';
 import {
   deleteDocuments,
   listDocuments,
@@ -97,18 +99,15 @@ const ChatWidget = ({ variant = 'floating' }: ChatWidgetProps) => {
     setThinkingFeedback(DEFAULT_THINKING_FEEDBACK);
 
     try {
-      const response = await sendChatMessage(nextMessages);
-      const citationSuffix = response.citations.length
-        ? `\n\nSources: ${response.citations
-            .map((citation) => `[${citation}]`)
-            .join(' ')}`
-        : '';
+      const response = config.perplexityEnabled
+        ? await sendPerplexityMessage(nextMessages)
+        : await sendChatMessage(nextMessages);
       setMessages((prev) => [
         ...prev,
         {
           ...response.message,
-          content: `${response.message.content}${citationSuffix}`,
           thinkingFeedback: response.thinkingFeedback,
+          citations: response.citations,
         },
       ]);
       setStatus('idle');
@@ -229,6 +228,9 @@ const ChatWidget = ({ variant = 'floating' }: ChatWidgetProps) => {
                   {message.role === 'assistant' ? 'Laura' : 'You'}
                 </span>
                 <p>{message.content}</p>
+                {message.role === 'assistant' && (message as ChatMessage & { citations?: string[] }).citations?.length ? (
+                  <CitationsPanel citations={(message as ChatMessage & { citations?: string[] }).citations ?? []} />
+                ) : null}
                 {message.role === 'assistant' && message.thinkingFeedback?.length ? (
                   <div className="chat-widget__thinking">
                     {message.thinkingFeedback.map((item) => (

@@ -14,6 +14,12 @@ describe('submitContactForm', () => {
       chatEnabled: false,
       chatErrors: [],
       mistralModel: 'mistral-small',
+      perplexityEnabled: false,
+      perplexityErrors: [],
+      perplexityApiKey: '',
+      perplexityModel: 'sonar',
+      perplexityBaseUrl: 'https://api.perplexity.ai',
+      perplexityTimeoutMs: 10000,
     };
 
     vi.useFakeTimers();
@@ -43,6 +49,12 @@ describe('submitContactForm', () => {
       chatEnabled: false,
       chatErrors: [],
       mistralModel: 'mistral-small',
+      perplexityEnabled: false,
+      perplexityErrors: [],
+      perplexityApiKey: '',
+      perplexityModel: 'sonar',
+      perplexityBaseUrl: 'https://api.perplexity.ai',
+      perplexityTimeoutMs: 10000,
     };
 
     const fetchMock = vi.fn().mockResolvedValue({ ok: false, status: 500 });

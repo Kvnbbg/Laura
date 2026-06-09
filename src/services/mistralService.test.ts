@@ -13,6 +13,12 @@ describe('sendChatMessage', () => {
     chatEnabled: true,
     chatErrors: [],
     mistralModel: 'mistral-small',
+    perplexityEnabled: false,
+    perplexityErrors: [],
+    perplexityApiKey: '',
+    perplexityModel: 'sonar',
+    perplexityBaseUrl: 'https://api.perplexity.ai',
+    perplexityTimeoutMs: 10000,
   };
 
   it('returns a parsed chat response', async () => {
