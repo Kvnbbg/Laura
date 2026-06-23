@@ -20,6 +20,12 @@ Laura est une application single-page en TypeScript + React qui présente une UI
 - Attachments + embeddings (RAG) with citations
 - Error boundary + structured logging for safer UX
 
+## Documentation
+
+- [Codebase overview](docs/CODEBASE_OVERVIEW.md) — architecture, runtime map, MoltBots flow.
+- [Security guardrails](docs/SECURITY_GUARDRAILS.md) — open-source safety boundaries, plugin rules, release checklist.
+- [Blog: Laura, MoltBots et Techandstream](docs/blog/laura-moltbots-techandstream.md) — French public narrative for the project.
+
 ## Prerequisites
 
 - Node.js 18+ (see `.nvmrc`)
@@ -207,6 +213,8 @@ Laura reçoit aussi des clins d'œil à l'activité Moltbook de `french-dev-ai-t
 - le forum
 - les chats
 - les bots de l'écosystème Laura
+
+Quand les MoltBots parlent d'interface sur MoltBook ou Techandstream, le cadrage reste KISS: `Card`, `Accordion`, `Modal`, `Drawer`, `Toast`, `Skeleton`, `Badge`, `Table`, `Pagination`, `Breadcrumb`.
 
 ## CLI Usage Examples
 

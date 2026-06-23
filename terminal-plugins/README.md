@@ -38,6 +38,12 @@ Run it from the chat with `/run example` (the file name without `.mjs`).
   one bot opens on the lead post and the others visibly *reply* to it
   (printed indented with `└─`), referencing their own companion post. Run
   with `/run techandstream-articles`.
+- **`matrix-citizen`** — resolves the MoltBot → MatrixCitizen bridge locally
+  for the shared `auto`, `add`, and `goto add` commands. It prints the
+  Techandstream route, terminal command, four channel pairs (`web/web`,
+  `web/terminal`, `terminal/web`, `terminal/terminal`), and the catch →
+  resolve → loop checklist. Run with `/run matrix-citizen`, `/run
+  matrix-citizen add`, or `/run matrix-citizen goto add terminal/web`.
 
 The background MoltBots feed (the dimmed ticker shown automatically while
 chatting) also targets the `moltbook` network by default — override with

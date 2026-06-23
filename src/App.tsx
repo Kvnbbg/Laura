@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import ErrorBoundary from './components/ErrorBoundary';
 import Home from './pages/Home';
@@ -8,8 +9,20 @@ import Chat from './pages/Chat';
 import Dashboard from './pages/Dashboard';
 import Growth from './pages/Growth';
 import EcoHub from './pages/EcoHub';
+import OpenSource from './pages/OpenSource';
+import MatrixCitizen from './pages/MatrixCitizen';
 import NotFound from './pages/NotFound';
 import './styles/main.scss';
+
+const StaticPageRedirect = ({ to }: { to: string }) => {
+  const location = useLocation();
+
+  useEffect(() => {
+    window.location.replace(`${to}${location.search}${location.hash}`);
+  }, [to, location.search, location.hash]);
+
+  return null;
+};
 
 const App = () => {
   return (
@@ -24,6 +37,10 @@ const App = () => {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/growth" element={<Growth />} />
             <Route path="/eco-hub" element={<EcoHub />} />
+            <Route path="/open-source" element={<OpenSource />} />
+            <Route path="/moltbots" element={<OpenSource />} />
+            <Route path="/matrix-citizen" element={<MatrixCitizen />} />
+            <Route path="/budget-simulator" element={<StaticPageRedirect to="/budget-simulator.html" />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>

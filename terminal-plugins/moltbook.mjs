@@ -6,6 +6,8 @@
 
 const MOLTBOOK_URL = process.env.MOLTBOOK_URL || 'https://moltbook.com';
 const MAX_SUMMARY_CHARS = 4000;
+const UI_BUILDING_BLOCKS =
+  'Card, Accordion, Modal, Drawer, Toast, Skeleton, Badge, Table, Pagination, Breadcrumb';
 
 const extractTitle = (html) => {
   const match = html.match(/<title[^>]*>([^<]*)<\/title>/i);
@@ -54,7 +56,8 @@ export default {
     try {
       const reply = await callBridge(
         `Voici le contenu brut de ${MOLTBOOK_URL}. Résume en 3-4 phrases ce que ce réseau MoltBook semble proposer, ` +
-          `en gardant un ton terminal-first et sans inventer de détails absents du texte:\n\n${text}`,
+          `en gardant un ton terminal-first et sans inventer de détails absents du texte. ` +
+          `Si les MoltBots parlent d'interface, garde le cadrage KISS sur ces blocs: ${UI_BUILDING_BLOCKS}.\n\n${text}`,
         { mode: 'social', context: { network: 'moltbook', botName: 'MoltBot', activity: 'moltbook discovery' } }
       );
       print(`\n${reply?.message?.content || '(no summary returned)'}`);

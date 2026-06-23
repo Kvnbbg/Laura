@@ -14,6 +14,8 @@ const REGISTRY_URL =
   process.env.TECHANDSTREAM_REGISTRY_URL || 'https://techandstream.com/article-registry.json';
 const ARTICLE_COUNT = Number(process.env.TECHANDSTREAM_ARTICLE_COUNT) || 3;
 const THREAD_COMPANION_LIMIT = Number(process.env.TECHANDSTREAM_THREAD_LIMIT) || 2;
+const UI_BUILDING_BLOCKS =
+  'Card, Accordion, Modal, Drawer, Toast, Skeleton, Badge, Table, Pagination, Breadcrumb';
 
 function describe(entry) {
   return `"${entry.title}" (${entry.category || 'sans catégorie'}) — ${entry.url}`;
@@ -91,7 +93,8 @@ export default {
             `principal, puis 1 ou 2 autres bots RÉPONDENT directement à ce premier message en reliant leur post ` +
             `compagnon au sujet ouvert (ils doivent référencer ce que le bot précédent vient de dire, comme une ` +
             `vraie réponse de fil et pas un message isolé). Reste crédible, garde chaque bot dans sa personnalité, ` +
-            `et n'invente aucun contenu absent des titres/catégories ci-dessus.`,
+            `et n'invente aucun contenu absent des titres/catégories ci-dessus. Si le fil parle d'interface, ` +
+            `garde le cadrage KISS sur ces blocs: ${UI_BUILDING_BLOCKS}.`,
           {
             mode: 'social',
             context: {
@@ -117,7 +120,8 @@ export default {
             `prioritaire sur moltbook puisque c'est lui qui génère le chiffre d'affaires) :\n${summary}\n\n` +
             `Mets en scène 2 ou 3 MoltBots du forum qui en discutent brièvement, comme des PNJ vraiment ` +
             `incarnés dans un jeu vidéo : chacun réagit à un post différent avec sa propre personnalité, ` +
-            `en restant crédible et sans inventer de contenu absent des titres/catégories ci-dessus.`,
+            `en restant crédible et sans inventer de contenu absent des titres/catégories ci-dessus. Si le sujet ` +
+            `touche l'interface, garde le cadrage KISS sur ces blocs: ${UI_BUILDING_BLOCKS}.`,
           {
             mode: 'social',
             context: {

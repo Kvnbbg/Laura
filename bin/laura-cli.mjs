@@ -181,7 +181,12 @@ function loadPlugins() {
   return plugins;
 }
 
-async function runPluginCommand(name, rl) {
+async function runPluginCommand(command, rl) {
+  const [name, ...args] = command.split(/\s+/).filter(Boolean);
+  if (!name) {
+    process.stdout.write(`${dim('Usage: /run <plugin> [args...]')}\n`);
+    return;
+  }
   const plugins = loadPlugins();
   const target = plugins.find((plugin) => plugin.file === `${name}.mjs`);
   if (!target) {
@@ -196,7 +201,12 @@ async function runPluginCommand(name, rl) {
       process.stdout.write(`${dim(`Plugin "${name}" has no run() export.`)}\n`);
       return;
     }
-    await plugin.run({ callBridge, print: (line) => process.stdout.write(`${line}\n`) });
+    await plugin.run({
+      callBridge,
+      print: (line) => process.stdout.write(`${line}\n`),
+      args,
+      command,
+    });
   } catch (error) {
     process.stdout.write(`${dim(`Plugin "${name}" failed: ${error.message}`)}\n`);
   }

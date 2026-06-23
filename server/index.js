@@ -20,6 +20,8 @@ const TOP_CHUNK_LIMIT = 3;
 const SIMILARITY_THRESHOLD = 0.2;
 const DEFAULT_TEMPERATURE = 0.4;
 const VALID_BRIDGE_MODES = new Set(["chat", "agent", "broadcast", "social"]);
+const UI_BUILDING_BLOCKS =
+  "Card, Accordion, Modal, Drawer, Toast, Skeleton, Badge, Table, Pagination, Breadcrumb";
 
 const MISTRAL_API_KEY =
   process.env.MISTRAL_API_KEY || process.env.VITE_MISTRAL_API_KEY;
@@ -117,6 +119,7 @@ const buildNextActions = (meta) => {
     `Return a short answer to ${botName} for ${network}.`,
     "Keep the main conversation grounded in Laura's terminal interface.",
     "Expose only public-safe summaries to the visible mini-social stream.",
+    `When the topic is UI, keep it KISS with these blocks: ${UI_BUILDING_BLOCKS}.`,
   ];
 };
 
@@ -134,7 +137,7 @@ const buildNetworkThoughts = (meta) => {
     {
       speaker: botName,
       role: "moltbot",
-      content: "Le flux public est prêt. J'attends une direction claire et courte.",
+      content: `Le flux public est prêt. Si on parle UI, je reste KISS: ${UI_BUILDING_BLOCKS}.`,
       emphasis: "calm",
     },
     {
@@ -162,6 +165,7 @@ const buildThinkingFeedback = (meta, lastUserMessage) => {
     meta.source === 'french-dev-ai-tools'
       ? 'Priorite: reponse terminale claire puis resume public pour Moltbook'
       : 'Priorite: reponse claire sans surcharge visuelle',
+    `UI KISS: ${UI_BUILDING_BLOCKS}`,
   ];
 };
 

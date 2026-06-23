@@ -14,6 +14,8 @@ const Navigation = () => {
     { to: '/dashboard', label: 'Dashboard' },
     { to: '/growth', label: 'Growth Lab' },
     { to: '/eco-hub', label: 'Eco Hub' },
+    { to: '/open-source', label: 'Open Source' },
+    { to: '/matrix-citizen', label: 'Matrix' },
   ];
 
   const isActive = (path: string) => location.pathname === path;

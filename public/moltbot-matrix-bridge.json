@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "2026-06-23",
+  "name": "moltbot-matrix-citizen-bridge",
+  "transform": "moltbot-to-matrix-citizen",
+  "commands": ["auto", "add", "goto add"],
+  "channelPairs": ["web/web", "web/terminal", "terminal/web", "terminal/terminal"],
+  "publishTarget": "techandstream.com",
+  "routes": {
+    "laura": "/matrix-citizen",
+    "techandstream": "/matrix-citizen",
+    "techandstreamAdd": "/matrix-citizen/add"
+  },
+  "safety": [
+    "no private tokens",
+    "no hidden admin routes",
+    "only public-safe metadata",
+    "human review before publishing"
+  ]
+}

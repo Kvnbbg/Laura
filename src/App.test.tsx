@@ -12,6 +12,8 @@ describe('App user journeys', () => {
     expect(screen.getAllByRole('link', { name: /contact/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /chat/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /eco hub/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: /open source/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: /matrix/i }).length).toBeGreaterThan(0);
   }, 15000);
 
   it('allows navigating from home to contact and switching contact methods', () => {
@@ -27,7 +29,7 @@ describe('App user journeys', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /full portal/i }));
     expect(screen.getByRole('heading', { name: /visit our contact center/i })).toBeInTheDocument();
-  });
+  }, 15000);
 
   it('recovers from an unknown route through the 404 flow', () => {
     window.history.pushState({}, '', '/definitely-missing');
@@ -51,7 +53,20 @@ describe('App user journeys', () => {
 
     fireEvent.click(screen.getAllByRole('link', { name: /eco hub/i })[0]);
     expect(screen.getByRole('heading', { name: /eco integration command center/i })).toBeInTheDocument();
+
+    fireEvent.click(screen.getAllByRole('link', { name: /open source/i })[0]);
+    expect(screen.getByRole('heading', { name: /laura craft les moltbots pour techandstream/i })).toBeInTheDocument();
+
+    fireEvent.click(screen.getAllByRole('link', { name: /matrix/i })[0]);
+    expect(screen.getByRole('heading', { name: /moltbots become matrixcitizen records/i })).toBeInTheDocument();
   }, 15000);
+
+  it('supports the MoltBots alias route', () => {
+    window.history.pushState({}, '', '/moltbots');
+    render(<App />);
+
+    expect(screen.getByRole('heading', { name: /laura craft les moltbots pour techandstream/i })).toBeInTheDocument();
+  });
 
   it('keeps chat flow resilient by trimming input and unblocking after response', async () => {
     window.history.pushState({}, '', '/chat');
