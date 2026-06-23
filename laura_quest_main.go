@@ -35,6 +35,13 @@ const (
 func c(color, text string) string { return color + text + Reset }
 func bold(text string) string     { return Bold + text + Reset }
 
+// hyperlink wraps text in an OSC 8 terminal hyperlink — clickable in modern
+// terminals (iTerm2, kitty, GNOME Terminal, Windows Terminal…), degrades to
+// plain text elsewhere. Lets a player click a preview link to open the web.
+func hyperlink(url, text string) string {
+	return fmt.Sprintf("\x1b]8;;%s\x1b\\%s\x1b]8;;\x1b\\", url, text)
+}
+
 // ── Data structures ────────────────────────────────────────────────
 type Quest struct {
 	ID        string `json:"id"`
@@ -241,7 +248,7 @@ func printAuditPointage(gs *GameState) {
 	}
 	fmt.Printf("\n%s\n", c(Cyan, "▶ Aperçus web — ouvre pour voir l'effet sur le site (terminal ⇄ web)"))
 	for _, b := range previewBridges() {
-		fmt.Printf("%s\n", c(Dim, fmt.Sprintf("   %-26s → %s", b.Screen, b.WebURL)))
+		fmt.Printf("%s %s\n", c(Dim, fmt.Sprintf("   %-26s →", b.Screen)), c(Cyan, hyperlink(b.WebURL, b.WebURL)))
 	}
 	gaps := auditGaps(gs)
 	if len(gaps) == 0 {
