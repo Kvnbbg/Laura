@@ -188,6 +188,26 @@ func screenAudit(gs *GameState) []string {
 	return out
 }
 
+// previewBridge links a terminal screen to its web counterpart on
+// techandstream.com. The game plays both ways: progress in the terminal, then
+// open the matching page to "see the effect" on the web (and back).
+type previewBridge struct {
+	Screen string
+	WebURL string
+}
+
+func previewBridges() []previewBridge {
+	return []previewBridge{
+		{"Quest worlds", "https://techandstream.com/codex"},
+		{"Body challenges", "https://techandstream.com/entrainement"},
+		{"Docs hub", "https://techandstream.com/codex"},
+		{"Cafe (Laura + MoltBots)", "https://techandstream.com/moltbook"},
+		{"Quiz", "https://techandstream.com/quiz"},
+		{"Game Lab", "https://techandstream.com/game-lab"},
+		{"Pricing / Pro", "https://techandstream.com/pricing"},
+	}
+}
+
 func loadBodyChallengesForAudit() []BodyChallenge {
 	var challengePack struct {
 		Challenges []BodyChallenge `json:"challenges"`
@@ -218,6 +238,10 @@ func printAuditPointage(gs *GameState) {
 	fmt.Printf("\n%s\n", c(Cyan, "Audit pointage"))
 	for _, line := range screenAudit(gs) {
 		fmt.Printf("%s\n", c(Dim, " - "+line))
+	}
+	fmt.Printf("\n%s\n", c(Cyan, "▶ Aperçus web — ouvre pour voir l'effet sur le site (terminal ⇄ web)"))
+	for _, b := range previewBridges() {
+		fmt.Printf("%s\n", c(Dim, fmt.Sprintf("   %-26s → %s", b.Screen, b.WebURL)))
 	}
 	gaps := auditGaps(gs)
 	if len(gaps) == 0 {
