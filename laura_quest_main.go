@@ -203,6 +203,37 @@ type previewBridge struct {
 	WebURL string
 }
 
+// dailyQuest mirrors the web's DailyQuest (french-dev questOfTheDay.ts). Keep
+// the pool IN SYNC (same order) so both surfaces resolve the same quest.
+type dailyQuest struct {
+	Emoji string
+	Title string
+	World string
+	Hint  string
+	XP    int
+}
+
+func questPool() []dailyQuest {
+	return []dailyQuest{
+		{"🐚", "Dompter le shell", "bash", "Enchaîne trois commandes en un seul pipe.", 20},
+		{"🦫", "Goroutine zen", "go", "Lance 3 goroutines, zéro data race.", 25},
+		{"🧪", "Hypothèse vérifiée", "science", "Remonte à la source primaire d'un fait viral.", 15},
+		{"🎨", "Pixel parfait", "css", "Centre une div sans un seul hack.", 15},
+		{"🧩", "Algo malin", "leetcode", "Passe d'O(n²) à O(n) sur un parcours.", 30},
+		{"🏛️", "Pile propre", "fullstack", "Sépare domaine, cas d'usage et UI.", 25},
+		{"📒", "Grand livre", "accounting", "Équilibre débit et crédit du jour.", 20},
+	}
+}
+
+// questOfTheDay is deterministic by UTC day number — identical to the web Codex
+// on the same day (shared daily challenge, no network).
+func questOfTheDay() dailyQuest {
+	pool := questPool()
+	day := int(time.Now().Unix() / 86400)
+	idx := ((day % len(pool)) + len(pool)) % len(pool)
+	return pool[idx]
+}
+
 func previewBridges() []previewBridge {
 	return []previewBridge{
 		{"Quest worlds", "https://techandstream.com/codex"},
@@ -246,6 +277,11 @@ func printAuditPointage(gs *GameState) {
 	for _, line := range screenAudit(gs) {
 		fmt.Printf("%s\n", c(Dim, " - "+line))
 	}
+	q := questOfTheDay()
+	fmt.Printf("\n%s\n", c(Magenta, "★ Quête du jour (la même que sur le web aujourd'hui)"))
+	fmt.Printf("%s\n", c(Yellow, fmt.Sprintf("   %s %s  [monde %s · +%d XP]", q.Emoji, bold(q.Title), q.World, q.XP)))
+	fmt.Printf("%s\n", c(Dim, "   "+q.Hint))
+
 	fmt.Printf("\n%s\n", c(Cyan, "▶ Aperçus web — ouvre pour voir l'effet sur le site (terminal ⇄ web)"))
 	for _, b := range previewBridges() {
 		fmt.Printf("%s %s\n", c(Dim, fmt.Sprintf("   %-26s →", b.Screen)), c(Cyan, hyperlink(b.WebURL, b.WebURL)))
