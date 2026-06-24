@@ -87,6 +87,17 @@ const normalizeBridgeMeta = (body) => {
   return { source, target, thread, mode, context };
 };
 
+const getMatrixProgress = (meta) => {
+  const progress = meta.context?.matrixProgress;
+  if (!progress || typeof progress !== 'object' || Array.isArray(progress)) {
+    return null;
+  }
+  if (progress.contract !== 'laura-bridge-progress-v1') {
+    return null;
+  }
+  return progress;
+};
+
 const buildAgentHints = (meta, lastUserMessage) => {
   const hints = new Set(["reply_terminal", "keep_terminal_primary"]);
   const message = (lastUserMessage?.content || "").toLowerCase();
@@ -107,6 +118,10 @@ const buildAgentHints = (meta, lastUserMessage) => {
   if (message.includes("quest") || message.includes("badge")) {
     hints.add("sync_quest_progress");
   }
+  if (getMatrixProgress(meta)) {
+    hints.add("sync_matrix_progress");
+    hints.add("themed_week_streak");
+  }
 
   return Array.from(hints);
 };
@@ -120,12 +135,16 @@ const buildNextActions = (meta) => {
     "Keep the main conversation grounded in Laura's terminal interface.",
     "Expose only public-safe summaries to the visible mini-social stream.",
     `When the topic is UI, keep it KISS with these blocks: ${UI_BUILDING_BLOCKS}.`,
+    getMatrixProgress(meta)
+      ? `Mirror public XP/streak progress for ${getMatrixProgress(meta).bonusWorld}.`
+      : "Use local deterministic streak progress when no bridge progress is provided.",
   ];
 };
 
 const buildNetworkThoughts = (meta) => {
   const botName = typeof meta.context?.botName === "string" ? meta.context.botName : "MoltBot";
   const activity = typeof meta.context?.activity === "string" ? meta.context.activity : "activity";
+  const progress = getMatrixProgress(meta);
 
   return [
     {
@@ -146,6 +165,16 @@ const buildNetworkThoughts = (meta) => {
       content: "Aucune fuite de secrets. Seulement des résumés publics sûrs.",
       emphasis: "warning",
     },
+    ...(progress
+      ? [
+          {
+            speaker: "Streak",
+            role: "matrix-progress",
+            content: `Monde bonus ${progress.bonusWorld}: ${progress.quest}, XP ${progress.xpTotal}.`,
+            emphasis: "signal",
+          },
+        ]
+      : []),
   ];
 };
 
@@ -444,6 +473,7 @@ app.post('/api/chat', async (req, res) => {
         target: bridgeMeta.target,
         thread: bridgeMeta.thread,
         mode: bridgeMeta.mode,
+        progress: getMatrixProgress(bridgeMeta),
       },
     });
   } catch (error) {

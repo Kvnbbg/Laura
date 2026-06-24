@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { ArrowRight, Bot, CheckCircle2, GitBranch, ShieldCheck, Terminal } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { ArrowRight, Bot, CheckCircle2, Cpu, GitBranch, Radio, ShieldCheck, Terminal } from 'lucide-react';
 import {
   MOLT_BOT_BRIDGE_CHANNELS,
   MOLT_BOT_BRIDGE_COMMANDS,
@@ -19,10 +19,78 @@ const botSeed = {
   skills: ['routing', 'safe-publishing', 'moltbook'],
 };
 
+const userSeed =
+  typeof window !== 'undefined'
+    ? window.localStorage.getItem('laura-matrix-user') || 'laura-local-user'
+    : 'laura-local-user';
+
+const MatrixPortal = ({
+  active,
+  accent,
+  color,
+  onClick,
+}: {
+  active: boolean;
+  accent: string;
+  color: string;
+  onClick: () => void;
+}) => (
+  <button
+    type="button"
+    className="matrix-portal"
+    aria-pressed={active}
+    aria-label="Toggle MatrixCitizen expert portal"
+    onClick={onClick}
+  >
+    <svg viewBox="0 0 220 220" role="img" aria-label="Animated MatrixCitizen portal">
+      <defs>
+        <radialGradient id="laura-matrix-portal-glow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor={accent} stopOpacity="0.84" />
+          <stop offset="48%" stopColor={color} stopOpacity="0.34" />
+          <stop offset="100%" stopColor="transparent" />
+        </radialGradient>
+        <filter id="laura-matrix-portal-blur">
+          <feGaussianBlur stdDeviation="3" />
+        </filter>
+      </defs>
+      <rect width="220" height="220" rx="18" fill="#111827" opacity="0.55" />
+      <circle cx="110" cy="110" r="78" fill="url(#laura-matrix-portal-glow)" filter="url(#laura-matrix-portal-blur)">
+        <animate attributeName="r" values={active ? '66;88;66' : '70;76;70'} dur={active ? '1.8s' : '4.2s'} repeatCount="indefinite" />
+      </circle>
+      <g transform="translate(110 110)">
+        <animateTransform attributeName="transform" type="rotate" from="0 110 110" to="360 110 110" dur={active ? '8s' : '18s'} repeatCount="indefinite" />
+        {Array.from({ length: 10 }).map((_, index) => {
+          const angle = (Math.PI * 2 * index) / 10;
+          const x = Math.cos(angle) * 72;
+          const y = Math.sin(angle) * 72;
+          return (
+            <line
+              key={index}
+              x1="0"
+              y1="0"
+              x2={x}
+              y2={y}
+              stroke={index % 2 === 0 ? accent : color}
+              strokeWidth={active ? '1.8' : '1.1'}
+              strokeOpacity="0.76"
+            />
+          );
+        })}
+      </g>
+      <circle cx="110" cy="110" r="42" fill="#020617" stroke={accent} strokeWidth="2" />
+      <path d="M86 118h48M96 102h28M102 134h16" stroke={color} strokeWidth="5" strokeLinecap="round" />
+      <circle cx="110" cy="110" r={active ? '96' : '88'} fill="none" stroke={accent} strokeDasharray="3 10" strokeWidth="2" opacity="0.85" />
+    </svg>
+    <span>MatrixCitizen portal: {active ? 'expert dev mode open' : 'click to open expert dev mode'}</span>
+  </button>
+);
+
 const MatrixCitizen = () => {
   const [command, setCommand] = useState<MoltBotBridgeCommand>('auto');
   const [source, setSource] = useState<MoltBotBridgeChannel>('web');
   const [target, setTarget] = useState<MoltBotBridgeChannel>('web');
+  const [expertPortalOpen, setExpertPortalOpen] = useState(false);
+  const [syncState, setSyncState] = useState<'local' | 'syncing' | 'synced' | 'fallback'>('local');
 
   const plan = useMemo(
     () =>
@@ -31,9 +99,56 @@ const MatrixCitizen = () => {
         command,
         source,
         target,
+        userId: userSeed,
       }),
     [command, source, target],
   );
+
+  useEffect(() => {
+    let cancelled = false;
+    const endpoint = import.meta.env.VITE_CHAT_ENDPOINT || '/api/chat';
+    if (import.meta.env.MODE === 'test' || typeof fetch !== 'function') {
+      setSyncState('local');
+      return () => {
+        cancelled = true;
+      };
+    }
+    setSyncState('syncing');
+
+    fetch(endpoint, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        source: 'laura-web',
+        target: 'french-dev-ai-tools',
+        mode: 'social',
+        thread: 'matrix-citizen-progress',
+        context: {
+          repo: 'Laura',
+          network: 'techandstream',
+          activity: 'matrix-citizen-progress-sync',
+          botName: plan.citizen.displayName,
+          matrixProgress: plan.progress.sync,
+        },
+        messages: [
+          {
+            role: 'user',
+            content: `Sync ${plan.progress.sync.contract} for ${plan.citizen.displayName}.`,
+          },
+        ],
+      }),
+    })
+      .then((response) => {
+        if (!cancelled) setSyncState(response.ok ? 'synced' : 'fallback');
+      })
+      .catch(() => {
+        if (!cancelled) setSyncState('local');
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [plan]);
 
   return (
     <main className="matrix-page">
@@ -52,6 +167,45 @@ const MatrixCitizen = () => {
           <ShieldCheck aria-hidden="true" size={28} />
           <span>No secrets, public metadata only</span>
         </div>
+      </section>
+
+      <section className="matrix-portal-grid" aria-labelledby="portal-title">
+        <MatrixPortal
+          active={expertPortalOpen}
+          accent={plan.progress.world.accent}
+          color={plan.progress.world.color}
+          onClick={() => setExpertPortalOpen((current) => !current)}
+        />
+        <article className="matrix-panel">
+          <div className="matrix-panel-heading">
+            <Radio aria-hidden="true" size={22} />
+            <div>
+              <p className="eyebrow">Themed-week streak</p>
+              <h2 id="portal-title">{plan.progress.world.theme}</h2>
+            </div>
+          </div>
+          <dl className="preview-list">
+            <div>
+              <dt>Bonus world</dt>
+              <dd>{plan.progress.world.name}</dd>
+            </div>
+            <div>
+              <dt>Quest</dt>
+              <dd>{plan.progress.world.quest}</dd>
+            </div>
+            <div>
+              <dt>XP</dt>
+              <dd>{plan.progress.xpTotal}</dd>
+            </div>
+            <div>
+              <dt>Streak</dt>
+              <dd>{plan.progress.streakDays}d x{plan.progress.multiplier}</dd>
+            </div>
+          </dl>
+          <p className="pulse">
+            Sync status: {syncState === 'synced' ? 'live bridge' : syncState === 'fallback' ? 'bridge fallback' : syncState}
+          </p>
+        </article>
       </section>
 
       <section className="matrix-panel" aria-labelledby="command-title">
@@ -150,6 +304,27 @@ const MatrixCitizen = () => {
             <Terminal aria-hidden="true" size={16} />
             {plan.terminalCommand}
           </code>
+        </div>
+      </section>
+
+      <section className="matrix-panel" aria-labelledby="dev-feed-title">
+        <div className="matrix-panel-heading">
+          <Cpu aria-hidden="true" size={22} />
+          <div>
+            <p className="eyebrow">Laura x Codex</p>
+            <h2 id="dev-feed-title">Dev novlangue feed</h2>
+          </div>
+        </div>
+        <div className="dev-feed">
+          {plan.devFeed.map((signal) => (
+            <article key={signal.id}>
+              <div>
+                <strong>{signal.speaker}</strong>
+                <span>{signal.role}</span>
+              </div>
+              <p>{signal.content}</p>
+            </article>
+          ))}
         </div>
       </section>
 

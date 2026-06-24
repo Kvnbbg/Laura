@@ -1,3 +1,10 @@
+import {
+  buildDevNovlangueFeed,
+  buildMatrixProgress,
+  type MatrixDevSignal,
+  type MatrixProgressState,
+} from './matrixProgress';
+
 export const MOLT_BOT_BRIDGE_COMMANDS = ['auto', 'add', 'goto add'] as const;
 export type MoltBotBridgeCommand = (typeof MOLT_BOT_BRIDGE_COMMANDS)[number];
 
@@ -18,6 +25,9 @@ export interface LauraMoltBotInput {
   source?: string;
   target?: string;
   command?: string;
+  userId?: string;
+  streakDays?: number;
+  xpTotal?: number;
 }
 
 export interface MatrixCitizenPreview {
@@ -48,6 +58,8 @@ export interface LauraMoltBotBridgePlan {
   terminalCommand: string;
   loop: string[];
   checks: string[];
+  progress: MatrixProgressState;
+  devFeed: MatrixDevSignal[];
 }
 
 const cleanSegment = (value: string): string =>
@@ -144,6 +156,12 @@ export function resolveLauraMoltBotBridge(input: LauraMoltBotInput): LauraMoltBo
   const command = normalizeMoltBotBridgeCommand(input.command);
   const channelPair = getMoltBotBridgePair(input.source, input.target);
   const citizen = createMatrixCitizenPreview({ ...input, command });
+  const progress = buildMatrixProgress({
+    userId: input.userId ?? citizen.username,
+    matrixCitizenId: citizen.id,
+    streakDays: input.streakDays,
+    xpTotal: input.xpTotal,
+  });
   const bot = encodeURIComponent(citizen.username);
   const techandstreamRoute =
     command === 'goto add'
@@ -162,6 +180,8 @@ export function resolveLauraMoltBotBridge(input: LauraMoltBotInput): LauraMoltBo
       'catch malformed command',
       'resolve command and channel pair',
       'transform MoltBot into MatrixCitizen',
+      'hash day-number into themed bonus world',
+      'sync public XP and streak envelope over /laura/bridge',
       'validate public preview',
       'open Techandstream add route',
     ],
@@ -171,5 +191,7 @@ export function resolveLauraMoltBotBridge(input: LauraMoltBotInput): LauraMoltBo
       'only public-safe metadata',
       'human review before publishing',
     ],
+    progress,
+    devFeed: buildDevNovlangueFeed(progress, citizen.displayName),
   };
 }

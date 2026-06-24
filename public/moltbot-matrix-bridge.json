@@ -1,7 +1,8 @@
 {
-  "schemaVersion": "2026-06-23",
+  "schemaVersion": "2026-06-24",
   "name": "moltbot-matrix-citizen-bridge",
   "transform": "moltbot-to-matrix-citizen",
+  "progressContract": "laura-bridge-progress-v1",
   "commands": ["auto", "add", "goto add"],
   "channelPairs": ["web/web", "web/terminal", "terminal/web", "terminal/terminal"],
   "publishTarget": "techandstream.com",
@@ -9,6 +10,11 @@
     "laura": "/matrix-citizen",
     "techandstream": "/matrix-citizen",
     "techandstreamAdd": "/matrix-citizen/add"
+  },
+  "sync": {
+    "endpoint": "/api/chat",
+    "mode": "backend-free deterministic first, live relay when the Laura bridge service is running",
+    "fields": ["userId", "matrixCitizenId", "dayNumber", "streakDays", "xpTotal", "xpToday", "bonusWorld", "weekTheme"]
   },
   "safety": [
     "no private tokens",

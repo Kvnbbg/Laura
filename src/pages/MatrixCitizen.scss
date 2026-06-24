@@ -99,7 +99,9 @@
 .command-grid,
 .select-grid,
 .matrix-grid,
+.matrix-portal-grid,
 .route-codes,
+.dev-feed,
 .loop-panel {
   display: grid;
   gap: $spacing-sm;
@@ -129,6 +131,52 @@
 
 .matrix-grid {
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+}
+
+.matrix-portal-grid {
+  grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.1fr);
+  gap: $spacing-lg;
+  align-items: stretch;
+}
+
+.matrix-portal {
+  position: relative;
+  min-height: 280px;
+  padding: $spacing-md;
+  overflow: hidden;
+  border: 1px solid rgba($cosmic-teal, 0.24);
+  border-radius: $radius-lg;
+  background: rgba($bg-darker, 0.68);
+  color: $text-primary;
+  box-shadow: $shadow-md;
+  cursor: pointer;
+  transition: $transition-base;
+
+  &:hover,
+  &[aria-pressed='true'] {
+    border-color: rgba($cosmic-cyan, 0.58);
+    box-shadow: 0 0 42px rgba($cosmic-cyan, 0.18);
+  }
+
+  svg {
+    display: block;
+    width: min(100%, 340px);
+    height: auto;
+    margin: 0 auto;
+  }
+
+  span {
+    position: absolute;
+    right: $spacing-md;
+    bottom: $spacing-md;
+    left: $spacing-md;
+    padding: $spacing-sm;
+    border: 1px solid rgba($text-secondary, 0.18);
+    border-radius: $radius-md;
+    background: rgba($bg-darker, 0.86);
+    color: $text-secondary;
+    font-size: $font-size-sm;
+  }
 }
 
 .select-grid {
@@ -229,6 +277,43 @@
   }
 }
 
+.dev-feed {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  article {
+    padding: $spacing-sm;
+    border: 1px solid rgba($text-secondary, 0.18);
+    border-radius: $radius-md;
+    background: rgba($bg-dark, 0.38);
+
+    div {
+      display: flex;
+      flex-wrap: wrap;
+      gap: $spacing-xs;
+      align-items: center;
+      margin-bottom: $spacing-xs;
+    }
+
+    strong {
+      color: $text-primary;
+    }
+
+    span {
+      padding: 0.15rem 0.45rem;
+      border: 1px solid rgba($cosmic-cyan, 0.26);
+      border-radius: 999px;
+      color: $cosmic-cyan;
+      font-size: $font-size-xs;
+    }
+
+    p {
+      margin: 0;
+      color: $text-secondary;
+      font-size: $font-size-sm;
+    }
+  }
+}
+
 .loop-panel {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   padding: $spacing-md;
@@ -249,6 +334,7 @@
 @media (max-width: 820px) {
   .matrix-hero,
   .matrix-grid,
+  .matrix-portal-grid,
   .route-panel {
     grid-template-columns: 1fr;
   }
@@ -268,7 +354,8 @@
 
   .command-grid,
   .select-grid,
-  .preview-list {
+  .preview-list,
+  .dev-feed {
     grid-template-columns: 1fr;
   }
 }
