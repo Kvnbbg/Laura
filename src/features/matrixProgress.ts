@@ -8,6 +8,35 @@ export interface MatrixDevSignal {
   intensity: 'calm' | 'signal' | 'expert';
 }
 
+export type MatrixWeekNodeStatus = 'done' | 'today' | 'queued';
+
+export interface MatrixWeekNode {
+  id: string;
+  dateLabel: string;
+  world: string;
+  quest: string;
+  motif: string;
+  xp: number;
+  status: MatrixWeekNodeStatus;
+}
+
+export interface MatrixBridgeActionItem {
+  id: string;
+  label: string;
+  command: 'auto' | 'add' | 'goto add';
+  channelPair: 'web/web' | 'web/terminal' | 'terminal/web' | 'terminal/terminal';
+  description: string;
+  xpReward: number;
+  routeHint: string;
+  terminalHint: string;
+}
+
+export interface MatrixRelayDraft {
+  id: string;
+  tone: 'dry' | 'expert' | 'social';
+  body: string;
+}
+
 export interface MatrixBonusWorld {
   id: string;
   name: string;
@@ -47,6 +76,7 @@ export interface MatrixProgressState {
   xpToday: number;
   multiplier: number;
   world: MatrixBonusWorld;
+  weekArc: MatrixWeekNode[];
   sync: MatrixProgressSync;
 }
 
@@ -106,6 +136,30 @@ const clampPositiveInt = (value: number | undefined, fallback: number): number =
   return Math.max(0, Math.round(value ?? fallback));
 };
 
+const toIsoDate = (dayNumber: number): string => new Date(dayNumber * 86_400_000).toISOString().slice(0, 10);
+
+const buildWeekArc = (
+  theme: (typeof WEEK_THEMES)[number],
+  progressDayNumber: number,
+  dayIndex: number,
+  userId: string,
+): MatrixWeekNode[] => {
+  const firstDay = progressDayNumber - dayIndex;
+
+  return theme.worlds.map((world, index) => {
+    const nodeDay = firstDay + index;
+    return {
+      id: `${theme.theme.toLowerCase().replace(/\s+/g, '-')}-${index}`,
+      dateLabel: toIsoDate(nodeDay),
+      world,
+      quest: theme.quests[index],
+      motif: ['portal', 'hash', 'relay', 'quest', 'matrix', 'streak', 'sync'][index],
+      xp: 18 + (stableHash(`${userId}:${nodeDay}:${world}`) % 28),
+      status: index < dayIndex ? 'done' : index === dayIndex ? 'today' : 'queued',
+    };
+  });
+};
+
 export const buildMatrixProgress = (input: MatrixProgressInput = {}): MatrixProgressState => {
   const now = input.now ?? new Date();
   const dayNumber = getUtcDayNumber(now);
@@ -131,6 +185,7 @@ export const buildMatrixProgress = (input: MatrixProgressInput = {}): MatrixProg
     quest: theme.quests[dayIndex],
   };
   const deterministicKey = `${userId}:${dayNumber}:${world.id}`;
+  const weekArc = buildWeekArc(theme, dayNumber, dayIndex, userId);
 
   return {
     userId,
@@ -143,6 +198,7 @@ export const buildMatrixProgress = (input: MatrixProgressInput = {}): MatrixProg
     xpToday,
     multiplier,
     world,
+    weekArc,
     sync: {
       contract: 'laura-bridge-progress-v1',
       userId,
@@ -160,6 +216,63 @@ export const buildMatrixProgress = (input: MatrixProgressInput = {}): MatrixProg
     },
   };
 };
+
+export const buildMatrixActionDeck = (
+  progress: MatrixProgressState,
+  channelPair: MatrixBridgeActionItem['channelPair'] = 'web/web',
+): MatrixBridgeActionItem[] => [
+  {
+    id: 'auto-triage',
+    label: 'auto triage',
+    command: 'auto',
+    channelPair,
+    description: `Score the feed signal, keep ${progress.world.name} active, choose the safest public action.`,
+    xpReward: Math.round(progress.xpToday * 0.35),
+    routeHint: `/matrix-citizen?action=auto&from=${channelPair}`,
+    terminalHint: `/run matrix-citizen auto ${channelPair}`,
+  },
+  {
+    id: 'add-record',
+    label: 'add record',
+    command: 'add',
+    channelPair,
+    description: 'Prepare a reviewed MatrixCitizen record with public metadata only.',
+    xpReward: Math.round(progress.xpToday * 0.5),
+    routeHint: `/matrix-citizen?action=add&from=${channelPair}`,
+    terminalHint: `/run matrix-citizen add ${channelPair}`,
+  },
+  {
+    id: 'goto-add',
+    label: 'goto add',
+    command: 'goto add',
+    channelPair,
+    description: 'Open the add surface directly and carry the same progress contract.',
+    xpReward: Math.round(progress.xpToday * 0.65),
+    routeHint: `/matrix-citizen/add?from=${channelPair}`,
+    terminalHint: `/run matrix-citizen goto add ${channelPair}`,
+  },
+];
+
+export const buildMatrixRelayDrafts = (
+  progress: MatrixProgressState,
+  citizenName = 'Laura MoltBot',
+): MatrixRelayDraft[] => [
+  {
+    id: `${progress.sync.deterministicKey}:dry-draft`,
+    tone: 'dry',
+    body: `${citizenName}: ${progress.world.name}. quest=${progress.world.quest}. sync=${progress.sync.contract}. no secrets.`,
+  },
+  {
+    id: `${progress.sync.deterministicKey}:expert-draft`,
+    tone: 'expert',
+    body: `Codex: replay deterministicKey ${progress.sync.deterministicKey}; carry ${progress.streakDays}d streak, x${progress.multiplier} multiplier.`,
+  },
+  {
+    id: `${progress.sync.deterministicKey}:social-draft`,
+    tone: 'social',
+    body: `MoltBot: ${progress.world.theme} is live. Add one public signal, then route it through MatrixCitizen.`,
+  },
+];
 
 export const buildDevNovlangueFeed = (
   progress: MatrixProgressState,

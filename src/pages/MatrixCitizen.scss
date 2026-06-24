@@ -97,11 +97,14 @@
 }
 
 .command-grid,
+.action-deck,
 .select-grid,
 .matrix-grid,
 .matrix-portal-grid,
 .route-codes,
+.relay-drafts,
 .dev-feed,
+.week-arc,
 .loop-panel {
   display: grid;
   gap: $spacing-sm;
@@ -125,6 +128,46 @@
       border-color: $cosmic-teal;
       color: $text-primary;
       background: rgba($cosmic-teal, 0.12);
+    }
+  }
+}
+
+.action-deck {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: $spacing-md;
+
+  button {
+    display: grid;
+    gap: 0.35rem;
+    min-height: 128px;
+    padding: $spacing-sm;
+    border: 1px solid rgba($text-secondary, 0.2);
+    border-radius: $radius-md;
+    background: rgba($bg-darker, 0.58);
+    color: $text-secondary;
+    text-align: left;
+    cursor: pointer;
+    transition: $transition-base;
+
+    &:hover,
+    &.is-active {
+      border-color: $cosmic-teal;
+      color: $text-primary;
+      background: rgba($cosmic-teal, 0.12);
+    }
+
+    strong {
+      color: $text-primary;
+    }
+
+    span,
+    small {
+      line-height: 1.45;
+    }
+
+    small {
+      color: $cosmic-cyan;
+      font-family: $font-family-mono;
     }
   }
 }
@@ -249,6 +292,50 @@
   background: rgba($cosmic-gold, 0.08);
 }
 
+.week-arc {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  margin-top: $spacing-md;
+
+  div {
+    min-height: 88px;
+    padding: $spacing-xs;
+    border: 1px solid rgba($text-secondary, 0.18);
+    border-radius: $radius-md;
+    background: rgba($bg-dark, 0.36);
+    color: $text-secondary;
+  }
+
+  .is-today {
+    border-color: rgba($cosmic-cyan, 0.62);
+    background: rgba($cosmic-cyan, 0.1);
+    color: $text-primary;
+  }
+
+  strong,
+  span,
+  small {
+    display: block;
+    line-height: 1.35;
+  }
+
+  strong {
+    color: $text-primary;
+    font-size: $font-size-sm;
+  }
+
+  span {
+    margin-top: 0.25rem;
+    font-size: $font-size-xs;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  small {
+    margin-top: 0.25rem;
+    color: $cosmic-cyan;
+  }
+}
+
 .route-panel {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(280px, 0.85fr);
@@ -274,6 +361,51 @@
   code {
     overflow-wrap: anywhere;
     font-family: $font-family-mono;
+  }
+}
+
+.relay-payload {
+  display: grid;
+  gap: $spacing-xs;
+  padding: $spacing-sm;
+  border: 1px solid rgba($text-secondary, 0.18);
+  border-radius: $radius-md;
+  background: rgba($bg-dark, 0.38);
+
+  strong {
+    color: $text-primary;
+  }
+
+  span {
+    color: $text-secondary;
+    overflow-wrap: anywhere;
+  }
+
+  code {
+    padding: $spacing-xs;
+    border-radius: $radius-sm;
+    background: rgba($bg-darker, 0.7);
+    color: $cosmic-cyan;
+    font-family: $font-family-mono;
+    overflow-wrap: anywhere;
+  }
+}
+
+.relay-drafts {
+  margin-top: $spacing-sm;
+
+  p {
+    margin: 0;
+    padding: $spacing-sm;
+    border: 1px solid rgba($text-secondary, 0.18);
+    border-radius: $radius-md;
+    background: rgba($bg-dark, 0.38);
+    color: $text-secondary;
+    font-size: $font-size-sm;
+  }
+
+  strong {
+    color: $text-primary;
   }
 }
 
@@ -353,8 +485,11 @@
   }
 
   .command-grid,
+  .action-deck,
   .select-grid,
   .preview-list,
+  .week-arc,
+  .relay-drafts,
   .dev-feed {
     grid-template-columns: 1fr;
   }

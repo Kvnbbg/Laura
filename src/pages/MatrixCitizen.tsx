@@ -91,6 +91,7 @@ const MatrixCitizen = () => {
   const [target, setTarget] = useState<MoltBotBridgeChannel>('web');
   const [expertPortalOpen, setExpertPortalOpen] = useState(false);
   const [syncState, setSyncState] = useState<'local' | 'syncing' | 'synced' | 'fallback'>('local');
+  const [selectedActionId, setSelectedActionId] = useState('auto-triage');
 
   const plan = useMemo(
     () =>
@@ -102,6 +103,10 @@ const MatrixCitizen = () => {
         userId: userSeed,
       }),
     [command, source, target],
+  );
+  const selectedAction = useMemo(
+    () => plan.actionDeck.find((action) => action.id === selectedActionId) ?? plan.actionDeck[0],
+    [plan.actionDeck, selectedActionId],
   );
 
   useEffect(() => {
@@ -129,6 +134,8 @@ const MatrixCitizen = () => {
           activity: 'matrix-citizen-progress-sync',
           botName: plan.citizen.displayName,
           matrixProgress: plan.progress.sync,
+          matrixActions: plan.actionDeck,
+          matrixRelayDrafts: plan.relayDrafts,
         },
         messages: [
           {
@@ -205,6 +212,15 @@ const MatrixCitizen = () => {
           <p className="pulse">
             Sync status: {syncState === 'synced' ? 'live bridge' : syncState === 'fallback' ? 'bridge fallback' : syncState}
           </p>
+          <div className="week-arc">
+            {plan.progress.weekArc.map((node) => (
+              <div key={node.id} className={node.status === 'today' ? 'is-today' : ''} title={`${node.dateLabel}: ${node.quest}`}>
+                <strong>{node.world}</strong>
+                <span>{node.status}</span>
+                <small>{node.xp} XP</small>
+              </div>
+            ))}
+          </div>
         </article>
       </section>
 
@@ -226,6 +242,26 @@ const MatrixCitizen = () => {
               onClick={() => setCommand(item)}
             >
               {item}
+            </button>
+          ))}
+        </div>
+        <div className="action-deck">
+          {plan.actionDeck.map((action) => (
+            <button
+              key={action.id}
+              type="button"
+              className={selectedAction.id === action.id ? 'is-active' : ''}
+              onClick={() => {
+                const [nextSource, nextTarget] = action.channelPair.split('/') as [MoltBotBridgeChannel, MoltBotBridgeChannel];
+                setSelectedActionId(action.id);
+                setCommand(action.command);
+                setSource(nextSource);
+                setTarget(nextTarget);
+              }}
+            >
+              <strong>{action.label}</strong>
+              <span>{action.description}</span>
+              <small>+{action.xpReward} XP</small>
             </button>
           ))}
         </div>
@@ -304,6 +340,28 @@ const MatrixCitizen = () => {
             <Terminal aria-hidden="true" size={16} />
             {plan.terminalCommand}
           </code>
+        </div>
+      </section>
+
+      <section className="matrix-panel" aria-labelledby="relay-title">
+        <div className="matrix-panel-heading">
+          <Terminal aria-hidden="true" size={22} />
+          <div>
+            <p className="eyebrow">Selected payload</p>
+            <h2 id="relay-title">Dry relay composer</h2>
+          </div>
+        </div>
+        <div className="relay-payload">
+          <strong>{selectedAction.label}</strong>
+          <span>{selectedAction.routeHint}</span>
+          <code>{selectedAction.terminalHint}</code>
+        </div>
+        <div className="relay-drafts">
+          {plan.relayDrafts.map((draft) => (
+            <p key={draft.id}>
+              <strong>{draft.tone}</strong>: {draft.body}
+            </p>
+          ))}
         </div>
       </section>
 

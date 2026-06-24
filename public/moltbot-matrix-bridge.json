@@ -14,7 +14,12 @@
   "sync": {
     "endpoint": "/api/chat",
     "mode": "backend-free deterministic first, live relay when the Laura bridge service is running",
-    "fields": ["userId", "matrixCitizenId", "dayNumber", "streakDays", "xpTotal", "xpToday", "bonusWorld", "weekTheme"]
+    "fields": ["userId", "matrixCitizenId", "dayNumber", "streakDays", "xpTotal", "xpToday", "bonusWorld", "weekTheme", "weekArc", "actionDeck", "relayDrafts"]
+  },
+  "extendedPayload": {
+    "weekArc": "seven deterministic day nodes for the active themed week",
+    "actionDeck": "auto/add/goto add actions for web/web, web/terminal, terminal/web, terminal/terminal",
+    "relayDrafts": "dry, expert, and social public-safe messages"
   },
   "safety": [
     "no private tokens",

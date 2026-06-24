@@ -1,8 +1,12 @@
 import {
+  buildMatrixActionDeck,
+  buildMatrixRelayDrafts,
   buildDevNovlangueFeed,
   buildMatrixProgress,
+  type MatrixBridgeActionItem,
   type MatrixDevSignal,
   type MatrixProgressState,
+  type MatrixRelayDraft,
 } from './matrixProgress';
 
 export const MOLT_BOT_BRIDGE_COMMANDS = ['auto', 'add', 'goto add'] as const;
@@ -59,6 +63,8 @@ export interface LauraMoltBotBridgePlan {
   loop: string[];
   checks: string[];
   progress: MatrixProgressState;
+  actionDeck: MatrixBridgeActionItem[];
+  relayDrafts: MatrixRelayDraft[];
   devFeed: MatrixDevSignal[];
 }
 
@@ -162,6 +168,7 @@ export function resolveLauraMoltBotBridge(input: LauraMoltBotInput): LauraMoltBo
     streakDays: input.streakDays,
     xpTotal: input.xpTotal,
   });
+  const actionDeck = buildMatrixActionDeck(progress, channelPair);
   const bot = encodeURIComponent(citizen.username);
   const techandstreamRoute =
     command === 'goto add'
@@ -192,6 +199,8 @@ export function resolveLauraMoltBotBridge(input: LauraMoltBotInput): LauraMoltBo
       'human review before publishing',
     ],
     progress,
+    actionDeck,
+    relayDrafts: buildMatrixRelayDrafts(progress, citizen.displayName),
     devFeed: buildDevNovlangueFeed(progress, citizen.displayName),
   };
 }

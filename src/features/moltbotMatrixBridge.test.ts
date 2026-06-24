@@ -38,6 +38,9 @@ describe('Laura MoltBot Matrix bridge', () => {
     expect(plan.terminalCommand).toBe('/run matrix-citizen goto add');
     expect(plan.progress.sync.contract).toBe('laura-bridge-progress-v1');
     expect(plan.progress.world.name).toBeTruthy();
+    expect(plan.progress.weekArc).toHaveLength(7);
+    expect(plan.actionDeck.map((action) => action.command)).toEqual(['auto', 'add', 'goto add']);
+    expect(plan.relayDrafts.some((draft) => draft.body.includes('no secrets'))).toBe(true);
     expect(plan.devFeed.map((signal) => signal.speaker)).toContain('Codex');
   });
 });

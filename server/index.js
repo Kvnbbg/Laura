@@ -98,6 +98,26 @@ const getMatrixProgress = (meta) => {
   return progress;
 };
 
+const getMatrixActions = (meta) => {
+  const actions = meta.context?.matrixActions;
+  if (!Array.isArray(actions)) {
+    return [];
+  }
+  return actions
+    .filter((action) => action && typeof action === 'object' && typeof action.label === 'string')
+    .slice(0, 6);
+};
+
+const getMatrixRelayDrafts = (meta) => {
+  const drafts = meta.context?.matrixRelayDrafts;
+  if (!Array.isArray(drafts)) {
+    return [];
+  }
+  return drafts
+    .filter((draft) => draft && typeof draft === 'object' && typeof draft.body === 'string')
+    .slice(0, 6);
+};
+
 const buildAgentHints = (meta, lastUserMessage) => {
   const hints = new Set(["reply_terminal", "keep_terminal_primary"]);
   const message = (lastUserMessage?.content || "").toLowerCase();
@@ -122,6 +142,12 @@ const buildAgentHints = (meta, lastUserMessage) => {
     hints.add("sync_matrix_progress");
     hints.add("themed_week_streak");
   }
+  if (getMatrixActions(meta).length) {
+    hints.add("route_matrix_action_deck");
+  }
+  if (getMatrixRelayDrafts(meta).length) {
+    hints.add("publish_dry_relay_draft");
+  }
 
   return Array.from(hints);
 };
@@ -138,6 +164,9 @@ const buildNextActions = (meta) => {
     getMatrixProgress(meta)
       ? `Mirror public XP/streak progress for ${getMatrixProgress(meta).bonusWorld}.`
       : "Use local deterministic streak progress when no bridge progress is provided.",
+    getMatrixActions(meta)[0]
+      ? `Resolve MatrixCitizen action ${getMatrixActions(meta)[0].label} over ${getMatrixActions(meta)[0].channelPair}.`
+      : "Keep auto/add/goto add ready for MatrixCitizen.",
   ];
 };
 
@@ -145,6 +174,7 @@ const buildNetworkThoughts = (meta) => {
   const botName = typeof meta.context?.botName === "string" ? meta.context.botName : "MoltBot";
   const activity = typeof meta.context?.activity === "string" ? meta.context.activity : "activity";
   const progress = getMatrixProgress(meta);
+  const relayDraft = getMatrixRelayDrafts(meta)[0];
 
   return [
     {
@@ -172,6 +202,16 @@ const buildNetworkThoughts = (meta) => {
             role: "matrix-progress",
             content: `Monde bonus ${progress.bonusWorld}: ${progress.quest}, XP ${progress.xpTotal}.`,
             emphasis: "signal",
+          },
+        ]
+      : []),
+    ...(relayDraft
+      ? [
+          {
+            speaker: "Relay",
+            role: relayDraft.tone || "dry",
+            content: relayDraft.body,
+            emphasis: "calm",
           },
         ]
       : []),
@@ -474,6 +514,8 @@ app.post('/api/chat', async (req, res) => {
         thread: bridgeMeta.thread,
         mode: bridgeMeta.mode,
         progress: getMatrixProgress(bridgeMeta),
+        actions: getMatrixActions(bridgeMeta),
+        relayDrafts: getMatrixRelayDrafts(bridgeMeta),
       },
     });
   } catch (error) {

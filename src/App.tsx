@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -10,9 +10,10 @@ import Dashboard from './pages/Dashboard';
 import Growth from './pages/Growth';
 import EcoHub from './pages/EcoHub';
 import OpenSource from './pages/OpenSource';
-import MatrixCitizen from './pages/MatrixCitizen';
 import NotFound from './pages/NotFound';
 import './styles/main.scss';
+
+const MatrixCitizen = lazy(() => import('./pages/MatrixCitizen'));
 
 const StaticPageRedirect = ({ to }: { to: string }) => {
   const location = useLocation();
@@ -39,7 +40,14 @@ const App = () => {
             <Route path="/eco-hub" element={<EcoHub />} />
             <Route path="/open-source" element={<OpenSource />} />
             <Route path="/moltbots" element={<OpenSource />} />
-            <Route path="/matrix-citizen" element={<MatrixCitizen />} />
+            <Route
+              path="/matrix-citizen"
+              element={
+                <Suspense fallback={<div role="status">Loading MatrixCitizen...</div>}>
+                  <MatrixCitizen />
+                </Suspense>
+              }
+            />
             <Route path="/budget-simulator" element={<StaticPageRedirect to="/budget-simulator.html" />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

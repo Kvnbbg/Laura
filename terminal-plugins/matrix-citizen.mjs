@@ -1,10 +1,26 @@
 const COMMANDS = ['auto', 'add', 'goto add'];
 const CHANNELS = ['web', 'terminal'];
 const WEEK_THEMES = [
-  ['Compiler Garden', ['AST Grove', 'Type Lagoon', 'Lint Orchard', 'Bundle Reef', 'Runtime Meadow', 'Patch Nursery', 'Release Canopy']],
-  ['Protocol Citadel', ['Handshake Gate', 'Schema Keep', 'Token Vault', 'Relay Spire', 'Audit Bridge', 'Webhook Hall', 'Consensus Roof']],
-  ['Open Source Reef', ['README Tide', 'Issue Coral', 'Fork Channel', 'Patch Current', 'Review Shelf', 'License Bay', 'Maintainer Light']],
-  ['Matrix Workshop', ['Portal Loom', 'Vector Forge', 'Signal Bench', 'Glyph Router', 'Packet Kiln', 'Citizen Lathe', 'Expert Switchyard']],
+  {
+    theme: 'Compiler Garden',
+    worlds: ['AST Grove', 'Type Lagoon', 'Lint Orchard', 'Bundle Reef', 'Runtime Meadow', 'Patch Nursery', 'Release Canopy'],
+    quests: ['normalize the input', 'compose the contract', 'prune the warning', 'split the chunk', 'trace the state', 'ship the diff', 'tag the release'],
+  },
+  {
+    theme: 'Protocol Citadel',
+    worlds: ['Handshake Gate', 'Schema Keep', 'Token Vault', 'Relay Spire', 'Audit Bridge', 'Webhook Hall', 'Consensus Roof'],
+    quests: ['open the handshake', 'validate the payload', 'seal the secret', 'relay the signal', 'write the audit', 'retry the webhook', 'publish consensus'],
+  },
+  {
+    theme: 'Open Source Reef',
+    worlds: ['README Tide', 'Issue Coral', 'Fork Channel', 'Patch Current', 'Review Shelf', 'License Bay', 'Maintainer Light'],
+    quests: ['read the public note', 'triage the issue', 'fork with intent', 'land the patch', 'resolve the review', 'respect the license', 'thank the maintainer'],
+  },
+  {
+    theme: 'Matrix Workshop',
+    worlds: ['Portal Loom', 'Vector Forge', 'Signal Bench', 'Glyph Router', 'Packet Kiln', 'Citizen Lathe', 'Expert Switchyard'],
+    quests: ['open the portal', 'forge the vector', 'compress the signal', 'route the glyph', 'harden the packet', 'shape the citizen', 'flip expert mode'],
+  },
 ];
 
 const cleanSegment = (value) =>
@@ -50,16 +66,63 @@ const stableHash = (value) => {
 const dayNumber = (date = new Date()) =>
   Math.floor(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()) / 86400000);
 
+const toIsoDate = (day) => new Date(day * 86400000).toISOString().slice(0, 10);
+
+const buildWeekArc = ({ theme, worlds, quests }, day, dayIndex, userId) => {
+  const firstDay = day - dayIndex;
+  return worlds.map((world, index) => {
+    const nodeDay = firstDay + index;
+    return {
+      dateLabel: toIsoDate(nodeDay),
+      world,
+      quest: quests[index],
+      xp: 18 + (stableHash(`${userId}:${nodeDay}:${world}`) % 28),
+      status: index < dayIndex ? 'done' : index === dayIndex ? 'today' : 'queued',
+    };
+  });
+};
+
+const buildActionDeck = (progress, channelPair) => [
+  {
+    label: 'auto triage',
+    command: 'auto',
+    routeHint: `/matrix-citizen?action=auto&from=${channelPair}`,
+    terminalHint: `/run matrix-citizen auto ${channelPair}`,
+    xpReward: Math.round(progress.xpToday * 0.35),
+  },
+  {
+    label: 'add record',
+    command: 'add',
+    routeHint: `/matrix-citizen?action=add&from=${channelPair}`,
+    terminalHint: `/run matrix-citizen add ${channelPair}`,
+    xpReward: Math.round(progress.xpToday * 0.5),
+  },
+  {
+    label: 'goto add',
+    command: 'goto add',
+    routeHint: `/matrix-citizen/add?from=${channelPair}`,
+    terminalHint: `/run matrix-citizen goto add ${channelPair}`,
+    xpReward: Math.round(progress.xpToday * 0.65),
+  },
+];
+
+const buildRelayDrafts = (progress, name) => [
+  `${name}: ${progress.bonusWorld}. quest=${progress.quest}. sync=${progress.contract}. no secrets.`,
+  `Codex: replay deterministicKey ${progress.deterministicKey}; carry ${progress.streakDays}d streak, x${progress.multiplier} multiplier.`,
+  `MoltBot: ${progress.weekTheme} is live. Add one public signal, then route it through MatrixCitizen.`,
+];
+
 const buildProgress = (name, citizenId) => {
   const userId = process.env.LAURA_MATRIX_USER_ID || cleanSegment(name) || 'laura_moltbot';
   const day = dayNumber();
   const weekIndex = Math.floor(day / 7);
   const dayIndex = day % 7;
-  const [theme, worlds] = WEEK_THEMES[stableHash(`${userId}:${weekIndex}`) % WEEK_THEMES.length];
+  const themeConfig = WEEK_THEMES[stableHash(`${userId}:${weekIndex}`) % WEEK_THEMES.length];
   const streakDays = Math.max(1, Number(process.env.LAURA_MATRIX_STREAK_DAYS) || ((stableHash(userId) % 5) + 1));
   const xpToday = 24 + (stableHash(`${userId}:${day}`) % 31) + Math.min(streakDays, 7) * 3;
   const xpTotal = Math.max(xpToday, Number(process.env.LAURA_MATRIX_XP_TOTAL) || 900 + (stableHash(userId) % 700) + xpToday);
-  const bonusWorld = worlds[dayIndex];
+  const bonusWorld = themeConfig.worlds[dayIndex];
+  const quest = themeConfig.quests[dayIndex];
   return {
     contract: 'laura-bridge-progress-v1',
     userId,
@@ -70,9 +133,10 @@ const buildProgress = (name, citizenId) => {
     xpToday,
     multiplier: Number((1 + Math.min(streakDays, 14) * 0.05).toFixed(2)),
     bonusWorld,
-    weekTheme: theme,
-    quest: `terminal sync: ${bonusWorld.toLowerCase()}`,
-    deterministicKey: `${userId}:${day}:${theme.toLowerCase().replace(/\s+/g, '-')}-${dayIndex}`,
+    weekTheme: themeConfig.theme,
+    quest,
+    weekArc: buildWeekArc(themeConfig, day, dayIndex, userId),
+    deterministicKey: `${userId}:${day}:${themeConfig.theme.toLowerCase().replace(/\s+/g, '-')}-${dayIndex}`,
     updatedAt: new Date().toISOString(),
   };
 };
@@ -83,6 +147,7 @@ const buildPlan = ({ command, source, target }) => {
   const citizenId = `matrix-${cleanSegment(name) || 'laura-moltbot'}`;
   const progress = buildProgress(name, citizenId);
   const pair = `${source}/${target}`;
+  const actionDeck = buildActionDeck(progress, pair);
   const route =
     command === 'goto add'
       ? `/matrix-citizen/add?bot=${encodeURIComponent(username)}&from=${pair}`
@@ -114,6 +179,8 @@ const buildPlan = ({ command, source, target }) => {
     ],
     checks: ['no private tokens', 'no hidden admin routes', 'public metadata only', 'human review before publishing'],
     progress,
+    actionDeck,
+    relayDrafts: buildRelayDrafts(progress, name),
   };
 };
 
@@ -137,6 +204,21 @@ export default {
     print(`streak: ${plan.progress.streakDays}d x${plan.progress.multiplier}`);
     print(`xp: ${plan.progress.xpTotal} (+${plan.progress.xpToday} today)`);
     print(`techandstream route: ${plan.techandstreamRoute}`);
+    print('');
+    print('week arc:');
+    for (const node of plan.progress.weekArc) {
+      print(`- ${node.dateLabel} ${node.status}: ${node.world} / ${node.quest} (+${node.xp} XP)`);
+    }
+    print('');
+    print('action deck:');
+    for (const action of plan.actionDeck) {
+      print(`- ${action.label}: ${action.terminalHint} (+${action.xpReward} XP)`);
+    }
+    print('');
+    print('relay drafts:');
+    for (const draft of plan.relayDrafts) {
+      print(`- ${draft}`);
+    }
     print('');
     print('channel matrix:');
     for (const sourceChannel of CHANNELS) {
