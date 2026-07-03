@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use or redistribute Laura, cite the original project and keep the NOTICE file."
+title: "Laura"
+type: software
+authors:
+  - family-names: "Marville"
+    given-names: "Kevin"
+repository-code: "https://github.com/Kvnbbg/Laura"
+url: "https://techandstream.com"
+license: "Apache-2.0"
+date-released: "2026-07-02"
+version: "1.0.0"

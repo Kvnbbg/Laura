@@ -1,5 +1,5 @@
 /**
- * CitationsPanel — renders Perplexity citations as numbered clickable links.
+ * CitationsPanel — renders sources and fallback links as numbered clickable links.
  *
  * Usage:
  *   <CitationsPanel citations={['https://example.com', 'https://other.com']} />
@@ -22,25 +22,41 @@ const truncateUrl = (url: string): string => {
   }
 };
 
+const isHttpUrl = (value: string): boolean => {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
+
 export function CitationsPanel({ citations }: CitationsPanelProps) {
   if (!citations.length) return null;
 
   return (
-    <div className="chat-widget__citations" aria-label="Sources Perplexity">
-      <p className="chat-widget__citations-label">Sources</p>
+    <div className="chat-widget__citations" aria-label="Sources and links">
+      <p className="chat-widget__citations-label">Sources & links</p>
       <ol className="chat-widget__citations-list">
         {citations.map((url, index) => (
           <li key={url} className="chat-widget__citation-item">
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="chat-widget__citation-link"
-              title={url}
-            >
-              <span className="chat-widget__citation-badge">{index + 1}</span>
-              <span className="chat-widget__citation-url">{truncateUrl(url)}</span>
-            </a>
+            {isHttpUrl(url) ? (
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="chat-widget__citation-link"
+                title={url}
+              >
+                <span className="chat-widget__citation-badge">{index + 1}</span>
+                <span className="chat-widget__citation-url">{truncateUrl(url)}</span>
+              </a>
+            ) : (
+              <span className="chat-widget__citation-link" title={url}>
+                <span className="chat-widget__citation-badge">{index + 1}</span>
+                <span className="chat-widget__citation-url">{truncateUrl(url)}</span>
+              </span>
+            )}
           </li>
         ))}
       </ol>

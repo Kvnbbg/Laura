@@ -159,7 +159,7 @@ output: reviewed web + terminal brief`}</code>
           <p>
             "Safe leaks" means public-safe release notes, approved metadata, and
             sanitized technical context. It does not mean exposing private tokens,
-            private user data, hidden admin routes, or unreviewed automation.
+            private user data, non-public admin routes, or unreviewed automation.
           </p>
         </div>
 

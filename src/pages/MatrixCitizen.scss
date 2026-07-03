@@ -1,4 +1,5 @@
 @use '../styles/variables' as *;
+@use 'sass:list';
 
 .matrix-page {
   display: grid;
@@ -344,6 +345,9 @@
 }
 
 .route-codes {
+  display: grid;
+  gap: $spacing-sm;
+
   a,
   code {
     display: flex;
@@ -460,6 +464,148 @@
   svg {
     flex: 0 0 auto;
     color: $cosmic-teal;
+  }
+}
+
+@keyframes portal-pulse {
+  0%, 100% { transform: scale(0.92); }
+  50% { transform: scale(1.08); }
+}
+
+@keyframes portal-spin {
+  from { transform: translate(110px, 110px) rotate(0deg); }
+  to { transform: translate(110px, 110px) rotate(360deg); }
+}
+
+.portal-pulse-slow {
+  transform-origin: center;
+  animation: portal-pulse 4.2s ease-in-out infinite;
+}
+
+.portal-pulse-fast {
+  transform-origin: center;
+  animation: portal-pulse 1.8s ease-in-out infinite;
+}
+
+.portal-spin-slower {
+  transform-origin: center;
+  animation: portal-spin 18s linear infinite;
+}
+
+.portal-spin-slow {
+  transform-origin: center;
+  animation: portal-spin 12s linear infinite;
+}
+
+.portal-spin-fast {
+  transform-origin: center;
+  animation: portal-spin 8s linear infinite;
+}
+
+@keyframes confetti-fall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(120px) rotate(720deg); opacity: 0; }
+}
+
+.matrix-confetti {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  z-index: 50;
+  pointer-events: none;
+
+  span {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    animation: confetti-fall 1.2s ease-out forwards;
+
+    @for $i from 0 through 23 {
+      &:nth-child(#{$i + 1}) {
+        left: #{(($i % 12) - 6) * 24}px;
+        background: list.nth([$cosmic-cyan, $cosmic-gold, $cosmic-teal, #ec4899], ($i % 4) + 1);
+        animation-delay: #{($i % 6) * 0.05}s;
+        transform: rotate(#{$i * 15}deg);
+      }
+    }
+  }
+}
+
+.command-grid button {
+  position: relative;
+
+  .shortcut-hint {
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    padding: 0.1rem 0.35rem;
+    border-radius: 999px;
+    background: rgba($bg-darker, 0.7);
+    color: $text-secondary;
+    font-size: 0.65rem;
+    font-family: $font-family-mono;
+  }
+
+  &.is-active .shortcut-hint {
+    background: rgba($bg-light, 0.2);
+    color: $text-primary;
+  }
+}
+
+.persona-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-sm;
+}
+
+.persona-tag {
+  padding: 0.25rem 0.65rem;
+  border: 1px solid rgba($cosmic-cyan, 0.35);
+  border-radius: 999px;
+  color: $cosmic-cyan;
+  font-size: $font-size-xs;
+  font-weight: 700;
+}
+
+.public-proofs {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  line-height: 1.7;
+
+  li + li {
+    margin-top: $spacing-xs;
+  }
+}
+
+.human-stamp {
+  margin-top: $spacing-sm;
+  padding: $spacing-sm;
+  border-radius: $radius-md;
+  background: rgba(#ec4899, 0.12);
+  color: #f9a8d4;
+  font-weight: 700;
+  text-align: center;
+}
+
+.human-review-toggle {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  cursor: pointer;
+
+  input {
+    width: 20px;
+    height: 20px;
+    accent-color: $cosmic-teal;
+  }
+
+  span {
+    color: $text-primary;
+    font-weight: 700;
   }
 }
 

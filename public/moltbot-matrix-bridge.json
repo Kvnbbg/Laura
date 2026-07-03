@@ -5,16 +5,34 @@
   "progressContract": "laura-bridge-progress-v1",
   "commands": ["auto", "add", "goto add"],
   "channelPairs": ["web/web", "web/terminal", "terminal/web", "terminal/terminal"],
+  "sourceRepository": "Laura",
+  "sourceRepositoryUrl": "https://github.com/Kvnbbg/Laura",
+  "targetRepository": "french-dev-ai-tools",
+  "targetRepositoryUrl": "https://github.com/Kvnbbg/french-dev-ai-tools",
   "publishTarget": "techandstream.com",
+  "publicOrigin": "https://techandstream.com",
+  "provenance": {
+    "author": "Kevin Marville / Techandstream",
+    "sourceRepositoryUrl": "https://github.com/Kvnbbg/Laura",
+    "license": "Apache-2.0",
+    "notice": "Keep LICENSE, NOTICE, and author attribution when redistributing Laura."
+  },
   "routes": {
     "laura": "/matrix-citizen",
-    "techandstream": "/matrix-citizen",
-    "techandstreamAdd": "/matrix-citizen/add"
+    "techandstream": "https://techandstream.com/matrix-citizen",
+    "techandstreamAdd": "https://techandstream.com/matrix-citizen/add"
   },
   "sync": {
-    "endpoint": "/api/chat",
-    "mode": "backend-free deterministic first, live relay when the Laura bridge service is running",
+    "endpoint": "/api/bridge/matrix-progress",
+    "mode": "backend-free deterministic first, credential-free bridge validation when the Laura API is running",
     "fields": ["userId", "matrixCitizenId", "dayNumber", "streakDays", "xpTotal", "xpToday", "bonusWorld", "weekTheme", "weekArc", "actionDeck", "relayDrafts"]
+  },
+  "goProducer": {
+    "command": "go run ./cmd/laura --bridge --bridge-command \"goto add\" --bridge-source terminal --bridge-target web",
+    "payloadSource": "laura-go",
+    "openclawAgent": "main",
+    "crestodianRole": "setup/status/doctor only; use the main OpenClaw agent for repository commands and code edits",
+    "postsTo": "/api/bridge/matrix-progress"
   },
   "extendedPayload": {
     "weekArc": "seven deterministic day nodes for the active themed week",
@@ -23,8 +41,25 @@
   },
   "safety": [
     "no private tokens",
-    "no hidden admin routes",
+    "no non-public admin routes",
     "only public-safe metadata",
     "human review before publishing"
-  ]
+  ],
+  "security": {
+    "reviewGate": "human-review-required",
+    "writeMode": "manual-publish-only",
+    "allowedPayload": [
+      "public article registry entries",
+      "public Moltbook page text",
+      "deterministic MatrixCitizen progress",
+      "reviewed MatrixCitizen preview metadata"
+    ],
+    "blockedPayload": [
+      ".env files",
+      "API keys or tokens",
+      "private uploads",
+      "unredacted terminal output",
+      "private prompts"
+    ]
+  }
 }

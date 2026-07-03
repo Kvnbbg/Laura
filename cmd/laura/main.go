@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"math/rand"
@@ -11,11 +12,18 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Kvnbbg/Laura/internal/bridge"
 	"github.com/Kvnbbg/Laura/internal/game"
 	"github.com/Kvnbbg/Laura/internal/ui"
 )
 
-const version = "0.1.0"
+const (
+	version        = "0.1.0"
+	projectName    = "Laura"
+	projectAuthor  = "Kevin Marville / Techandstream"
+	projectSource  = "https://github.com/Kvnbbg/Laura"
+	projectLicense = "Apache-2.0"
+)
 
 func main() {
 	var (
@@ -30,17 +38,45 @@ func main() {
 		dailyFlag      = flag.Bool("daily", false, "Play today's Code/Data Master daily set")
 		weakTopicsFlag = flag.Bool("weak-topics", false, "Train your weakest Code/Data Master topics first")
 		reviewFlag     = flag.Bool("review", false, "Review missions you've already completed")
+		bridgeFlag     = flag.Bool("bridge", false, "Emit public-safe Laura -> french-dev-ai-tools MatrixCitizen bridge JSON")
+		bridgeCommand  = flag.String("bridge-command", "auto", "Bridge command: auto|add|goto add")
+		bridgeSource   = flag.String("bridge-source", "terminal", "Bridge source channel: web|terminal")
+		bridgeTarget   = flag.String("bridge-target", "web", "Bridge target channel: web|terminal")
+		bridgeUser     = flag.String("bridge-user", "", "Public MatrixCitizen user id for deterministic progress")
+		bridgeBot      = flag.String("bridge-bot", "Laura MoltBot", "Public MoltBot display name")
+		bridgeRepo     = flag.String("bridge-repo", "", "Laura repo path for OpenClaw status hints")
 	)
 	flag.Parse()
 	_ = noColor
 
 	if *versionFlg {
-		fmt.Println(version)
+		fmt.Printf("%s %s\n", projectName, version)
+		fmt.Println("Author:", projectAuthor)
+		fmt.Println("Source:", projectSource)
+		fmt.Println("License:", projectLicense)
 		return
 	}
 	if *resetFlag {
 		_ = game.Reset()
 		fmt.Println("Save reset.")
+		return
+	}
+	if *bridgeFlag {
+		payload := bridge.Build(bridge.Options{
+			Command:  *bridgeCommand,
+			Source:   *bridgeSource,
+			Target:   *bridgeTarget,
+			UserID:   *bridgeUser,
+			BotName:  *bridgeBot,
+			RepoPath: strings.TrimSpace(*bridgeRepo),
+		})
+		encoder := json.NewEncoder(os.Stdout)
+		encoder.SetEscapeHTML(false)
+		encoder.SetIndent("", "  ")
+		if err := encoder.Encode(payload); err != nil {
+			fmt.Fprintf(os.Stderr, "bridge encode failed: %v\n", err)
+			os.Exit(1)
+		}
 		return
 	}
 

@@ -7,27 +7,10 @@ export type EnvSource = {
   VITE_CHAT_ENDPOINT?: string;
   VITE_CHAT_TIMEOUT_MS?: string;
   VITE_ENABLE_CHAT?: string;
-  VITE_MISTRAL_API_KEY?: string;
   VITE_MISTRAL_MODEL?: string;
-  // Perplexity provider
-  VITE_ENABLE_PERPLEXITY?: string;
-  VITE_PERPLEXITY_API_KEY?: string;
-  VITE_PERPLEXITY_MODEL?: string;
-  VITE_PERPLEXITY_BASE_URL?: string;
-  VITE_PERPLEXITY_TIMEOUT_MS?: string;
 };
 
 export type MistralModel = 'mistral-small' | 'mistral-medium' | 'mistral-large';
-
-export type PerplexityModel =
-  | 'sonar'
-  | 'sonar-pro'
-  | 'sonar-reasoning'
-  | 'sonar-reasoning-pro';
-
-const DEFAULT_PERPLEXITY_BASE_URL = 'https://api.perplexity.ai';
-const DEFAULT_PERPLEXITY_MODEL: PerplexityModel = 'sonar';
-const DEFAULT_PERPLEXITY_TIMEOUT_MS = 10_000;
 
 export type AppConfig = {
   appName: string;
@@ -38,13 +21,6 @@ export type AppConfig = {
   chatEnabled: boolean;
   chatErrors: string[];
   mistralModel: MistralModel;
-  // Perplexity
-  perplexityEnabled: boolean;
-  perplexityErrors: string[];
-  perplexityApiKey: string;
-  perplexityModel: PerplexityModel;
-  perplexityBaseUrl: string;
-  perplexityTimeoutMs: number;
 };
 
 const DEFAULT_TIMEOUT_MS = 5000;
@@ -140,46 +116,7 @@ export const createConfig = (env: EnvSource): AppConfig => {
     chatErrors.push(modelError);
   }
 
-  const apiKey = env.VITE_MISTRAL_API_KEY?.trim();
-  if (chatEnabledRequested && !apiKey) {
-    chatErrors.push(
-      'VITE_MISTRAL_API_KEY is required to enable chat. Please set it in your environment.'
-    );
-  }
-
   const chatEnabled = chatEnabledRequested && chatErrors.length === 0;
-
-  // ── Perplexity ────────────────────────────────────────────────────────────
-  const perplexityEnabledRequested = parseBoolean(env.VITE_ENABLE_PERPLEXITY);
-  const perplexityErrors: string[] = [];
-  const perplexityApiKey = env.VITE_PERPLEXITY_API_KEY?.trim() ?? '';
-
-  if (perplexityEnabledRequested && !perplexityApiKey) {
-    perplexityErrors.push(
-      'VITE_PERPLEXITY_API_KEY is required to enable Perplexity. Please set it in your environment.'
-    );
-  }
-
-  const rawPerplexityModel = env.VITE_PERPLEXITY_MODEL?.trim();
-  const validPerplexityModels: PerplexityModel[] = [
-    'sonar', 'sonar-pro', 'sonar-reasoning', 'sonar-reasoning-pro',
-  ];
-  const perplexityModel: PerplexityModel =
-    validPerplexityModels.includes(rawPerplexityModel as PerplexityModel)
-      ? (rawPerplexityModel as PerplexityModel)
-      : DEFAULT_PERPLEXITY_MODEL;
-
-  const rawPerplexityBase = env.VITE_PERPLEXITY_BASE_URL?.trim();
-  const perplexityBaseUrl =
-    rawPerplexityBase && rawPerplexityBase.startsWith('https://')
-      ? rawPerplexityBase
-      : DEFAULT_PERPLEXITY_BASE_URL;
-
-  const perplexityTimeoutMs = env.VITE_PERPLEXITY_TIMEOUT_MS
-    ? parseTimeout(env.VITE_PERPLEXITY_TIMEOUT_MS, 'VITE_PERPLEXITY_TIMEOUT_MS')
-    : DEFAULT_PERPLEXITY_TIMEOUT_MS;
-
-  const perplexityEnabled = perplexityEnabledRequested && perplexityErrors.length === 0;
 
   return {
     appName,
@@ -190,12 +127,6 @@ export const createConfig = (env: EnvSource): AppConfig => {
     chatEnabled,
     chatErrors,
     mistralModel,
-    perplexityEnabled,
-    perplexityErrors,
-    perplexityApiKey,
-    perplexityModel,
-    perplexityBaseUrl,
-    perplexityTimeoutMs,
   };
 };
 

@@ -240,7 +240,7 @@ const STATIC_DATA = {
       title: '3. Activate chat',
       description: (config) => config.chatEnabled
         ? 'Chat is enabled and ready to answer with attachments.'
-        : 'Set VITE_ENABLE_CHAT=true and add VITE_MISTRAL_API_KEY to enable the chat experience.',
+        : 'Set VITE_ENABLE_CHAT=true and keep provider keys on the server.',
     },
   ] as ChecklistStep[],
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowRight, Bot, CheckCircle2, Cpu, GitBranch, Radio, ShieldCheck, Terminal } from 'lucide-react';
 import {
   MOLT_BOT_BRIDGE_CHANNELS,
@@ -23,6 +23,17 @@ const userSeed =
   typeof window !== 'undefined'
     ? window.localStorage.getItem('laura-matrix-user') || 'laura-local-user'
     : 'laura-local-user';
+
+const Confetti = ({ active }: { active: boolean }) => {
+  if (!active) return null;
+  return (
+    <div className="matrix-confetti" aria-hidden="true">
+      {Array.from({ length: 24 }).map((_, i) => (
+        <span key={i} style={{ '--i': i } as CSSProperties} />
+      ))}
+    </div>
+  );
+};
 
 const MatrixPortal = ({
   active,
@@ -54,11 +65,18 @@ const MatrixPortal = ({
         </filter>
       </defs>
       <rect width="220" height="220" rx="18" fill="#111827" opacity="0.55" />
-      <circle cx="110" cy="110" r="78" fill="url(#laura-matrix-portal-glow)" filter="url(#laura-matrix-portal-blur)">
-        <animate attributeName="r" values={active ? '66;88;66' : '70;76;70'} dur={active ? '1.8s' : '4.2s'} repeatCount="indefinite" />
-      </circle>
-      <g transform="translate(110 110)">
-        <animateTransform attributeName="transform" type="rotate" from="0 110 110" to="360 110 110" dur={active ? '8s' : '18s'} repeatCount="indefinite" />
+      <circle
+        cx="110"
+        cy="110"
+        r={active ? 78 : 74}
+        fill="url(#laura-matrix-portal-glow)"
+        filter="url(#laura-matrix-portal-blur)"
+        className={active ? 'portal-pulse-fast' : 'portal-pulse-slow'}
+      />
+      <g
+        transform="translate(110 110)"
+        className={active ? 'portal-spin-fast' : 'portal-spin-slow'}
+      >
         {Array.from({ length: 10 }).map((_, index) => {
           const angle = (Math.PI * 2 * index) / 10;
           const x = Math.cos(angle) * 72;
@@ -79,7 +97,17 @@ const MatrixPortal = ({
       </g>
       <circle cx="110" cy="110" r="42" fill="#020617" stroke={accent} strokeWidth="2" />
       <path d="M86 118h48M96 102h28M102 134h16" stroke={color} strokeWidth="5" strokeLinecap="round" />
-      <circle cx="110" cy="110" r={active ? '96' : '88'} fill="none" stroke={accent} strokeDasharray="3 10" strokeWidth="2" opacity="0.85" />
+      <circle
+        cx="110"
+        cy="110"
+        r={active ? 96 : 88}
+        fill="none"
+        stroke={accent}
+        strokeDasharray="3 10"
+        strokeWidth="2"
+        opacity="0.85"
+        className={active ? 'portal-spin-slow' : 'portal-spin-slower'}
+      />
     </svg>
     <span>MatrixCitizen portal: {active ? 'expert dev mode open' : 'click to open expert dev mode'}</span>
   </button>
@@ -92,6 +120,9 @@ const MatrixCitizen = () => {
   const [expertPortalOpen, setExpertPortalOpen] = useState(false);
   const [syncState, setSyncState] = useState<'local' | 'syncing' | 'synced' | 'fallback'>('local');
   const [selectedActionId, setSelectedActionId] = useState('auto-triage');
+  const [humanReview, setHumanReview] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const prevSyncRef = useRef(syncState);
 
   const plan = useMemo(
     () =>
@@ -111,7 +142,7 @@ const MatrixCitizen = () => {
 
   useEffect(() => {
     let cancelled = false;
-    const endpoint = import.meta.env.VITE_CHAT_ENDPOINT || '/api/chat';
+    const endpoint = import.meta.env.VITE_MATRIX_BRIDGE_ENDPOINT || '/api/bridge/matrix-progress';
     if (import.meta.env.MODE === 'test' || typeof fetch !== 'function') {
       setSyncState('local');
       return () => {
@@ -129,20 +160,22 @@ const MatrixCitizen = () => {
         mode: 'social',
         thread: 'matrix-citizen-progress',
         context: {
-          repo: 'Laura',
-          network: 'techandstream',
+          repo: plan.security.sourceRepository,
+          targetRepository: plan.security.targetRepository,
+          network: plan.security.publishTarget,
+          publicOrigin: plan.security.publicOrigin,
           activity: 'matrix-citizen-progress-sync',
           botName: plan.citizen.displayName,
+          humanReview,
+          reviewGate: plan.security.reviewGate,
+          writeMode: plan.security.writeMode,
+          bridgeSecurity: plan.security,
+          frenchDevToolsUrl: plan.frenchDevToolsUrl,
+          techandstreamRoute: plan.techandstreamRoute,
           matrixProgress: plan.progress.sync,
           matrixActions: plan.actionDeck,
           matrixRelayDrafts: plan.relayDrafts,
         },
-        messages: [
-          {
-            role: 'user',
-            content: `Sync ${plan.progress.sync.contract} for ${plan.citizen.displayName}.`,
-          },
-        ],
       }),
     })
       .then((response) => {
@@ -155,10 +188,39 @@ const MatrixCitizen = () => {
     return () => {
       cancelled = true;
     };
-  }, [plan]);
+  }, [humanReview, plan]);
+
+  useEffect(() => {
+    if (syncState === 'synced' && prevSyncRef.current !== 'synced') {
+      setShowConfetti(true);
+      const t = window.setTimeout(() => setShowConfetti(false), 1600);
+      return () => window.clearTimeout(t);
+    }
+    prevSyncRef.current = syncState;
+  }, [syncState]);
+
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      if (
+        event.target instanceof HTMLElement &&
+        (event.target.tagName === 'INPUT' ||
+          event.target.tagName === 'TEXTAREA' ||
+          event.target.isContentEditable)
+      ) {
+        return;
+      }
+      if (event.key === '1') setCommand('auto');
+      if (event.key === '2') setCommand('add');
+      if (event.key === '3') setCommand('goto add');
+      if (event.key.toLowerCase() === 'e') setExpertPortalOpen((s) => !s);
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
 
   return (
     <main className="matrix-page">
+      <Confetti active={showConfetti} />
       <section className="matrix-hero">
         <div>
           <p className="eyebrow">Laura to Techandstream</p>
@@ -166,8 +228,8 @@ const MatrixCitizen = () => {
           <p>
             Laura uses the same public-safe bridge contract from web or terminal:
             choose <strong>auto</strong>, <strong>add</strong>, or <strong>goto add</strong>,
-            resolve the channel pair, then send the validated MatrixCitizen preview to
-            Techandstream.com.
+            resolve the channel pair, then prepare a validated MatrixCitizen preview from
+            public Laura and french-dev-ai-tools signals for Techandstream.com.
           </p>
         </div>
         <div className="matrix-status" aria-label="Bridge status">
@@ -234,14 +296,16 @@ const MatrixCitizen = () => {
         </div>
 
         <div className="command-grid">
-          {MOLT_BOT_BRIDGE_COMMANDS.map((item) => (
+          {MOLT_BOT_BRIDGE_COMMANDS.map((item, idx) => (
             <button
               key={item}
               type="button"
               className={command === item ? 'is-active' : ''}
               onClick={() => setCommand(item)}
+              title={`Shortcut: ${idx + 1}`}
             >
               {item}
+              <span className="shortcut-hint">{idx + 1}</span>
             </button>
           ))}
         </div>
@@ -258,6 +322,7 @@ const MatrixCitizen = () => {
                 setSource(nextSource);
                 setTarget(nextTarget);
               }}
+              title={action.routeHint}
             >
               <strong>{action.label}</strong>
               <span>{action.description}</span>
@@ -319,7 +384,30 @@ const MatrixCitizen = () => {
             </div>
           </dl>
           <p className="pulse">{plan.citizen.pulse}</p>
+          {humanReview && (
+            <p className="human-stamp">Human reviewed: eligible for manual publish</p>
+          )}
         </article>
+      </section>
+
+      <section className="matrix-panel" aria-labelledby="persona-title">
+        <div className="matrix-panel-heading">
+          <Bot aria-hidden="true" size={22} />
+          <div>
+            <p className="eyebrow">MoltBot persona</p>
+            <h2 id="persona-title">Public guardrails and persona</h2>
+          </div>
+        </div>
+        <div className="persona-tags">
+          {plan.citizen.personality?.map((trait) => (
+            <span key={trait} className="persona-tag">{trait}</span>
+          ))}
+        </div>
+        <ul className="public-proofs">
+          {plan.citizen.publicProofs?.map((proof) => (
+            <li key={proof}>{proof}</li>
+          ))}
+        </ul>
       </section>
 
       <section className="matrix-panel route-panel" aria-labelledby="route-title">
@@ -328,12 +416,17 @@ const MatrixCitizen = () => {
           <h2 id="route-title">Web route and terminal command</h2>
           <p>
             Web/web, web/terminal, terminal/web, and terminal/terminal all land on the same
-            contract. Techandstream owns the MatrixCitizen schema; Laura owns fast creation.
+            contract. Laura prepares the public-safe draft, french-dev-ai-tools remains the
+            source repository, and Techandstream receives only reviewed HTTPS routes.
           </p>
         </div>
         <div className="route-codes">
-          <a href={plan.techandstreamRoute}>
-            Techandstream route
+          <a href={plan.techandstreamRoute} target="_blank" rel="noreferrer noopener">
+            Techandstream HTTPS route
+            <ArrowRight aria-hidden="true" size={16} />
+          </a>
+          <a href={plan.frenchDevToolsUrl} target="_blank" rel="noreferrer noopener">
+            french-dev-ai-tools source
             <ArrowRight aria-hidden="true" size={16} />
           </a>
           <code>
@@ -384,6 +477,24 @@ const MatrixCitizen = () => {
             </article>
           ))}
         </div>
+      </section>
+
+      <section className="matrix-panel" aria-labelledby="review-title">
+        <div className="matrix-panel-heading">
+          <CheckCircle2 aria-hidden="true" size={22} />
+          <div>
+            <p className="eyebrow">Safety</p>
+            <h2 id="review-title">Human review gate</h2>
+          </div>
+        </div>
+        <label className="human-review-toggle">
+          <input
+            type="checkbox"
+            checked={humanReview}
+            onChange={(e) => setHumanReview(e.target.checked)}
+          />
+          <span>{humanReview ? 'Human reviewed' : 'Awaiting human review'}</span>
+        </label>
       </section>
 
       <section className="loop-panel" aria-label="Bridge catch resolve loop">

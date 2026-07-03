@@ -28,8 +28,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     logger.error('UI error boundary captured an exception.', {
       message: error.message,
-      stack: error.stack,
-      componentStack: info.componentStack,
+      componentStack: import.meta.env.DEV ? info.componentStack : undefined,
     });
   }
 

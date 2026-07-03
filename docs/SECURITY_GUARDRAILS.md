@@ -1,15 +1,21 @@
 # Security Guardrails
 
 Laura is open source, so the safe default is simple: public code, private secrets, explicit boundaries.
+These guardrails are ANSSI-style hygiene for reducing accidental exposure; they
+are not a formal ANSSI certification or audit.
 
 ## Hard Rules
 
 - Do not commit real API keys, tokens, cookies, private logs, private prompts, or customer data.
-- Prefer server-side `MISTRAL_API_KEY`; do not rely on client-exposed `VITE_MISTRAL_API_KEY` for production secrets.
+- Keep provider credentials server-side, for example `MISTRAL_API_KEY`.
+- Never add `VITE_*_API_KEY`, `VITE_*_SECRET`, `VITE_*_TOKEN`, or browser-side `Authorization: Bearer ...` provider calls.
 - Keep terminal plugins read-only by default.
 - Do not claim Techandstream capabilities that production code does not enforce.
 - Do not publish raw RAG uploads, private terminal history, or hidden system prompts as MoltBot content.
 - Do not add auto-install, shell execution, or write actions to plugins without an explicit user confirmation flow.
+- Do not reuse uploaded RAG documents across users or browser sessions.
+- If Mistral is unavailable, prefer deterministic local fallback content over leaking internal errors.
+- Keep `LICENSE`, `NOTICE`, `AUTHORS.md`, `CITATION.cff`, and package provenance metadata in open-source redistributions.
 
 ## Safe MoltBot Boundary
 
@@ -39,6 +45,8 @@ Keep these defaults:
 - public-safe summaries for social mode,
 - minimal context injection,
 - no private log exposure,
+- session-scoped document retrieval,
+- upload secret-pattern rejection,
 - Ollama fallback only when the operator configures `OLLAMA_MODEL`,
 - Mistral calls only through the server in production.
 
@@ -61,13 +69,14 @@ git status --short
 npm run build
 npm run test -- --run src/App.test.tsx --testTimeout 15000
 npm run lint
-rg -n "sk-|api[_-]?key|secret|password|token|BEGIN PRIVATE KEY" . \
-  --glob '!node_modules/**' \
-  --glob '!dist/**' \
-  --glob '!package-lock.json'
+npm run check:security
 ```
 
-Finding placeholder names such as `MISTRAL_API_KEY` is expected. Finding real values is a release blocker.
+Finding server-side placeholder names such as `MISTRAL_API_KEY` is expected.
+Finding browser-exposed provider keys, local machine paths in public payloads,
+or real values is a release blocker.
+Finding missing author, license, NOTICE, citation, or repository metadata is
+also a release blocker.
 
 ## Public Copy Rule
 

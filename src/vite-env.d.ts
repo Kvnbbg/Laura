@@ -7,7 +7,6 @@ interface ImportMetaEnv {
   readonly VITE_CHAT_ENDPOINT?: string;
   readonly VITE_CHAT_TIMEOUT_MS?: string;
   readonly VITE_ENABLE_CHAT?: string;
-  readonly VITE_MISTRAL_API_KEY?: string;
   readonly VITE_MISTRAL_MODEL?: string;
 }
 

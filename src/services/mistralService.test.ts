@@ -13,12 +13,6 @@ describe('sendChatMessage', () => {
     chatEnabled: true,
     chatErrors: [],
     mistralModel: 'mistral-small',
-    perplexityEnabled: false,
-    perplexityErrors: [],
-    perplexityApiKey: '',
-    perplexityModel: 'sonar',
-    perplexityBaseUrl: 'https://api.perplexity.ai',
-    perplexityTimeoutMs: 10000,
   };
 
   it('returns a parsed chat response', async () => {
@@ -54,6 +48,27 @@ describe('sendChatMessage', () => {
     await expect(
       sendChatMessage([{ role: 'user', content: 'Hi' }], baseConfig)
     ).rejects.toBeInstanceOf(AppError);
+
+    vi.unstubAllGlobals();
+  });
+
+  it('returns a local fallback when the chat API is unavailable', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const response = await sendChatMessage(
+      [{ role: 'user', content: 'Need code with TOKEN=super-secret-value' }],
+      baseConfig
+    );
+
+    expect(response.message.content).toContain('Mode local');
+    expect(response.message.content).toContain('```ts');
+    expect(response.message.content).toContain('TOKEN=[REDACTED]');
+    expect(response.message.content).not.toContain('super-secret-value');
+    expect(response.citations).toContain('https://techandstream.com');
 
     vi.unstubAllGlobals();
   });

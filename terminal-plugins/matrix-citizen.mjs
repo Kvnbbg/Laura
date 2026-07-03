@@ -1,5 +1,23 @@
 const COMMANDS = ['auto', 'add', 'goto add'];
 const CHANNELS = ['web', 'terminal'];
+const PUBLIC_ORIGIN = 'https://techandstream.com';
+const FRENCH_DEV_TOOLS_URL = 'https://github.com/Kvnbbg/french-dev-ai-tools';
+const SECURITY = {
+  sourceRepository: 'Laura',
+  targetRepository: 'french-dev-ai-tools',
+  targetRepositoryUrl: FRENCH_DEV_TOOLS_URL,
+  publicOrigin: PUBLIC_ORIGIN,
+  publishTarget: 'techandstream.com',
+  reviewGate: 'human-review-required',
+  writeMode: 'manual-publish-only',
+  allowedPayload: [
+    'public article registry entries',
+    'public Moltbook page text',
+    'deterministic MatrixCitizen progress',
+    'reviewed MatrixCitizen preview metadata',
+  ],
+  blockedPayload: ['.env files', 'API keys or tokens', 'private uploads', 'unredacted terminal output', 'private prompts'],
+};
 const WEEK_THEMES = [
   {
     theme: 'Compiler Garden',
@@ -20,6 +38,11 @@ const WEEK_THEMES = [
     theme: 'Matrix Workshop',
     worlds: ['Portal Loom', 'Vector Forge', 'Signal Bench', 'Glyph Router', 'Packet Kiln', 'Citizen Lathe', 'Expert Switchyard'],
     quests: ['open the portal', 'forge the vector', 'compress the signal', 'route the glyph', 'harden the packet', 'shape the citizen', 'flip expert mode'],
+  },
+  {
+    theme: 'Human Week',
+    worlds: ['Coffee Grove', 'Walk Park', 'Review Circle', 'Draft Hill', 'Feedback Lake', 'Merge Terrace', 'Ship Square'],
+    quests: ['share the context', 'take a walk', 'ask for review', 'write the draft', 'give kind feedback', 'merge with care', 'ship for humans'],
   },
 ];
 
@@ -53,6 +76,17 @@ const resolvePair = (pairArg) => {
 };
 
 const operationFor = (command) => (command === 'goto add' ? 'goto_add' : command);
+
+const buildTechandstreamRoute = (command, username, channelPair) => {
+  const path = command === 'goto add' ? '/matrix-citizen/add' : '/matrix-citizen';
+  const url = new URL(path, PUBLIC_ORIGIN);
+  url.searchParams.set('bot', username);
+  url.searchParams.set('from', channelPair);
+  if (command !== 'goto add') {
+    url.searchParams.set('action', command);
+  }
+  return url.toString();
+};
 
 const stableHash = (value) => {
   let hash = 0x811c9dc5;
@@ -110,6 +144,7 @@ const buildRelayDrafts = (progress, name) => [
   `${name}: ${progress.bonusWorld}. quest=${progress.quest}. sync=${progress.contract}. no secrets.`,
   `Codex: replay deterministicKey ${progress.deterministicKey}; carry ${progress.streakDays}d streak, x${progress.multiplier} multiplier.`,
   `MoltBot: ${progress.weekTheme} is live. Add one public signal, then route it through MatrixCitizen.`,
+  `Human review: required before Techandstream receives any public publish action.`,
 ];
 
 const buildProgress = (name, citizenId) => {
@@ -148,10 +183,7 @@ const buildPlan = ({ command, source, target }) => {
   const progress = buildProgress(name, citizenId);
   const pair = `${source}/${target}`;
   const actionDeck = buildActionDeck(progress, pair);
-  const route =
-    command === 'goto add'
-      ? `/matrix-citizen/add?bot=${encodeURIComponent(username)}&from=${pair}`
-      : `/matrix-citizen?bot=${encodeURIComponent(username)}&action=${encodeURIComponent(command)}&from=${pair}`;
+  const route = buildTechandstreamRoute(command, username, pair);
 
   return {
     command,
@@ -164,9 +196,10 @@ const buildPlan = ({ command, source, target }) => {
       displayName: name,
       tier: 'rising',
       action: command === 'auto' ? 'COMMENT_INSIGHT' : 'PUBLISH_PROJECT_UPDATE',
-      focus: 'MoltBot to MatrixCitizen bridge for Techandstream.com',
+      focus: 'Public MoltBot to MatrixCitizen bridge for Techandstream.com via french-dev-ai-tools',
     },
     techandstreamRoute: route,
+    frenchDevToolsUrl: FRENCH_DEV_TOOLS_URL,
     terminalCommand: `/run matrix-citizen ${command}`,
     loop: [
       'catch malformed command',
@@ -177,7 +210,15 @@ const buildPlan = ({ command, source, target }) => {
       'validate public preview',
       'open Techandstream add route',
     ],
-    checks: ['no private tokens', 'no hidden admin routes', 'public metadata only', 'human review before publishing'],
+    checks: [
+      `target repository: ${SECURITY.targetRepository}`,
+      `public origin: ${SECURITY.publicOrigin}`,
+      'no private tokens',
+      'no non-public admin routes',
+      'public metadata only',
+      'human review before publishing',
+    ],
+    security: SECURITY,
     progress,
     actionDeck,
     relayDrafts: buildRelayDrafts(progress, name),
@@ -203,7 +244,11 @@ export default {
     print(`bonus world: ${plan.progress.weekTheme} / ${plan.progress.bonusWorld}`);
     print(`streak: ${plan.progress.streakDays}d x${plan.progress.multiplier}`);
     print(`xp: ${plan.progress.xpTotal} (+${plan.progress.xpToday} today)`);
+    print(`source repo: ${plan.security.sourceRepository}`);
+    print(`target repo: ${plan.security.targetRepository}`);
+    print(`source URL: ${plan.frenchDevToolsUrl}`);
     print(`techandstream route: ${plan.techandstreamRoute}`);
+    print(`write mode: ${plan.security.writeMode}`);
     print('');
     print('week arc:');
     for (const node of plan.progress.weekArc) {

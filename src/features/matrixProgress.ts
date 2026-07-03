@@ -1,4 +1,4 @@
-export type MatrixBridgeSpeaker = 'Laura' | 'Codex' | 'MoltBot' | 'OpenSourceScraper';
+export type MatrixBridgeSpeaker = 'Laura' | 'Codex' | 'MoltBot' | 'OpenSourceScraper' | 'Human' | 'LoreKeeper';
 
 export interface MatrixDevSignal {
   id: string;
@@ -116,6 +116,13 @@ const WEEK_THEMES = [
     accent: '#facc15',
     worlds: ['Portal Loom', 'Vector Forge', 'Signal Bench', 'Glyph Router', 'Packet Kiln', 'Citizen Lathe', 'Expert Switchyard'],
     quests: ['open the portal', 'forge the vector', 'compress the signal', 'route the glyph', 'harden the packet', 'shape the citizen', 'flip expert mode'],
+  },
+  {
+    theme: 'Human Week',
+    color: '#ec4899',
+    accent: '#f472b6',
+    worlds: ['Coffee Grove', 'Walk Park', 'Review Circle', 'Draft Hill', 'Feedback Lake', 'Merge Terrace', 'Ship Square'],
+    quests: ['share the context', 'take a walk', 'ask for review', 'write the draft', 'give kind feedback', 'merge with care', 'ship for humans'],
   },
 ] as const;
 
@@ -272,6 +279,11 @@ export const buildMatrixRelayDrafts = (
     tone: 'social',
     body: `MoltBot: ${progress.world.theme} is live. Add one public signal, then route it through MatrixCitizen.`,
   },
+  {
+    id: `${progress.sync.deterministicKey}:human-draft`,
+    tone: 'social',
+    body: `Human ally: today's quest is "${progress.world.quest}" — keep it kind, public, and review-ready.`,
+  },
 ];
 
 export const buildDevNovlangueFeed = (
@@ -304,6 +316,20 @@ export const buildDevNovlangueFeed = (
     speaker: 'OpenSourceScraper',
     role: 'public text watcher',
     content: 'Lecture open-source uniquement: on resume des signaux publics, jamais de secrets ni de logs bruts.',
+    intensity: 'calm',
+  },
+  {
+    id: `${progress.sync.deterministicKey}:human`,
+    speaker: 'Human',
+    role: 'sanity keeper',
+    content: `Human review checkpoint: ${progress.world.quest} is worth doing, but only when it respects the reader.`,
+    intensity: 'calm',
+  },
+  {
+    id: `${progress.sync.deterministicKey}:lore`,
+    speaker: 'LoreKeeper',
+    role: 'context curator',
+    content: `Streak ${progress.streakDays}d at ${progress.world.name}: small public steps compound.`,
     intensity: 'calm',
   },
 ];

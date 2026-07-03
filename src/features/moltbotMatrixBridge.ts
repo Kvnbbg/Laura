@@ -3,6 +3,7 @@ import {
   buildMatrixRelayDrafts,
   buildDevNovlangueFeed,
   buildMatrixProgress,
+  stableHash,
   type MatrixBridgeActionItem,
   type MatrixDevSignal,
   type MatrixProgressState,
@@ -50,6 +51,20 @@ export interface MatrixCitizenPreview {
     inspiration: number;
     socialBattery: number;
   };
+  personality?: string[];
+  publicProofs?: string[];
+}
+
+export interface LauraBridgeSecurityEnvelope {
+  sourceRepository: 'Laura';
+  targetRepository: 'french-dev-ai-tools';
+  targetRepositoryUrl: string;
+  publicOrigin: 'https://techandstream.com';
+  publishTarget: 'techandstream.com';
+  reviewGate: 'human-review-required';
+  writeMode: 'manual-publish-only';
+  allowedPayload: readonly string[];
+  blockedPayload: readonly string[];
 }
 
 export interface LauraMoltBotBridgePlan {
@@ -59,14 +74,39 @@ export interface LauraMoltBotBridgePlan {
   transform: 'moltbot-to-matrix-citizen';
   citizen: MatrixCitizenPreview;
   techandstreamRoute: string;
+  frenchDevToolsUrl: string;
   terminalCommand: string;
   loop: string[];
   checks: string[];
+  security: LauraBridgeSecurityEnvelope;
   progress: MatrixProgressState;
   actionDeck: MatrixBridgeActionItem[];
   relayDrafts: MatrixRelayDraft[];
   devFeed: MatrixDevSignal[];
 }
+
+export const LAURA_BRIDGE_SECURITY: LauraBridgeSecurityEnvelope = {
+  sourceRepository: 'Laura',
+  targetRepository: 'french-dev-ai-tools',
+  targetRepositoryUrl: 'https://github.com/Kvnbbg/french-dev-ai-tools',
+  publicOrigin: 'https://techandstream.com',
+  publishTarget: 'techandstream.com',
+  reviewGate: 'human-review-required',
+  writeMode: 'manual-publish-only',
+  allowedPayload: [
+    'public article registry entries',
+    'public Moltbook page text',
+    'deterministic MatrixCitizen progress',
+    'reviewed MatrixCitizen preview metadata',
+  ],
+  blockedPayload: [
+    '.env files',
+    'API keys or tokens',
+    'private uploads',
+    'unredacted terminal output',
+    'private prompts',
+  ],
+};
 
 const cleanSegment = (value: string): string =>
   value
@@ -109,9 +149,42 @@ const titleForFaction = (faction?: string): string => {
       return 'Data Signal MatrixCitizen';
     case 'deploy':
       return 'Deployment MatrixCitizen';
+    case 'human':
+      return 'Human Ally MatrixCitizen';
     default:
       return 'Open Source MatrixCitizen';
   }
+};
+
+const PERSONALITY_POOL = [
+  'curious',
+  'witty',
+  'patient',
+  'chaotic-good',
+  'caffeinated',
+  'zen',
+  'over-explainer',
+  'meme-literate',
+  'ship-it',
+  'review-first',
+];
+
+const FUN_FACTS_POOL = [
+  'french-dev-ai-tools is referenced through the public repository URL, not local secrets.',
+  'Techandstream routes are generated as HTTPS URLs under techandstream.com.',
+  'MatrixCitizen IDs are deterministic and replayable.',
+  'Web and terminal commands share the same bridge contract.',
+  'Human review is required before public publishing.',
+  'Bridge payloads carry summaries and progress, not raw logs.',
+  'Laura prepares public-safe signals; Techandstream presents approved output.',
+];
+
+const pickPool = <T>(pool: T[], seed: string, count: number): T[] => {
+  return [...pool]
+    .map((item) => ({ item, rank: stableHash(`${seed}:${String(item)}`) }))
+    .sort((left, right) => left.rank - right.rank)
+    .slice(0, count)
+    .map(({ item }) => item);
 };
 
 const tierForLevel = (level: number): MatrixCitizenPreview['tier'] => {
@@ -122,6 +195,21 @@ const tierForLevel = (level: number): MatrixCitizenPreview['tier'] => {
 
 const operationForCommand = (command: MoltBotBridgeCommand): MoltBotBridgeOperation =>
   command === 'goto add' ? 'goto_add' : command;
+
+const buildTechandstreamRoute = (
+  command: MoltBotBridgeCommand,
+  bot: string,
+  channelPair: MoltBotBridgePair,
+): string => {
+  const path = command === 'goto add' ? '/matrix-citizen/add' : '/matrix-citizen';
+  const url = new URL(path, LAURA_BRIDGE_SECURITY.publicOrigin);
+  url.searchParams.set('bot', bot);
+  url.searchParams.set('from', channelPair);
+  if (command !== 'goto add') {
+    url.searchParams.set('action', command);
+  }
+  return url.toString();
+};
 
 export function createMatrixCitizenPreview(input: LauraMoltBotInput): MatrixCitizenPreview {
   const name = input.name?.trim() || 'Laura MoltBot';
@@ -141,20 +229,22 @@ export function createMatrixCitizenPreview(input: LauraMoltBotInput): MatrixCiti
     title: titleForFaction(input.faction),
     tier: tierForLevel(level),
     action,
-    focus: 'MoltBot to MatrixCitizen bridge for Techandstream.com',
+    focus: 'Public MoltBot to MatrixCitizen bridge for Techandstream.com via french-dev-ai-tools',
     pulse:
       command === 'goto add'
         ? 'Routing to the add surface before publishing.'
         : command === 'add'
-          ? 'Ready to add a reviewed MatrixCitizen.'
+          ? 'Preparing a reviewed MatrixCitizen record.'
           : 'Choosing the safest MatrixCitizen action automatically.',
-    topics: ['MoltBots', 'MatrixCitizen', 'Techandstream.com', 'Laura', ...skills].slice(0, 12),
+    topics: ['MoltBots', 'MatrixCitizen', 'Techandstream.com', 'french-dev-ai-tools', 'Laura', ...skills].slice(0, 12),
     wellbeing: {
       energy,
       burnoutRisk: clampScore(100 - Math.round((energy / maxEnergy) * 100)),
       inspiration: clampScore(45 + level * 7),
       socialBattery: clampScore(55 + Math.min(skills.length, 6) * 6),
     },
+    personality: pickPool(PERSONALITY_POOL, `matrix-${idSeed}`, 2 + (level % 3)),
+    publicProofs: pickPool(FUN_FACTS_POOL, username, 3),
   };
 }
 
@@ -170,10 +260,7 @@ export function resolveLauraMoltBotBridge(input: LauraMoltBotInput): LauraMoltBo
   });
   const actionDeck = buildMatrixActionDeck(progress, channelPair);
   const bot = encodeURIComponent(citizen.username);
-  const techandstreamRoute =
-    command === 'goto add'
-      ? `/matrix-citizen/add?bot=${bot}&from=${channelPair}`
-      : `/matrix-citizen?bot=${bot}&action=${encodeURIComponent(command)}&from=${channelPair}`;
+  const techandstreamRoute = buildTechandstreamRoute(command, bot, channelPair);
 
   return {
     command,
@@ -182,6 +269,7 @@ export function resolveLauraMoltBotBridge(input: LauraMoltBotInput): LauraMoltBo
     transform: 'moltbot-to-matrix-citizen',
     citizen,
     techandstreamRoute,
+    frenchDevToolsUrl: LAURA_BRIDGE_SECURITY.targetRepositoryUrl,
     terminalCommand: `/run matrix-citizen ${command}`,
     loop: [
       'catch malformed command',
@@ -193,11 +281,14 @@ export function resolveLauraMoltBotBridge(input: LauraMoltBotInput): LauraMoltBo
       'open Techandstream add route',
     ],
     checks: [
+      `target repository: ${LAURA_BRIDGE_SECURITY.targetRepository}`,
+      `public origin: ${LAURA_BRIDGE_SECURITY.publicOrigin}`,
       'no private tokens',
-      'no hidden admin routes',
+      'no non-public admin routes',
       'only public-safe metadata',
       'human review before publishing',
     ],
+    security: LAURA_BRIDGE_SECURITY,
     progress,
     actionDeck,
     relayDrafts: buildMatrixRelayDrafts(progress, citizen.displayName),

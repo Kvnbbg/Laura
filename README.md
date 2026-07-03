@@ -24,6 +24,7 @@ Laura est une application single-page en TypeScript + React qui présente une UI
 
 - [Codebase overview](docs/CODEBASE_OVERVIEW.md) — architecture, runtime map, MoltBots flow.
 - [Security guardrails](docs/SECURITY_GUARDRAILS.md) — open-source safety boundaries, plugin rules, release checklist.
+- [Authorship and provenance](docs/AUTHORSHIP_AND_PROVENANCE.md) — attribution, NOTICE retention, and open-source release traceability.
 - [Blog: Laura, MoltBots et Techandstream](docs/blog/laura-moltbots-techandstream.md) — French public narrative for the project.
 
 ## Prerequisites
@@ -135,9 +136,25 @@ laura --world css
 laura --stats
 laura --reset
 laura --no-color
+laura --bridge --bridge-command "goto add" --bridge-source terminal --bridge-target web
 laura --version
 laura --help
 ```
+
+### Bridge Go -> french-dev-ai-tools -> Techandstream
+
+The production Go CLI can emit the public-safe MatrixCitizen bridge payload
+used by the web app and terminal plugin:
+
+```bash
+go run ./cmd/laura --bridge --bridge-command "goto add" --bridge-source terminal --bridge-target web
+```
+
+The JSON is safe to hand to OpenClaw `main` or POST to the Laura API endpoint
+`/api/bridge/matrix-progress`. It only carries reviewed public metadata,
+deterministic MatrixCitizen progress, Techandstream HTTPS routes, and an
+OpenClaw hint that Crestodian is setup/status-only while repo work belongs to
+the main agent.
 
 ## Pont terminal
 
@@ -188,20 +205,42 @@ cp .env.example .env
 | `VITE_APP_NAME` | No | App name displayed in the footer |
 | `VITE_CONTACT_ENDPOINT` | No | API endpoint for contact form submissions |
 | `VITE_CONTACT_TIMEOUT_MS` | No | Timeout (ms) for contact form requests |
-| `VITE_ENABLE_CHAT` | Yes (for chat) | Feature flag for chat widget (`true`/`false`) |
-| `VITE_MISTRAL_API_KEY` | Yes (for chat) | Required when chat is enabled (client validation) |
-| `VITE_MISTRAL_MODEL` | No | `mistral-small` (default), `mistral-medium`, or `mistral-large` |
+| `VITE_ENABLE_CHAT` | Yes (for chat UI) | Feature flag for chat widget (`true`/`false`) |
+| `VITE_MISTRAL_MODEL` | No | Public display/default model hint only; the server chooses the provider |
 | `VITE_CHAT_ENDPOINT` | No | Override the chat API endpoint (default `/api/chat`) |
 | `VITE_CHAT_TIMEOUT_MS` | No | Timeout (ms) for chat requests |
-| `MISTRAL_API_KEY` | Yes (server) | Server-side Mistral API key (preferred) |
+| `MISTRAL_API_KEY` | Yes (server, unless using Ollama) | Server-side Mistral API key |
 | `MISTRAL_MODEL` | No (server) | Server-side chat model override |
 
-Si `VITE_ENABLE_CHAT=true` mais que `VITE_MISTRAL_API_KEY` manque ou que le modèle est invalide, l'interface affiche une erreur claire et laisse le chat désactivé.
+`VITE_*` variables are bundled into the browser. Do not put provider API keys,
+tokens, private endpoints, prompts, or credentials in any `VITE_*` value. Chat
+provider credentials belong only in the Node server environment.
+
+Si `VITE_ENABLE_CHAT=true` mais que le modèle public est invalide, l'interface
+affiche une erreur claire et laisse le chat désactivé. Si le serveur n'a pas de
+clé `MISTRAL_API_KEY` et pas de `OLLAMA_MODEL`, `/api/chat` répond avec le mode
+local: liens cliquables, dialogue court, commandes sûres et snippets.
+
+## Daily Mistral + no-key fallback
+
+Laura supports two daily modes:
+
+- **Mistral mode**: set server-only `MISTRAL_API_KEY`, run `npm run dev:server`,
+  then use the chat normally for planning, code review, snippets, summaries, and
+  document-grounded answers.
+- **Local fallback mode**: leave `MISTRAL_API_KEY` unset. `/api/chat` returns a
+  deterministic local response with clickable Techandstream/GitHub links,
+  short dialogue prompts, safe commands, and code snippets. No provider call is
+  attempted.
+
+If the local API itself is unavailable, the browser chat still provides a local
+fallback answer so users are not blocked by missing API setup.
 
 ## Pièces jointes + RAG
 
 - Upload TXT or Markdown files in the chat widget.
 - Le serveur découpe le contenu, construit les embeddings et récupère les passages les plus pertinents pour chaque prompt.
+- Les documents sont isolés par session navigateur, limités, expirent en mémoire, et sont rejetés si un motif de secret est détecté.
 - Laura cite les sources au format `[DocName • chunk 3]`.
 - Utilise **Delete my documents** pour effacer les données stockées.
 
@@ -224,6 +263,7 @@ npm run dev:server # start the Mistral proxy + RAG server
 npm run lint       # run ESLint
 npm run test       # run Vitest suite
 npm run build      # typecheck + build production assets
+npm run provenance:check # verify author, license, NOTICE, and bridge provenance
 npm run serve      # serve the built assets via sirv
 ```
 
@@ -257,7 +297,7 @@ curl -X POST https://api.example.com/contact \
 
 ## Troubleshooting
 
-- **Chat disabled**: Ensure `VITE_ENABLE_CHAT=true` and `VITE_MISTRAL_API_KEY` are set.
+- **Chat disabled**: Ensure `VITE_ENABLE_CHAT=true`; provider keys stay server-side in `MISTRAL_API_KEY`.
 - **No citations**: Upload files and ensure the server is running on port 4000.
 - **Contact form fails**: Verify `VITE_CONTACT_ENDPOINT` is reachable and accepts JSON.
 - **Unexpected crashes**: The error boundary will surface the error; review console logs for details.
@@ -266,7 +306,11 @@ curl -X POST https://api.example.com/contact \
 ## Security Notes
 
 - Do not commit real API keys to `.env` files.
-- Prefer `MISTRAL_API_KEY` on the server and reverse-proxy `/api` to avoid exposing secrets.
+- Use `MISTRAL_API_KEY` only on the server and reverse-proxy `/api` to avoid exposing secrets.
+- Never create `VITE_*_API_KEY`, `VITE_*_SECRET`, or `VITE_*_TOKEN` values.
+- Set `LAURA_ALLOWED_ORIGINS` in production and keep document uploads session-scoped.
+- Run `npm run check:security` before publishing open-source releases.
+- Keep `LICENSE`, `NOTICE`, `AUTHORS.md`, `CITATION.cff`, and package metadata intact when redistributing.
 - Use HTTPS endpoints for `VITE_CONTACT_ENDPOINT` in production.
 - Review `SECURITY.md` for coordinated disclosure guidance.
 
@@ -280,4 +324,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## License
 
-Apache-2.0. See [LICENSE](LICENSE).
+Apache-2.0. See [LICENSE](LICENSE), [NOTICE](NOTICE), and [AUTHORS.md](AUTHORS.md).

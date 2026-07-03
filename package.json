@@ -3,11 +3,26 @@
   "version": "1.0.0",
   "description": "Laura's AI float cosmic dream persona with React and scss-cosmic-dream",
   "type": "module",
+  "author": "Kevin Marville (Techandstream)",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Kvnbbg/Laura.git"
+  },
+  "homepage": "https://github.com/Kvnbbg/Laura#readme",
+  "bugs": {
+    "url": "https://github.com/Kvnbbg/Laura/issues"
+  },
   "scripts": {
     "dev": "vite",
     "dev:server": "node server/index.js",
     "chat": "node bin/laura-cli.mjs",
     "build": "tsc && vite build",
+    "check:go": "go vet ./cmd/laura ./internal/... && go test ./cmd/laura ./internal/... && go build -o bin/laura ./cmd/laura",
+    "provenance:check": "node scripts/provenance-check.mjs",
+    "security:scan": "node scripts/security-scan.mjs",
+    "security:scan:bundle": "node scripts/security-scan.mjs --include-build",
+    "check:security": "npm run security:scan && npm run provenance:check && npm run build && npm run security:scan:bundle",
     "preview": "vite preview",
     "serve": "sirv dist --host 0.0.0.0 --port ${PORT:-3000} --cors --single",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",

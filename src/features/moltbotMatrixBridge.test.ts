@@ -35,10 +35,17 @@ describe('Laura MoltBot Matrix bridge', () => {
     expect(plan.citizen.displayName).toBe('Forge Bot');
     expect(plan.citizen.action).toBe('PUBLISH_PROJECT_UPDATE');
     expect(plan.techandstreamRoute).toContain('/matrix-citizen/add');
+    expect(new URL(plan.techandstreamRoute).origin).toBe('https://techandstream.com');
+    expect(plan.techandstreamRoute).toContain('from=terminal%2Fweb');
+    expect(plan.frenchDevToolsUrl).toBe('https://github.com/Kvnbbg/french-dev-ai-tools');
+    expect(plan.security.targetRepository).toBe('french-dev-ai-tools');
+    expect(plan.security.blockedPayload).toContain('API keys or tokens');
     expect(plan.terminalCommand).toBe('/run matrix-citizen goto add');
     expect(plan.progress.sync.contract).toBe('laura-bridge-progress-v1');
     expect(plan.progress.world.name).toBeTruthy();
     expect(plan.progress.weekArc).toHaveLength(7);
+    expect(plan.security.publicOrigin).toBe('https://techandstream.com');
+    expect(plan.citizen.publicProofs).toHaveLength(3);
     expect(plan.actionDeck.map((action) => action.command)).toEqual(['auto', 'add', 'goto add']);
     expect(plan.relayDrafts.some((draft) => draft.body.includes('no secrets'))).toBe(true);
     expect(plan.devFeed.map((signal) => signal.speaker)).toContain('Codex');

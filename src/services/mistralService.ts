@@ -1,5 +1,6 @@
 import { getConfig, type AppConfig } from '../config/env';
 import { AppError } from '../utils/errors';
+import { getDocumentSessionHeaders } from './documentSession';
 import { fetchWithTimeout } from './http';
 
 export type ChatRole = 'system' | 'user' | 'assistant';
@@ -25,6 +26,80 @@ const isValidChatMessage = (message: ChatMessage) =>
   typeof message.content === 'string' &&
   message.content.trim().length > 0 &&
   Boolean(message.role);
+
+const fallbackLinks = [
+  'https://techandstream.com',
+  'https://techandstream.com/matrix-citizen',
+  'https://github.com/Kvnbbg/Laura',
+  'https://github.com/Kvnbbg/french-dev-ai-tools',
+];
+
+const redactLocalSecrets = (value: string): string =>
+  value
+    .replace(/Bearer\s+\S+/gi, 'Bearer [REDACTED]')
+    .replace(/\b(API_KEY|TOKEN|SECRET|PASSWORD)=\S+/gi, '$1=[REDACTED]');
+
+const buildLocalFallbackResponse = (
+  messages: ChatMessage[],
+  reason = 'Local chat service unavailable'
+): ChatResponse => {
+  const lastUserMessage =
+    [...messages].reverse().find((message) => message.role === 'user')?.content ??
+    'daily Laura work';
+  const safeIntent = redactLocalSecrets(lastUserMessage).slice(0, 260);
+  const wantsCode = /code|script|bug|fix|go|react|node|api|build|test|deploy|cli/i.test(safeIntent);
+  const codeBlock = wantsCode
+    ? [
+        '',
+        'Snippet local sans API:',
+        '```ts',
+        'export function publicSafeSummary(input: string) {',
+        '  return input',
+        '    .replace(/Bearer\\s+\\S+/gi, "Bearer [REDACTED]")',
+        '    .replace(/(API_KEY|TOKEN|SECRET)=\\S+/gi, "$1=[REDACTED]")',
+        '    .slice(0, 600);',
+        '}',
+        '```',
+      ]
+    : [];
+
+  return {
+    message: {
+      role: 'assistant',
+      content: [
+        `Mode local: ${reason}.`,
+        '',
+        `Signal recu: ${safeIntent || 'daily Laura work'}`,
+        '',
+        'Liens utiles:',
+        '- Techandstream: https://techandstream.com',
+        '- MatrixCitizen: https://techandstream.com/matrix-citizen',
+        '- Laura GitHub: https://github.com/Kvnbbg/Laura',
+        '- french-dev-ai-tools: https://github.com/Kvnbbg/french-dev-ai-tools',
+        '',
+        'Dialogue rapide:',
+        'Laura: Je peux structurer ton travail sans API externe.',
+        'Toi: Que faire maintenant ?',
+        'Laura: Choisis une action courte, lance les checks, puis publie seulement du contenu public-safe.',
+        '',
+        'Commandes utiles:',
+        '```bash',
+        'npm run security:scan',
+        'npm run lint',
+        'npm run build',
+        'npm run check:go',
+        '```',
+        ...codeBlock,
+      ].join('\n'),
+    },
+    citations: fallbackLinks,
+    thinkingFeedback: [
+      'Mode local sans fournisseur',
+      'Liens publics prepares',
+      'Code snippet public-safe',
+    ],
+  };
+};
 
 const parseChatReply = (payload: unknown): ChatResponse => {
   if (
@@ -82,13 +157,16 @@ export const sendChatMessage = async (
       config.chatEndpoint,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getDocumentSessionHeaders() },
         body: JSON.stringify({ messages } satisfies ChatPayload),
       },
       config.chatTimeoutMs
     );
 
     if (!response.ok) {
+      if ([404, 500, 502, 503].includes(response.status)) {
+        return buildLocalFallbackResponse(messages, `Chat API returned ${response.status}`);
+      }
       throw new AppError('CHAT_REQUEST_FAILED', 'Chat request failed', {
         userMessage:
           'We could not reach the chat service. Please try again shortly.',
@@ -100,9 +178,11 @@ export const sendChatMessage = async (
     return parseChatReply(payload);
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') {
-      throw new AppError('CHAT_TIMEOUT', 'Chat request timed out', {
-        userMessage: 'Chat timed out. Please retry in a moment.',
-      });
+      return buildLocalFallbackResponse(messages, 'Chat request timed out');
+    }
+
+    if (error instanceof TypeError) {
+      return buildLocalFallbackResponse(messages);
     }
 
     throw error;

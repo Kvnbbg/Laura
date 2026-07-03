@@ -77,6 +77,42 @@
       font-size: 0.95rem;
       line-height: 1.4;
     }
+
+    a {
+      color: #9ec8ff;
+      text-decoration: underline;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__message-content {
+    display: grid;
+    gap: 0.55rem;
+    margin-top: 0.35rem;
+
+    p {
+      margin: 0;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__code-block {
+    margin: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid rgba(116, 176, 255, 0.18);
+    background: rgba(0, 0, 0, 0.35);
+    padding: 0.75rem;
+    color: #e7f0ff;
+    font-size: 0.82rem;
+    line-height: 1.5;
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      white-space: pre;
+    }
   }
 
   &__role {

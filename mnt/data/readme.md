@@ -8,7 +8,7 @@ Build a robust, production-grade “Laura” application with an embedded Mistra
 
 Non-negotiable constraints (from the guide)
 1) Secure configuration via environment variables:
-   - VITE_MISTRAL_API_KEY (required when chat enabled)
+   - MISTRAL_API_KEY (server-only; required when chat is enabled without a local Ollama fallback)
    - VITE_MISTRAL_MODEL default mistral-small; options: mistral-small, mistral-medium, mistral-large
    - VITE_ENABLE_CHAT feature flag (true/false)
    Implement validation at startup and user-friendly failures when missing/invalid.

@@ -5,6 +5,10 @@ import crypto from 'crypto';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 4000;
+const HOST =
+  process.env.HOST ||
+  process.env.LAURA_API_HOST ||
+  (process.env.NODE_ENV === 'production' ? '0.0.0.0' : '127.0.0.1');
 
 const CHAT_MODELS = new Set(['mistral-small', 'mistral-medium', 'mistral-large', 'codestral-latest']);
 const DEFAULT_CHAT_MODEL = 'mistral-small';
@@ -12,6 +16,7 @@ const EMBED_MODEL = 'mistral-embed';
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024;
 const ALLOWED_MIME_TYPES = new Set(['text/plain', 'text/markdown']);
+const BLOCKED_FILE_EXTENSIONS = new Set(['.bat', '.cmd', '.com', '.exe', '.js', '.mjs', '.ps1', '.sh']);
 const FILE_SIZE_LABEL = '2MB';
 const REQUEST_BODY_LIMIT = '1mb';
 const CHUNK_SIZE = 800;
@@ -19,12 +24,22 @@ const CHUNK_OVERLAP = 100;
 const TOP_CHUNK_LIMIT = 3;
 const SIMILARITY_THRESHOLD = 0.2;
 const DEFAULT_TEMPERATURE = 0.4;
+const MAX_FILES_PER_UPLOAD = 5;
+const MAX_DOCUMENTS_PER_SESSION = 8;
+const MAX_CHUNKS_PER_SESSION = 240;
+const MAX_TEXT_CHARS = 160_000;
+const DOCUMENT_SESSION_HEADER = 'x-laura-session';
+const DOCUMENT_SESSION_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{15,127}$/;
+const DOCUMENT_TTL_MS = 30 * 60 * 1000;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const RATE_LIMIT_MAX = Number(process.env.LAURA_RATE_LIMIT_PER_MINUTE) || 120;
 const VALID_BRIDGE_MODES = new Set(["chat", "agent", "broadcast", "social"]);
 const UI_BUILDING_BLOCKS =
   "Card, Accordion, Modal, Drawer, Toast, Skeleton, Badge, Table, Pagination, Breadcrumb";
+const TRUSTED_MATRIX_PUBLIC_ORIGIN = "https://techandstream.com";
+const TRUSTED_MATRIX_TARGET_REPOSITORY = "french-dev-ai-tools";
 
-const MISTRAL_API_KEY =
-  process.env.MISTRAL_API_KEY || process.env.VITE_MISTRAL_API_KEY;
+const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
 const MISTRAL_MODEL = CHAT_MODELS.has(process.env.MISTRAL_MODEL ?? '')
   ? process.env.MISTRAL_MODEL
   : CHAT_MODELS.has(process.env.VITE_MISTRAL_MODEL ?? '')
@@ -36,6 +51,23 @@ const MISTRAL_MODEL = CHAT_MODELS.has(process.env.MISTRAL_MODEL ?? '')
 // e.g. `ollama pull laura-local` then OLLAMA_MODEL=laura-local.
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || process.env.LAURA_LOCAL_MODEL || '';
+const REDACT_USER_SECRETS = process.env.LAURA_REDACT_USER_SECRETS !== 'false';
+const DEFAULT_ALLOWED_ORIGINS = new Set([
+  'https://techandstream.com',
+  'https://www.techandstream.com',
+]);
+const CONFIGURED_ALLOWED_ORIGINS = new Set(
+  (process.env.LAURA_ALLOWED_ORIGINS || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+);
+const DAILY_FALLBACK_LINKS = [
+  'https://techandstream.com',
+  'https://techandstream.com/matrix-citizen',
+  'https://github.com/Kvnbbg/Laura',
+  'https://github.com/Kvnbbg/french-dev-ai-tools',
+];
 
 const logger = {
   info: (message, meta = {}) => {
@@ -55,14 +87,232 @@ const logger = {
   },
 };
 
+const redactLogText = (value) =>
+  String(value ?? '')
+    .replace(/(api[_-]?key|token|secret|password)["']?\s*[:=]\s*["']?[^"'\s,}]+/gi, '$1=[REDACTED]')
+    .replace(/Bearer\s+[A-Za-z0-9._~+/=-]+/gi, 'Bearer [REDACTED]')
+    .slice(0, 500);
+
+const errorLogMeta = (error) => ({
+  error: redactLogText(error?.message || error),
+});
+
+const sensitivePatterns = [
+  {
+    pattern: /-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/g,
+    replacement: '[REDACTED_PRIVATE_KEY]',
+  },
+  {
+    pattern: /Bearer\s+[A-Za-z0-9._~+/=-]{16,}/gi,
+    replacement: 'Bearer [REDACTED]',
+  },
+  {
+    pattern: /\b(sk-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,}|xox[baprs]-[A-Za-z0-9-]{20,})\b/g,
+    replacement: '[REDACTED_TOKEN]',
+  },
+  {
+    pattern: /\b([A-Z0-9_]*(?:API_KEY|SECRET|TOKEN|PASSWORD|PRIVATE_KEY)[A-Z0-9_]*)\s*([:=])\s*["']?([^"'\s,;]{8,})["']?/gi,
+    replacement: '$1$2[REDACTED]',
+  },
+];
+
+const redactSensitiveText = (text) =>
+  sensitivePatterns.reduce(
+    (value, { pattern, replacement }) => value.replace(pattern, replacement),
+    String(text ?? '')
+  );
+
+const containsSensitiveText = (text) =>
+  sensitivePatterns.some(({ pattern }) => {
+    pattern.lastIndex = 0;
+    return pattern.test(String(text ?? ''));
+  });
+
+const sanitizeProviderMessages = (messages) => {
+  if (!REDACT_USER_SECRETS) {
+    return messages;
+  }
+  return messages.map((message) => ({
+    ...message,
+    content: redactSensitiveText(message.content),
+  }));
+};
+
+const lastUserText = (messages) =>
+  [...messages]
+    .reverse()
+    .find((message) => message?.role === 'user')
+    ?.content?.trim() || '';
+
+const buildLocalFallbackContent = (message) => {
+  const intent = redactSensitiveText(message).slice(0, 260) || 'daily Laura work';
+  const lower = intent.toLowerCase();
+  const wantsCode = /code|script|bug|fix|go|react|node|api|build|test|deploy|cli/.test(lower);
+  const wantsPlan = /daily|jour|routine|plan|todo|today|aujourd/.test(lower);
+
+  const lines = [
+    'Mode local sans clé Mistral.',
+    '',
+    `Signal reçu: ${intent}`,
+    '',
+    'Liens utiles:',
+    '- Techandstream: https://techandstream.com',
+    '- MatrixCitizen: https://techandstream.com/matrix-citizen',
+    '- Laura GitHub: https://github.com/Kvnbbg/Laura',
+    '- french-dev-ai-tools: https://github.com/Kvnbbg/french-dev-ai-tools',
+    '',
+    'Dialogue rapide:',
+    'Laura: Je peux fonctionner sans API externe pour structurer ton travail.',
+    'Toi: Que faire maintenant ?',
+    'Laura: Choisis une action courte, lance une vérification, puis garde seulement les données publiques.',
+    '',
+  ];
+
+  if (wantsPlan) {
+    lines.push(
+      'Routine quotidienne:',
+      '1. Décrire l’objectif en une phrase.',
+      '2. Demander un plan court à Laura.',
+      '3. Lancer les checks locaux.',
+      '4. Convertir le résultat en note publique si aucun secret n’est présent.',
+      ''
+    );
+  }
+
+  lines.push(
+    'Commandes sûres du jour:',
+    '```bash',
+    'npm run security:scan',
+    'npm run lint',
+    'npm run build',
+    'npm run check:go',
+    '```',
+    ''
+  );
+
+  if (wantsCode) {
+    lines.push(
+      'Snippet local sans API:',
+      '```ts',
+      'export function publicSafeSummary(input: string) {',
+      '  return input',
+      '    .replace(/Bearer\\s+\\S+/gi, "Bearer [REDACTED]")',
+      '    .replace(/(API_KEY|TOKEN|SECRET)=\\S+/gi, "$1=[REDACTED]")',
+      '    .slice(0, 600);',
+      '}',
+      '```',
+      ''
+    );
+  }
+
+  lines.push(
+    'Pour activer Mistral plus tard: configure seulement `MISTRAL_API_KEY` côté serveur, jamais dans une variable `VITE_*`.'
+  );
+
+  return lines.join('\n');
+};
+
+const buildLocalFallbackResponse = (messages, bridgeMeta) => {
+  const content = buildLocalFallbackContent(lastUserText(messages));
+  const syntheticMessage = { role: 'user', content: lastUserText(messages) };
+  return {
+    message: { role: 'assistant', content },
+    citations: DAILY_FALLBACK_LINKS,
+    thinkingFeedback: [
+      'Mode local sans API',
+      'Liens publics prepares',
+      'Code snippet public-safe',
+    ],
+    agentHints: [
+      'local_fallback',
+      'public_links',
+      'daily_workflow',
+      'no_provider_key',
+    ],
+    nextActions: [
+      'Use the clickable links for navigation.',
+      'Copy the code snippet only after reviewing it locally.',
+      'Set server-only MISTRAL_API_KEY when external chat is required.',
+    ],
+    networkThoughts: buildNetworkThoughts(bridgeMeta),
+    bridge: {
+      provider: 'local-fallback',
+      endpoint: '/api/chat',
+      source: bridgeMeta.source,
+      target: bridgeMeta.target,
+      thread: bridgeMeta.thread,
+      mode: bridgeMeta.mode,
+      progress: getMatrixProgress(bridgeMeta),
+      actions: getMatrixActions(bridgeMeta),
+      relayDrafts: getMatrixRelayDrafts(bridgeMeta),
+      lastSignal: syntheticMessage.content,
+    },
+  };
+};
+
+const normalizeDocumentName = (name) => {
+  const base = String(name || 'document.txt').split(/[\\/]/).pop() || 'document.txt';
+  return base.replace(/[\u0000-\u001f<>:"|?*]/g, '_').slice(0, 120) || 'document.txt';
+};
+
+const getFileExtension = (name) => {
+  const cleanName = normalizeDocumentName(name).toLowerCase();
+  const index = cleanName.lastIndexOf('.');
+  return index >= 0 ? cleanName.slice(index) : '';
+};
+
+const isLocalOrigin = (origin) => /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/i.test(origin);
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  if (DEFAULT_ALLOWED_ORIGINS.has(origin) || CONFIGURED_ALLOWED_ORIGINS.has(origin)) return true;
+  return process.env.NODE_ENV !== 'production' && isLocalOrigin(origin);
+};
+
 if (!MISTRAL_API_KEY) {
   logger.warn('Mistral API key missing.', {
-    hint: 'Set MISTRAL_API_KEY (preferred) or VITE_MISTRAL_API_KEY.',
+    hint: 'Set server-only MISTRAL_API_KEY. Do not expose provider keys with VITE_* variables.',
   });
 }
 
-app.use(cors({ origin: true }));
+app.disable('x-powered-by');
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  if (process.env.NODE_ENV === 'production') {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
+  const origin = req.headers.origin;
+  if (origin && !isAllowedOrigin(origin)) {
+    return res.status(403).json({ message: 'Origin not allowed.' });
+  }
+  next();
+});
+app.use(cors({
+  origin: (origin, callback) => callback(null, isAllowedOrigin(origin)),
+  credentials: false,
+  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Laura-Session'],
+  maxAge: 600,
+}));
 app.use(express.json({ limit: REQUEST_BODY_LIMIT }));
+
+const rateBuckets = new Map();
+app.use('/api', (req, res, next) => {
+  const now = Date.now();
+  const key = req.ip || req.socket.remoteAddress || 'unknown';
+  const bucket = rateBuckets.get(key);
+  if (!bucket || now - bucket.startedAt > RATE_LIMIT_WINDOW_MS) {
+    rateBuckets.set(key, { startedAt: now, count: 1 });
+    return next();
+  }
+  bucket.count += 1;
+  if (bucket.count > RATE_LIMIT_MAX) {
+    return res.status(429).json({ message: 'Too many requests.' });
+  }
+  next();
+});
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -70,6 +320,49 @@ const upload = multer({
 });
 
 const documentStore = new Map();
+
+const sweepExpiredDocuments = () => {
+  const now = Date.now();
+  for (const [sessionId, session] of documentStore.entries()) {
+    if (now - session.updatedAt > DOCUMENT_TTL_MS) {
+      documentStore.delete(sessionId);
+    }
+  }
+};
+
+const getDocumentSessionId = (req) => {
+  const raw = req.headers[DOCUMENT_SESSION_HEADER];
+  const value = Array.isArray(raw) ? raw[0] : raw;
+  if (typeof value !== 'string') {
+    return null;
+  }
+  const trimmed = value.trim();
+  return DOCUMENT_SESSION_PATTERN.test(trimmed) ? trimmed : null;
+};
+
+const requireDocumentSessionId = (req, res) => {
+  const sessionId = getDocumentSessionId(req);
+  if (!sessionId) {
+    res.status(400).json({ message: 'Document session header is required.' });
+    return null;
+  }
+  return sessionId;
+};
+
+const getSessionDocuments = (sessionId, create = false) => {
+  sweepExpiredDocuments();
+  const existing = documentStore.get(sessionId);
+  if (existing) {
+    existing.updatedAt = Date.now();
+    return existing.documents;
+  }
+  if (!create) {
+    return new Map();
+  }
+  const session = { updatedAt: Date.now(), documents: new Map() };
+  documentStore.set(sessionId, session);
+  return session.documents;
+};
 
 const normalizeBridgeMeta = (body) => {
   const source = typeof body?.source === "string" && body.source.trim() ? body.source.trim() : "laura-terminal";
@@ -118,6 +411,29 @@ const getMatrixRelayDrafts = (meta) => {
     .slice(0, 6);
 };
 
+const getMatrixBridgeSecurity = (meta) => {
+  const security =
+    meta.context?.bridgeSecurity && typeof meta.context.bridgeSecurity === "object"
+      ? meta.context.bridgeSecurity
+      : meta.context ?? {};
+
+  const publicOrigin =
+    typeof security.publicOrigin === "string" ? security.publicOrigin : meta.context?.publicOrigin;
+  const targetRepository =
+    typeof security.targetRepository === "string" ? security.targetRepository : meta.context?.targetRepository;
+  const writeMode = typeof security.writeMode === "string" ? security.writeMode : meta.context?.writeMode;
+
+  return {
+    trusted:
+      publicOrigin === TRUSTED_MATRIX_PUBLIC_ORIGIN &&
+      targetRepository === TRUSTED_MATRIX_TARGET_REPOSITORY &&
+      writeMode === "manual-publish-only",
+    publicOrigin,
+    targetRepository,
+    writeMode,
+  };
+};
+
 const buildAgentHints = (meta, lastUserMessage) => {
   const hints = new Set(["reply_terminal", "keep_terminal_primary"]);
   const message = (lastUserMessage?.content || "").toLowerCase();
@@ -148,6 +464,10 @@ const buildAgentHints = (meta, lastUserMessage) => {
   if (getMatrixRelayDrafts(meta).length) {
     hints.add("publish_dry_relay_draft");
   }
+  if (getMatrixBridgeSecurity(meta).trusted) {
+    hints.add("trusted_techandstream_https_route");
+    hints.add("french_dev_ai_tools_public_source");
+  }
 
   return Array.from(hints);
 };
@@ -155,6 +475,7 @@ const buildAgentHints = (meta, lastUserMessage) => {
 const buildNextActions = (meta) => {
   const network = typeof meta.context?.network === "string" ? meta.context.network : "moltbook";
   const botName = typeof meta.context?.botName === "string" ? meta.context.botName : "MoltBot";
+  const matrixSecurity = getMatrixBridgeSecurity(meta);
 
   return [
     `Return a short answer to ${botName} for ${network}.`,
@@ -167,6 +488,9 @@ const buildNextActions = (meta) => {
     getMatrixActions(meta)[0]
       ? `Resolve MatrixCitizen action ${getMatrixActions(meta)[0].label} over ${getMatrixActions(meta)[0].channelPair}.`
       : "Keep auto/add/goto add ready for MatrixCitizen.",
+    matrixSecurity.trusted
+      ? `Use only ${matrixSecurity.publicOrigin} routes sourced from ${matrixSecurity.targetRepository}; publishing stays manual-review-only.`
+      : "If MatrixCitizen trust markers are missing, keep the result local and public-safe.",
   ];
 };
 
@@ -175,6 +499,7 @@ const buildNetworkThoughts = (meta) => {
   const activity = typeof meta.context?.activity === "string" ? meta.context.activity : "activity";
   const progress = getMatrixProgress(meta);
   const relayDraft = getMatrixRelayDrafts(meta)[0];
+  const matrixSecurity = getMatrixBridgeSecurity(meta);
 
   return [
     {
@@ -215,8 +540,31 @@ const buildNetworkThoughts = (meta) => {
           },
         ]
       : []),
+    ...(matrixSecurity.trusted
+      ? [
+          {
+            speaker: "Trust",
+            role: "bridge-policy",
+            content: `Route HTTPS ${matrixSecurity.publicOrigin}; source publique ${matrixSecurity.targetRepository}; publication manuelle uniquement.`,
+            emphasis: "calm",
+          },
+        ]
+      : []),
   ];
 };
+
+const buildMatrixBridgeStatus = (bridgeMeta) => ({
+  provider: 'laura',
+  endpoint: '/api/bridge/matrix-progress',
+  source: bridgeMeta.source,
+  target: bridgeMeta.target,
+  thread: bridgeMeta.thread,
+  mode: bridgeMeta.mode,
+  security: getMatrixBridgeSecurity(bridgeMeta),
+  progress: getMatrixProgress(bridgeMeta),
+  actions: getMatrixActions(bridgeMeta),
+  relayDrafts: getMatrixRelayDrafts(bridgeMeta),
+});
 
 const buildThinkingFeedback = (meta, lastUserMessage) => {
   const contextLabel =
@@ -340,9 +688,10 @@ const embedTexts = async (texts) => {
  * @param {number} limit - Number of chunks to return.
  * @returns {{ score: number, doc: { name: string }, chunk: { index: number, text: string } }[]} Ranked chunks.
  */
-const pickTopChunks = (queryEmbedding, limit = TOP_CHUNK_LIMIT) => {
+const pickTopChunks = (queryEmbedding, sessionId, limit = TOP_CHUNK_LIMIT) => {
   const scored = [];
-  for (const doc of documentStore.values()) {
+  const documents = sessionId ? getSessionDocuments(sessionId, false) : new Map();
+  for (const doc of documents.values()) {
     for (const chunk of doc.chunks) {
       const score = cosineSimilarity(queryEmbedding, chunk.embedding);
       scored.push({ score, doc, chunk });
@@ -359,8 +708,8 @@ const pickTopChunks = (queryEmbedding, limit = TOP_CHUNK_LIMIT) => {
  * Build a summary list of stored documents for API responses.
  * @returns {{ id: string, name: string, chunks: number }[]} Document summaries.
  */
-const getDocumentSummaries = () =>
-  Array.from(documentStore.values()).map((doc) => ({
+const getDocumentSummaries = (sessionId) =>
+  Array.from(getSessionDocuments(sessionId, false).values()).map((doc) => ({
     id: doc.id,
     name: doc.name,
     chunks: doc.chunks.length,
@@ -370,49 +719,89 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', model: MISTRAL_MODEL });
 });
 
-app.get('/api/documents', (_req, res) => {
-  res.json({ documents: getDocumentSummaries() });
+app.get('/api/documents', (req, res) => {
+  const sessionId = requireDocumentSessionId(req, res);
+  if (!sessionId) return;
+  res.json({ documents: getDocumentSummaries(sessionId) });
 });
 
-app.delete('/api/documents', (_req, res) => {
-  documentStore.clear();
+app.delete('/api/documents', (req, res) => {
+  const sessionId = requireDocumentSessionId(req, res);
+  if (!sessionId) return;
+  documentStore.delete(sessionId);
   res.json({ status: 'cleared' });
 });
 
 app.post('/api/documents', upload.array('files'), async (req, res) => {
   try {
+    const sessionId = requireDocumentSessionId(req, res);
+    if (!sessionId) return;
+
     const files = req.files ?? [];
     if (!files.length) {
       return res.status(400).json({ message: 'No files uploaded.' });
     }
+    if (files.length > MAX_FILES_PER_UPLOAD) {
+      return res.status(413).json({
+        message: `Upload at most ${MAX_FILES_PER_UPLOAD} files at a time.`,
+      });
+    }
+
+    const documents = getSessionDocuments(sessionId, true);
+    if (documents.size + files.length > MAX_DOCUMENTS_PER_SESSION) {
+      return res.status(413).json({
+        message: `Store at most ${MAX_DOCUMENTS_PER_SESSION} documents per session.`,
+      });
+    }
 
     for (const file of files) {
+      const safeName = normalizeDocumentName(file.originalname);
+      const extension = getFileExtension(safeName);
       if (file.size > MAX_FILE_SIZE) {
         return res.status(413).json({
-          message: `File exceeds size limit of ${FILE_SIZE_LABEL}: ${file.originalname}`,
+          message: `File exceeds size limit of ${FILE_SIZE_LABEL}: ${safeName}`,
         });
       }
 
       if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
         return res.status(415).json({
-          message: `File type not allowed: ${file.originalname}`,
+          message: `File type not allowed: ${safeName}`,
         });
       }
 
-      if (file.originalname.endsWith('.exe') || file.originalname.endsWith('.sh')) {
+      if (BLOCKED_FILE_EXTENSIONS.has(extension)) {
         return res.status(415).json({
-          message: `Executable files are not allowed: ${file.originalname}`,
+          message: `Executable files are not allowed: ${safeName}`,
         });
       }
 
       const text = file.buffer.toString('utf-8').trim();
       if (!text) {
         return res.status(400).json({
-          message: `File ${file.originalname} is empty or unreadable.`,
+          message: `File ${safeName} is empty or unreadable.`,
+        });
+      }
+      if (text.length > MAX_TEXT_CHARS) {
+        return res.status(413).json({
+          message: `File text is too large after decoding: ${safeName}`,
+        });
+      }
+      if (containsSensitiveText(text)) {
+        return res.status(400).json({
+          message: `File appears to contain credentials or secrets and was not indexed: ${safeName}`,
         });
       }
 
-      const rawChunks = chunkText(text);
+      const rawChunks = chunkText(redactSensitiveText(text));
+      const currentChunkCount = Array.from(documents.values()).reduce(
+        (sum, doc) => sum + doc.chunks.length,
+        0
+      );
+      if (currentChunkCount + rawChunks.length > MAX_CHUNKS_PER_SESSION) {
+        return res.status(413).json({
+          message: `Document session exceeds ${MAX_CHUNKS_PER_SESSION} indexed chunks.`,
+        });
+      }
       const embeddings = await embedTexts(rawChunks.map((chunk) => chunk.text));
       const storedChunks = rawChunks.map((chunk, index) => ({
         id: crypto.randomUUID(),
@@ -423,20 +812,45 @@ app.post('/api/documents', upload.array('files'), async (req, res) => {
 
       const document = {
         id: crypto.randomUUID(),
-        name: file.originalname,
+        name: safeName,
         chunks: storedChunks,
       };
-      documentStore.set(document.id, document);
+      documents.set(document.id, document);
     }
 
-    res.json({ documents: getDocumentSummaries() });
+    res.json({ documents: getDocumentSummaries(sessionId) });
   } catch (error) {
-    logger.error('Upload failed', {
-      error: error.message,
-      stack: error.stack,
-    });
+    logger.error('Upload failed', errorLogMeta(error));
     res.status(500).json({ message: 'Failed to process documents.' });
   }
+});
+
+app.post('/api/bridge/matrix-progress', (req, res) => {
+  const bridgeMeta = normalizeBridgeMeta(req.body ?? {});
+  const progress = getMatrixProgress(bridgeMeta);
+  const security = getMatrixBridgeSecurity(bridgeMeta);
+
+  if (!progress) {
+    return res.status(400).json({ message: 'Matrix progress contract is required.' });
+  }
+  if (!security.trusted) {
+    return res.status(400).json({ message: 'Trusted Matrix bridge security envelope is required.' });
+  }
+
+  const syntheticMessage = {
+    role: 'user',
+    content: `Sync ${progress.contract} for ${progress.matrixCitizenId}.`,
+  };
+
+  res.json({
+    status: 'accepted',
+    message: 'Matrix progress accepted for public-safe manual review.',
+    thinkingFeedback: buildThinkingFeedback(bridgeMeta, syntheticMessage),
+    agentHints: buildAgentHints(bridgeMeta, syntheticMessage),
+    nextActions: buildNextActions(bridgeMeta),
+    networkThoughts: buildNetworkThoughts(bridgeMeta),
+    bridge: buildMatrixBridgeStatus(bridgeMeta),
+  });
 });
 
 app.post('/api/chat', async (req, res) => {
@@ -456,12 +870,16 @@ app.post('/api/chat', async (req, res) => {
       .find((message) => message?.role === 'user');
     const bridgeMeta = normalizeBridgeMeta(req.body ?? {});
 
+    if (!MISTRAL_API_KEY) {
+      return res.json(buildLocalFallbackResponse(messages, bridgeMeta));
+    }
+
     let contextPrompt = '';
     let citations = [];
 
     if (lastUserMessage) {
-      const [queryEmbedding] = await embedTexts([lastUserMessage.content]);
-      const topChunks = pickTopChunks(queryEmbedding);
+      const [queryEmbedding] = await embedTexts([redactSensitiveText(lastUserMessage.content)]);
+      const topChunks = pickTopChunks(queryEmbedding, getDocumentSessionId(req));
       citations = topChunks.map(
         (chunk) => `${chunk.doc.name} • chunk ${chunk.chunk.index}`
       );
@@ -489,7 +907,7 @@ app.post('/api/chat', async (req, res) => {
             ? `${systemPrompt}\n\n${contextPrompt}`
             : systemPrompt,
         },
-        ...messages,
+        ...sanitizeProviderMessages(messages),
       ],
       temperature: DEFAULT_TEMPERATURE,
     });
@@ -519,10 +937,7 @@ app.post('/api/chat', async (req, res) => {
       },
     });
   } catch (error) {
-    logger.error('Chat failed', {
-      error: error.message,
-      stack: error.stack,
-    });
+    logger.error('Chat failed', errorLogMeta(error));
     const status = error.status ?? 500;
     res.status(status).json({ message: 'Chat request failed.' });
   }
@@ -541,7 +956,10 @@ app.post('/api/chat/stream', async (req, res) => {
 
     const systemPrompt =
       'You are Laura, a cosmic dream companion. Be concise and terminal-first.';
-    const fullMessages = [{ role: 'system', content: systemPrompt }, ...messages];
+    const fullMessages = sanitizeProviderMessages([
+      { role: 'system', content: systemPrompt },
+      ...messages,
+    ]);
 
     // Prefer the local Ollama model when no Mistral key is configured (or
     // when explicitly requested) — keeps the terminal chat usable offline.
@@ -554,7 +972,10 @@ app.post('/api/chat/stream', async (req, res) => {
 
       if (!upstream.ok || !upstream.body) {
         const details = await upstream.text().catch(() => '');
-        logger.error('Ollama stream failed', { status: upstream.status, details });
+        logger.error('Ollama stream failed', {
+          status: upstream.status,
+          details: redactLogText(details),
+        });
         return res.status(upstream.status || 502).json({ message: 'Local Ollama stream failed.' });
       }
 
@@ -598,7 +1019,17 @@ app.post('/api/chat/stream', async (req, res) => {
     }
 
     if (!MISTRAL_API_KEY) {
-      return res.status(500).json({ message: 'Mistral API key missing.' });
+      const fallback = buildLocalFallbackResponse(messages, normalizeBridgeMeta(req.body ?? {}));
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.flushHeaders?.();
+      const content = fallback.message.content;
+      for (let index = 0; index < content.length; index += 160) {
+        res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: content.slice(index, index + 160) } }] })}\n\n`);
+      }
+      res.write('data: [DONE]\n\n');
+      return res.end();
     }
 
     const upstream = await fetch('https://api.mistral.ai/v1/chat/completions', {
@@ -617,7 +1048,10 @@ app.post('/api/chat/stream', async (req, res) => {
 
     if (!upstream.ok || !upstream.body) {
       const details = await upstream.text().catch(() => '');
-      logger.error('Stream upstream failed', { status: upstream.status, details });
+      logger.error('Stream upstream failed', {
+        status: upstream.status,
+        details: redactLogText(details),
+      });
       return res.status(upstream.status || 502).json({ message: 'Streaming chat request failed.' });
     }
 
@@ -647,6 +1081,6 @@ app.post('/api/chat/stream', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  logger.info('Laura API listening', { port: PORT });
+app.listen(PORT, HOST, () => {
+  logger.info('Laura API listening', { host: HOST, port: PORT });
 });

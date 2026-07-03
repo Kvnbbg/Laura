@@ -79,6 +79,24 @@ Available on:
 
 Laura peut aussi faire un clin d'œil à l'activité Moltbook de `french-dev-ai-tools`, pour relier le terminal, le blog, le forum et les agents.
 
+## Pont Go MatrixCitizen
+
+Le CLI Go sait générer le payload public-safe qui relie Laura,
+`french-dev-ai-tools`, OpenClaw et `https://techandstream.com`:
+
+```bash
+go run ./cmd/laura --bridge --bridge-command "goto add" --bridge-source terminal --bridge-target web
+```
+
+Le payload contient:
+
+- route HTTPS Techandstream (`/matrix-citizen` ou `/matrix-citizen/add`)
+- contrat `laura-bridge-progress-v1`
+- enveloppe de sécurité `human-review-required` + `manual-publish-only`
+- action deck `auto/add/goto add`
+- brouillons publics, sans secrets ni logs bruts
+- handoff OpenClaw vers l'agent `main`, Crestodian restant réservé au setup/status/doctor
+
 ## Pont terminal
 
 Le pont de chat utilise le même format de requête/réponse que la web app:

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { getConfig } from '../config/env';
 import { sendChatMessage, type ChatMessage } from '../services/mistralService';
-import { sendPerplexityMessage } from '../services/perplexityService';
 import { CitationsPanel } from './CitationsPanel';
 import {
   deleteDocuments,
@@ -23,7 +22,7 @@ const INITIAL_MESSAGES: ChatMessage[] = [
   {
     role: 'assistant',
     content:
-      'Welcome to Laura. Ask me about the cosmic dream experience or upload documents for grounded answers.',
+      'Welcome to Laura. Ask about daily Mistral workflows, code, links, or uploads. If no provider API is available, I can still answer locally with safe links, dialogue, and snippets.',
   },
 ];
 
@@ -32,6 +31,70 @@ const DEFAULT_THINKING_FEEDBACK = [
   'Filtrage du contexte utile',
   'Preparation d\'une reponse compacte',
 ];
+
+type MessageSegment =
+  | { type: 'text'; value: string }
+  | { type: 'code'; value: string; language: string };
+
+const parseMessageSegments = (content: string): MessageSegment[] => {
+  const segments: MessageSegment[] = [];
+  const pattern = /```(\w+)?\n([\s\S]*?)```/g;
+  let cursor = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = pattern.exec(content))) {
+    if (match.index > cursor) {
+      segments.push({ type: 'text', value: content.slice(cursor, match.index) });
+    }
+    segments.push({
+      type: 'code',
+      language: match[1] ?? '',
+      value: match[2].trim(),
+    });
+    cursor = match.index + match[0].length;
+  }
+
+  if (cursor < content.length) {
+    segments.push({ type: 'text', value: content.slice(cursor) });
+  }
+
+  return segments.length ? segments : [{ type: 'text', value: content }];
+};
+
+const renderTextWithLinks = (value: string) => {
+  const parts = value.split(/(https?:\/\/[^\s)]+)/g);
+  return parts.map((part, index) => {
+    if (/^https?:\/\//.test(part)) {
+      return (
+        <a key={`${part}-${index}`} href={part} target="_blank" rel="noreferrer noopener">
+          {part}
+        </a>
+      );
+    }
+
+    const lines = part.split('\n');
+    return lines.map((line, lineIndex) => (
+      <span key={`${index}-${lineIndex}`}>
+        {line}
+        {lineIndex < lines.length - 1 ? <br /> : null}
+      </span>
+    ));
+  });
+};
+
+const MessageContent = ({ content }: { content: string }) => (
+  <div className="chat-widget__message-content">
+    {parseMessageSegments(content).map((segment, index) =>
+      segment.type === 'code' ? (
+        <pre key={`code-${index}`} className="chat-widget__code-block">
+          <code>{segment.value}</code>
+        </pre>
+      ) : (
+        <p key={`text-${index}`}>{renderTextWithLinks(segment.value.trim())}</p>
+      )
+    )}
+  </div>
+);
 
 const ChatWidget = ({ variant = 'floating' }: ChatWidgetProps) => {
   const config = getConfig();
@@ -99,9 +162,7 @@ const ChatWidget = ({ variant = 'floating' }: ChatWidgetProps) => {
     setThinkingFeedback(DEFAULT_THINKING_FEEDBACK);
 
     try {
-      const response = config.perplexityEnabled
-        ? await sendPerplexityMessage(nextMessages)
-        : await sendChatMessage(nextMessages);
+      const response = await sendChatMessage(nextMessages);
       setMessages((prev) => [
         ...prev,
         {
@@ -227,7 +288,7 @@ const ChatWidget = ({ variant = 'floating' }: ChatWidgetProps) => {
                 <span className="chat-widget__role">
                   {message.role === 'assistant' ? 'Laura' : 'You'}
                 </span>
-                <p>{message.content}</p>
+                <MessageContent content={message.content} />
                 {message.role === 'assistant' && (message as ChatMessage & { citations?: string[] }).citations?.length ? (
                   <CitationsPanel citations={(message as ChatMessage & { citations?: string[] }).citations ?? []} />
                 ) : null}

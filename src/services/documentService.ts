@@ -1,5 +1,6 @@
 import { getConfig } from '../config/env';
 import { AppError } from '../utils/errors';
+import { getDocumentSessionHeaders } from './documentSession';
 import { fetchWithTimeout } from './http';
 
 export type DocumentSummary = {
@@ -25,6 +26,7 @@ export const uploadDocuments = async (files: File[]) => {
     '/api/documents',
     {
       method: 'POST',
+      headers: getDocumentSessionHeaders(),
       body,
     },
     config.chatTimeoutMs
@@ -46,7 +48,9 @@ export const uploadDocuments = async (files: File[]) => {
 };
 
 export const listDocuments = async () => {
-  const response = await fetch('/api/documents');
+  const response = await fetch('/api/documents', {
+    headers: getDocumentSessionHeaders(),
+  });
   if (!response.ok) {
     throw new AppError('DOC_LIST_FAILED', 'Document listing failed', {
       userMessage: 'We could not load your documents. Please try again.',
@@ -58,7 +62,10 @@ export const listDocuments = async () => {
 };
 
 export const deleteDocuments = async () => {
-  const response = await fetch('/api/documents', { method: 'DELETE' });
+  const response = await fetch('/api/documents', {
+    method: 'DELETE',
+    headers: getDocumentSessionHeaders(),
+  });
   if (!response.ok) {
     throw new AppError('DOC_DELETE_FAILED', 'Document deletion failed', {
       userMessage: 'We could not delete your documents. Please try again.',
