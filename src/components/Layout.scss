@@ -18,3 +18,52 @@
   padding: $spacing-lg 0;
   margin-top: $spacing-xl;
 }
+
+.app-network {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+
+  a {
+    display: grid;
+    gap: 0.2rem;
+    min-height: 4rem;
+    padding: 0.75rem;
+    border: 1px solid rgba($cosmic-purple, 0.22);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    color: $text-primary;
+    text-decoration: none;
+    transition: border-color 0.18s ease, transform 0.18s ease, background 0.18s ease;
+
+    &:hover,
+    &:focus-visible {
+      border-color: rgba($cosmic-purple, 0.5);
+      background: rgba(255, 255, 255, 0.14);
+      transform: translateY(-1px);
+    }
+  }
+
+  span {
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  small {
+    color: $text-secondary;
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-network {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .app-network {
+    grid-template-columns: 1fr;
+  }
+}

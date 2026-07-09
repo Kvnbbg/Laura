@@ -1,7 +1,7 @@
 const COMMANDS = ['auto', 'add', 'goto add'];
 const CHANNELS = ['web', 'terminal'];
 const PUBLIC_ORIGIN = 'https://techandstream.com';
-const FRENCH_DEV_TOOLS_URL = 'https://github.com/Kvnbbg/french-dev-ai-tools';
+const FRENCH_DEV_TOOLS_URL = 'https://techandstream.com';
 const SECURITY = {
   sourceRepository: 'Laura',
   targetRepository: 'french-dev-ai-tools',

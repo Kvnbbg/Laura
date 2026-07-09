@@ -66,7 +66,7 @@ const DAILY_FALLBACK_LINKS = [
   'https://techandstream.com',
   'https://techandstream.com/matrix-citizen',
   'https://github.com/Kvnbbg/Laura',
-  'https://github.com/Kvnbbg/french-dev-ai-tools',
+  'https://techandstream.com',
 ];
 
 const logger = {
@@ -159,7 +159,7 @@ const buildLocalFallbackContent = (message) => {
     '- Techandstream: https://techandstream.com',
     '- MatrixCitizen: https://techandstream.com/matrix-citizen',
     '- Laura GitHub: https://github.com/Kvnbbg/Laura',
-    '- french-dev-ai-tools: https://github.com/Kvnbbg/french-dev-ai-tools',
+    '- TechAndStream live: https://techandstream.com',
     '',
     'Dialogue rapide:',
     'Laura: Je peux fonctionner sans API externe pour structurer ton travail.',

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import CliInstallGuide from '../components/CliInstallGuide';
 import './About.scss';
 
 function cn(...inputs: ClassValue[]) {
@@ -261,8 +262,9 @@ const About: React.FC = () => {
         {/* The Project Reality */}
         <section>
           <ModelAvailability />
+          <CliInstallGuide />
           
-          <div className="grid gap-8 lg:grid-cols-2">
+          <div className="mt-12 grid gap-8 lg:grid-cols-2">
             <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-8">
               <h3 className="mb-4 text-xl font-bold text-white flex items-center gap-2">
                 <Telescope className="h-5 w-5 text-purple-400 lucide-animated" />
@@ -279,7 +281,7 @@ const About: React.FC = () => {
                 <a href="https://aistudio.instagram.com/ai/1503668480968231/" className="text-pink-400 hover:underline mx-1">Instagram</a>.
               </p>
               <p className="mb-4 text-slate-400 text-sm leading-relaxed">
-                Un salut spécial à <a href="https://github.com/Kvnbbg/french-dev-ai-tools" className="text-cyan-400 hover:underline mx-1">french-dev-ai-tools</a>
+                Un salut spécial à <a href="https://techandstream.com" className="text-cyan-400 hover:underline mx-1">TechAndStream</a>
                 et à l'activité Moltbook: c'est là que Laura se branche pour garder le lien entre le blog, le forum, les bots et les usages métier.
               </p>
               <ul className="space-y-3 text-sm text-slate-300">

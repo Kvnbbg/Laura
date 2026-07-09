@@ -12,6 +12,7 @@ describe('App user journeys', () => {
     expect(screen.getAllByRole('link', { name: /contact/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /chat/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /eco hub/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: /cli install/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /open source/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: /matrix/i }).length).toBeGreaterThan(0);
   }, 25000);
@@ -47,6 +48,18 @@ describe('App user journeys', () => {
 
     expect(screen.getByRole('heading', { name: /laura craft les moltbots pour techandstream/i })).toBeInTheDocument();
   });
+
+  it('renders the CLI install page route', () => {
+    window.history.pushState({}, '', '/install-cli');
+    render(<App />);
+
+    expect(
+      screen.getByRole('heading', { name: /install laura as a terminal-first ai companion/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByText('go install github.com/Kvnbbg/Laura/cmd/laura@latest').length,
+    ).toBeGreaterThan(0);
+  }, 20000);
 
   it('keeps chat flow resilient by trimming input and unblocking after response', async () => {
     window.history.pushState({}, '', '/chat');

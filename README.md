@@ -31,20 +31,21 @@ Laura est une application single-page en TypeScript + React qui présente une UI
 
 - Node.js 18+ (see `.nvmrc`)
 - npm 9+ (or compatible)
+- Go 1.22+ for the production CLI (`cmd/laura`)
 
 ## Installation
+
+For the web app and Node API proxy:
 
 ```bash
 npm install
 ```
 
-Si tu veux aussi le moteur terminal et le pont, installe Go 1.22+ puis lance-le directement:
+For the CLI-first experience, use the dedicated install section below:
 
-```bash
-go run laura_quest_main.go
-go build -o laura laura_quest_main.go
-./laura
-```
+- [Install Laura CLI](#install-laura-cli)
+- Live web guide: https://laura-mpqxyyiau-kvnbbgs-projects.vercel.app/install-cli
+- Local web guide: `/install-cli` in the Laura app
 
 ## Running Locally
 
@@ -101,50 +102,105 @@ npm run serve
 
 Le site statique est servi sur le port 3000. Il faut lancer le serveur API séparément et reverse-proxy `/api` vers lui quand tu veux le chat + RAG en production.
 
-## Laura Quest CLI
+## Install Laura CLI
 
-Commande de prod:
+Laura is primarily useful as a terminal companion. The recommended path is the
+Go CLI in `cmd/laura`: it has the clean package layout, bridge mode, version
+metadata, local progress, and the maintained flags.
 
-```bash
-go run ./cmd/laura
-```
+### Fast Install
 
-Binaire local:
-
-```bash
-go build -o bin/laura ./cmd/laura
-./bin/laura
-```
-
-Installation locale:
-
-```bash
-go build -o ~/.local/bin/laura ./cmd/laura
-laura
-```
-
-Ou via `go install`:
+Install directly with Go:
 
 ```bash
 go install github.com/Kvnbbg/Laura/cmd/laura@latest
 ```
 
-Flags disponibles:
+Make sure Go's binary directory is on your `PATH`:
 
 ```bash
+export PATH="$(go env GOPATH)/bin:$PATH"
+```
+
+Persist that path for future shells:
+
+```bash
+printf '\nexport PATH="$(go env GOPATH)/bin:$PATH"\n' >> ~/.bashrc
+source ~/.bashrc
+```
+
+Verify the install:
+
+```bash
+laura --version
+laura --help
+```
+
+### Build From Source
+
+Clone the public repository and build the production command:
+
+```bash
+git clone https://github.com/Kvnbbg/Laura.git
+cd Laura
+go test ./...
+go build -o bin/laura ./cmd/laura
+./bin/laura --help
+```
+
+Install it as a local command:
+
+```bash
+mkdir -p ~/.local/bin
+go build -o ~/.local/bin/laura ./cmd/laura
+export PATH="$HOME/.local/bin:$PATH"
+laura --version
+```
+
+Persist `~/.local/bin`:
+
+```bash
+printf '\nexport PATH="$HOME/.local/bin:$PATH"\n' >> ~/.bashrc
+source ~/.bashrc
+```
+
+### Run Without Installing
+
+From the repository root:
+
+```bash
+go run ./cmd/laura
+```
+
+### Common Commands
+
+```bash
+laura
+laura --help
+laura --version
 laura --world css
 laura --stats
 laura --reset
 laura --no-color
 laura --bridge --bridge-command "goto add" --bridge-source terminal --bridge-target web
-laura --version
-laura --help
 ```
 
-### Bridge Go -> french-dev-ai-tools -> Techandstream
+### Update
 
-The production Go CLI can emit the public-safe MatrixCitizen bridge payload
-used by the web app and terminal plugin:
+```bash
+go install github.com/Kvnbbg/Laura/cmd/laura@latest
+```
+
+### Uninstall
+
+```bash
+rm -f "$(go env GOPATH)/bin/laura" ~/.local/bin/laura
+```
+
+### Bridge Go -> TechAndStream
+
+The production Go CLI can emit the public-safe MatrixCitizen bridge payload used
+by the web app and terminal plugin:
 
 ```bash
 go run ./cmd/laura --bridge --bridge-command "goto add" --bridge-source terminal --bridge-target web
@@ -155,6 +211,11 @@ The JSON is safe to hand to OpenClaw `main` or POST to the Laura API endpoint
 deterministic MatrixCitizen progress, Techandstream HTTPS routes, and an
 OpenClaw hint that Crestodian is setup/status-only while repo work belongs to
 the main agent.
+
+### Legacy Terminal Entry
+
+`laura_quest_main.go` is kept for older local experiments. New CLI work should
+prefer `cmd/laura`.
 
 ## Pont terminal
 

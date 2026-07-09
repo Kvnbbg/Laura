@@ -31,7 +31,7 @@ const fallbackLinks = [
   'https://techandstream.com',
   'https://techandstream.com/matrix-citizen',
   'https://github.com/Kvnbbg/Laura',
-  'https://github.com/Kvnbbg/french-dev-ai-tools',
+  'https://techandstream.com',
 ];
 
 const redactLocalSecrets = (value: string): string =>
@@ -75,7 +75,7 @@ const buildLocalFallbackResponse = (
         '- Techandstream: https://techandstream.com',
         '- MatrixCitizen: https://techandstream.com/matrix-citizen',
         '- Laura GitHub: https://github.com/Kvnbbg/Laura',
-        '- french-dev-ai-tools: https://github.com/Kvnbbg/french-dev-ai-tools',
+        '- TechAndStream live: https://techandstream.com',
         '',
         'Dialogue rapide:',
         'Laura: Je peux structurer ton travail sans API externe.',

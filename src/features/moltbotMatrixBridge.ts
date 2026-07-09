@@ -88,7 +88,7 @@ export interface LauraMoltBotBridgePlan {
 export const LAURA_BRIDGE_SECURITY: LauraBridgeSecurityEnvelope = {
   sourceRepository: 'Laura',
   targetRepository: 'french-dev-ai-tools',
-  targetRepositoryUrl: 'https://github.com/Kvnbbg/french-dev-ai-tools',
+  targetRepositoryUrl: 'https://techandstream.com',
   publicOrigin: 'https://techandstream.com',
   publishTarget: 'techandstream.com',
   reviewGate: 'human-review-required',

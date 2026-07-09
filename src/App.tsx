@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard';
 import Growth from './pages/Growth';
 import EcoHub from './pages/EcoHub';
 import OpenSource from './pages/OpenSource';
+import InstallCli from './pages/InstallCli';
 import NotFound from './pages/NotFound';
 import './styles/main.scss';
 
@@ -39,6 +40,7 @@ const App = () => {
             <Route path="/growth" element={<Growth />} />
             <Route path="/eco-hub" element={<EcoHub />} />
             <Route path="/open-source" element={<OpenSource />} />
+            <Route path="/install-cli" element={<InstallCli />} />
             <Route path="/moltbots" element={<OpenSource />} />
             <Route
               path="/matrix-citizen"

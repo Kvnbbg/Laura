@@ -637,8 +637,8 @@ const Chat: React.FC = () => {
                 Elle crée des jeux en terminal, répond à tes questions et accompagne tes projets, comme un agent <span className="text-purple-300">Ollama</span> ou <span className="text-cyan-300">Hugging Face</span>, mais avec une vraie personnalité.
               </p>
               <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-                <a className="rounded-full border border-slate-800 bg-slate-900/60 px-3 py-1.5 hover:border-purple-500 hover:text-white transition-colors" href="https://github.com/Kvnbbg/french-dev-ai-tools">Moltbook</a>
-                <a className="rounded-full border border-slate-800 bg-slate-900/60 px-3 py-1.5 hover:border-purple-500 hover:text-white transition-colors" href="https://github.com/Kvnbbg/french-dev-ai-tools">french-dev-ai-tools</a>
+                <a className="rounded-full border border-slate-800 bg-slate-900/60 px-3 py-1.5 hover:border-purple-500 hover:text-white transition-colors" href="https://techandstream.com">Moltbook</a>
+                <a className="rounded-full border border-slate-800 bg-slate-900/60 px-3 py-1.5 hover:border-purple-500 hover:text-white transition-colors" href="https://techandstream.com">TechAndStream</a>
                 <a className="rounded-full border border-slate-800 bg-slate-900/60 px-3 py-1.5 hover:border-purple-500 hover:text-white transition-colors" href="https://techandstream.com/blogging.html">Blog</a>
                 <a className="rounded-full border border-slate-800 bg-slate-900/60 px-3 py-1.5 hover:border-purple-500 hover:text-white transition-colors" href="https://techandstream.com/forum.html">Forum</a>
                 <a className="rounded-full border border-slate-800 bg-slate-900/60 px-3 py-1.5 hover:border-purple-500 hover:text-white transition-colors" href="https://techandstream.com/cuisine-sociale.html">Cuisine sociale</a>

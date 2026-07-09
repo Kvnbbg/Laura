@@ -17,7 +17,7 @@ const (
 	SourceRepository    = "Laura"
 	SourceRepositoryURL = "https://github.com/Kvnbbg/Laura"
 	TargetRepository    = "french-dev-ai-tools"
-	TargetRepositoryURL = "https://github.com/Kvnbbg/french-dev-ai-tools"
+	TargetRepositoryURL = "https://techandstream.com"
 	PublishTarget       = "techandstream.com"
 	PublicOrigin        = "https://techandstream.com"
 	SyncEndpoint        = "/api/bridge/matrix-progress"

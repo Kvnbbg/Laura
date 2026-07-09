@@ -37,7 +37,7 @@ describe('Laura MoltBot Matrix bridge', () => {
     expect(plan.techandstreamRoute).toContain('/matrix-citizen/add');
     expect(new URL(plan.techandstreamRoute).origin).toBe('https://techandstream.com');
     expect(plan.techandstreamRoute).toContain('from=terminal%2Fweb');
-    expect(plan.frenchDevToolsUrl).toBe('https://github.com/Kvnbbg/french-dev-ai-tools');
+    expect(plan.frenchDevToolsUrl).toBe('https://techandstream.com');
     expect(plan.security.targetRepository).toBe('french-dev-ai-tools');
     expect(plan.security.blockedPayload).toContain('API keys or tokens');
     expect(plan.terminalCommand).toBe('/run matrix-citizen goto add');
