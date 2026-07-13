@@ -144,7 +144,7 @@ Clone the public repository and build the production command:
 git clone https://github.com/Kvnbbg/Laura.git
 cd Laura
 go test ./...
-go build -o bin/laura ./cmd/laura
+go build -trimpath -ldflags="-s -w" -o bin/laura ./cmd/laura
 ./bin/laura --help
 ```
 
@@ -152,7 +152,7 @@ Install it as a local command:
 
 ```bash
 mkdir -p ~/.local/bin
-go build -o ~/.local/bin/laura ./cmd/laura
+go build -trimpath -ldflags="-s -w" -o ~/.local/bin/laura ./cmd/laura
 export PATH="$HOME/.local/bin:$PATH"
 laura --version
 ```
@@ -230,7 +230,7 @@ Commande locale optionnelle:
 
 ```bash
 mkdir -p ~/.local/bin
-go build -o ~/.local/bin/laura laura_quest_main.go
+go build -trimpath -ldflags="-s -w" -o ~/.local/bin/laura laura_quest_main.go
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
 laura

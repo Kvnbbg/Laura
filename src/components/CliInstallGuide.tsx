@@ -27,7 +27,7 @@ const CLI_SOURCE_COMMANDS = [
   'git clone https://github.com/Kvnbbg/Laura.git',
   'cd Laura',
   'go test ./...',
-  'go build -o bin/laura ./cmd/laura',
+  'go build -trimpath -ldflags="-s -w" -o bin/laura ./cmd/laura',
   './bin/laura --help',
 ];
 

@@ -18,7 +18,7 @@
     "dev:server": "node server/index.js",
     "chat": "node bin/laura-cli.mjs",
     "build": "tsc && vite build",
-    "check:go": "go vet ./cmd/laura ./internal/... && go test ./cmd/laura ./internal/... && go build -o bin/laura ./cmd/laura",
+    "check:go": "go vet ./cmd/laura ./internal/... && go test ./cmd/laura ./internal/... && go build -trimpath -ldflags=\"-s -w\" -o bin/laura ./cmd/laura",
     "provenance:check": "node scripts/provenance-check.mjs",
     "security:scan": "node scripts/security-scan.mjs",
     "security:scan:bundle": "node scripts/security-scan.mjs --include-build",
