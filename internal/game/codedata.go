@@ -9,7 +9,21 @@ import (
 )
 
 // CodeDataTracks lists the learning tracks available in Code/Data Master mode.
-var CodeDataTracks = []string{"dsa", "sql", "stats", "ml", "de", "system"}
+var CodeDataTracks = []string{"dsa", "sql", "stats", "ml", "de", "system", "go"}
+
+type TrackStage struct {
+	Level    int
+	Title    string
+	Concept  string
+	Practice string
+}
+
+type TrackLearningPath struct {
+	Track       string
+	Title       string
+	Explanation string
+	Stages      []TrackStage
+}
 
 // NormalizeTrack maps user-typed aliases onto the canonical track keys.
 func NormalizeTrack(input string) string {
@@ -27,6 +41,8 @@ func NormalizeTrack(input string) string {
 		return "de"
 	case "system", "system design", "systemdesign", "design":
 		return "system"
+	case "go", "golang", "go cli", "backend go":
+		return "go"
 	}
 	return s
 }
@@ -118,6 +134,57 @@ func WeakTopics(topicMaster map[string]int) []string {
 		out = append(out, p.track)
 	}
 	return out
+}
+
+func LearningPath(track string) (TrackLearningPath, bool) {
+	switch NormalizeTrack(track) {
+	case "go":
+		return TrackLearningPath{
+			Track:       "go",
+			Title:       "Go engineering path",
+			Explanation: "Build small, testable command-line and service code: clear package boundaries, explicit errors, tiny interfaces, cancellation, concurrency, and repeatable release checks.",
+			Stages: []TrackStage{
+				{
+					Level:    1,
+					Title:    "Program shape",
+					Concept:  "A runnable Go command starts at package main, keeps imports explicit, and leaves business logic outside main when it grows.",
+					Practice: "Write a small command that parses input, calls one pure helper, and prints one result.",
+				},
+				{
+					Level:    1,
+					Title:    "Error contracts",
+					Concept:  "Go favors explicit error returns over hidden exceptions, so callers can decide whether to retry, wrap, log, or stop.",
+					Practice: "Return (value, error), check err immediately, and add context with fmt.Errorf(\"...: %w\", err).",
+				},
+				{
+					Level:    2,
+					Title:    "Package boundaries",
+					Concept:  "Good packages own one reason to change; exported names are the public contract and unexported names are implementation detail.",
+					Practice: "Move parsing or scoring into an internal package, then test it without running the CLI.",
+				},
+				{
+					Level:    2,
+					Title:    "Interfaces at the edge",
+					Concept:  "Small consumer-side interfaces make code easier to test without forcing a large fake implementation.",
+					Practice: "Accept an io.Reader or interface{ Save(State) error } instead of a concrete storage client.",
+				},
+				{
+					Level:    3,
+					Title:    "Context and concurrency",
+					Concept:  "context.Context carries cancellation and deadlines; goroutines need a stop path so background work does not leak.",
+					Practice: "Start one goroutine, select on ctx.Done(), and prove it exits in a test.",
+				},
+				{
+					Level:    3,
+					Title:    "Release discipline",
+					Concept:  "Engineering quality comes from repeatable checks: gofmt, go vet, go test, and a deterministic build.",
+					Practice: "Run the same validation command before every ship and keep generated binaries out of unrelated diffs.",
+				},
+			},
+		}, true
+	default:
+		return TrackLearningPath{}, false
+	}
 }
 
 // CheckNumeric reports whether input and expected both parse as numbers and,

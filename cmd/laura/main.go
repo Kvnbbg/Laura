@@ -34,10 +34,11 @@ func main() {
 		noAnimation    = flag.Bool("no-animation", false, "Disable animation")
 		versionFlg     = flag.Bool("version", false, "Print version")
 		modeFlag       = flag.String("mode", "", "Game mode (e.g. code-data)")
-		trackFlag      = flag.String("track", "", "Code/Data Master track: sql|dsa|stats|ml|de|system")
+		trackFlag      = flag.String("track", "", "Code/Data Master track: sql|dsa|stats|ml|de|system|go")
 		dailyFlag      = flag.Bool("daily", false, "Play today's Code/Data Master daily set")
 		weakTopicsFlag = flag.Bool("weak-topics", false, "Train your weakest Code/Data Master topics first")
 		reviewFlag     = flag.Bool("review", false, "Review missions you've already completed")
+		pathFlag       = flag.Bool("path", false, "Print the learning path for --track and exit")
 		bridgeFlag     = flag.Bool("bridge", false, "Emit public-safe Laura -> french-dev-ai-tools MatrixCitizen bridge JSON")
 		bridgeCommand  = flag.String("bridge-command", "auto", "Bridge command: auto|add|goto add")
 		bridgeSource   = flag.String("bridge-source", "terminal", "Bridge source channel: web|terminal")
@@ -45,6 +46,13 @@ func main() {
 		bridgeUser     = flag.String("bridge-user", "", "Public MatrixCitizen user id for deterministic progress")
 		bridgeBot      = flag.String("bridge-bot", "Laura MoltBot", "Public MoltBot display name")
 		bridgeRepo     = flag.String("bridge-repo", "", "Laura repo path for OpenClaw status hints")
+		mindwalkBridge = flag.Bool("mindwalk-bridge", false, "Emit local-first Mindwalk bridge JSON")
+		mindwalkCmd    = flag.String("mindwalk-command", "serve", "Mindwalk command: check|serve|open|build|trace|analyze")
+		mindwalkRepo   = flag.String("mindwalk-repo", "", "Repository path to visualize with Mindwalk")
+		mindwalkSess   = flag.String("mindwalk-session", "", "Session JSONL path for mindwalk open|trace|analyze")
+		mindwalkPort   = flag.Int("mindwalk-port", 8766, "Local Mindwalk serve port")
+		mindwalkJudge  = flag.String("mindwalk-judge", "codex", "Mindwalk analyze judge: codex|claude")
+		mindwalkNoOpen = flag.Bool("mindwalk-no-open", true, "Pass --no-open to mindwalk serve/open")
 	)
 	flag.Parse()
 	_ = noColor
@@ -79,12 +87,30 @@ func main() {
 		}
 		return
 	}
+	if *mindwalkBridge {
+		payload := bridge.BuildMindwalk(bridge.MindwalkOptions{
+			Command:     *mindwalkCmd,
+			RepoPath:    strings.TrimSpace(*mindwalkRepo),
+			SessionPath: strings.TrimSpace(*mindwalkSess),
+			Port:        *mindwalkPort,
+			Judge:       *mindwalkJudge,
+			NoOpen:      *mindwalkNoOpen,
+		})
+		encoder := json.NewEncoder(os.Stdout)
+		encoder.SetEscapeHTML(false)
+		encoder.SetIndent("", "  ")
+		if err := encoder.Encode(payload); err != nil {
+			fmt.Fprintf(os.Stderr, "mindwalk bridge encode failed: %v\n", err)
+			os.Exit(1)
+		}
+		return
+	}
 
 	rand.Seed(time.Now().UnixNano())
 	engine := game.NewEngine()
 	session := game.NewSession(engine, loadState())
 	runMaster := normalizeWorldChoice(*worldFlag) == "master"
-	codeDataOpts, codeDataRequested := buildCodeDataOptions(*modeFlag, *trackFlag, *dailyFlag, *weakTopicsFlag, *reviewFlag)
+	codeDataOpts, codeDataRequested := buildCodeDataOptions(*modeFlag, *trackFlag, *dailyFlag, *weakTopicsFlag, *reviewFlag, *pathFlag)
 
 	if *statsFlag {
 		printStats(session.State, engine)
@@ -113,6 +139,10 @@ func main() {
 	session.State.Player.Name = ensureName(session.State.Player.Name)
 
 	if codeDataRequested {
+		if codeDataOpts.path {
+			printCodeDataPath(codeDataOpts.track)
+			return
+		}
 		runCodeDataMaster(scanner, session, codeDataOpts, *noAnimation)
 		_ = session.Save()
 	}
@@ -376,6 +406,7 @@ type codeDataOptions struct {
 	daily      bool
 	weakTopics bool
 	review     bool
+	path       bool
 }
 
 const codeDataDailyRounds = 5
@@ -383,17 +414,39 @@ const codeDataDailyRounds = 5
 // buildCodeDataOptions turns the raw CLI flags into codeDataOptions and
 // reports whether the user asked for Code/Data Master at all (any of
 // --mode code-data, --track, --daily, --weak-topics, --review).
-func buildCodeDataOptions(mode, track string, daily, weakTopics, review bool) (codeDataOptions, bool) {
-	requested := strings.EqualFold(strings.TrimSpace(mode), "code-data") || track != "" || daily || weakTopics || review
-	opts := codeDataOptions{daily: daily, weakTopics: weakTopics, review: review}
+func buildCodeDataOptions(mode, track string, daily, weakTopics, review, path bool) (codeDataOptions, bool) {
+	requested := strings.EqualFold(strings.TrimSpace(mode), "code-data") || track != "" || daily || weakTopics || review || path
+	opts := codeDataOptions{daily: daily, weakTopics: weakTopics, review: review, path: path}
 	if game.IsCodeDataTrack(track) {
 		opts.track = game.NormalizeTrack(track)
+	}
+	if opts.path && opts.track == "" {
+		opts.track = "go"
 	}
 	return opts, requested
 }
 
+func printCodeDataPath(track string) {
+	if track == "" {
+		track = "go"
+	}
+	path, ok := game.LearningPath(track)
+	if !ok {
+		fmt.Println("No learning path yet for", track)
+		fmt.Println("Available mission tracks:", strings.Join(game.CodeDataTracks, ", "))
+		return
+	}
+	fmt.Printf("\n[%s] %s\n", strings.ToUpper(path.Track), path.Title)
+	fmt.Println(path.Explanation)
+	for _, stage := range path.Stages {
+		fmt.Printf("\nL%d - %s\n", stage.Level, stage.Title)
+		fmt.Println("Concept:", stage.Concept)
+		fmt.Println("Practice:", stage.Practice)
+	}
+}
+
 // runCodeDataMaster mixes missions across Code/Data Master tracks (DSA, SQL,
-// stats, ML, data engineering, system design), modeled on runMasterMix:
+// stats, ML, data engineering, system design, Go), modeled on runMasterMix:
 // adaptive difficulty, dedup-aware random picks, periodic stats audits, and
 // global-command interception, with mission-type-aware presentation and
 // answer checking layered on top.

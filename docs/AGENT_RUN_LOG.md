@@ -1,5 +1,18 @@
 # Agent Run Log — Laura
 
+## 2026-07-15 00:57 — Follow-up note (mindwalk)
+
+- Kevin shared `https://github.com/cosmtrek/mindwalk` for the Laura repo as something to do next.
+- Initial read: Mindwalk is a local Go + React/Three.js viewer that maps Claude Code/Codex sessions over repository activity. It may be useful for inspecting Laura agent runs, especially file reads/edits/search paths around the hybrid React, Express, Node CLI, and Go Quest codebase.
+- Suggested next action: install and run `mindwalk` locally against the existing Codex sessions, then decide whether to document it in Laura's agent workflow or keep it as an external inspection tool.
+
+## 2026-07-15 01:03 — Mindwalk bridge code
+
+- Added `terminal-plugins/mindwalk.mjs`: a Laura terminal plugin that checks for the external `mindwalk` binary, starts `mindwalk serve` on a local port for Laura, exports `.mindwalk/laura-citymap.json`, traces sessions, opens a single session, or explicitly runs `mindwalk analyze`.
+- Added `internal/bridge/mindwalk.go` plus tests: the Go CLI can now emit a `laura-mindwalk-bridge-v1` JSON handoff with local-only viewing guidance, explicit analyze warnings, install command, and concrete Mindwalk CLI commands.
+- Added `--mindwalk-bridge` flags to `cmd/laura`: example `go run ./cmd/laura --mindwalk-bridge --mindwalk-command serve --mindwalk-repo /path/to/Laura`.
+- Kept Mindwalk external: Laura does not vendor or auto-install it; the plugin prints the install command if the binary is missing.
+
 ## 2026-06-08 14:30
 
 - Ran baseline inspection: `git status` (clean, branch `main`, remote `origin → github.com/Kvnbbg/Laura.git`).

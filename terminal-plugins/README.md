@@ -44,6 +44,17 @@ Run it from the chat with `/run example` (the file name without `.mjs`).
   `web/terminal`, `terminal/web`, `terminal/terminal`), and the catch →
   resolve → loop checklist. Run with `/run matrix-citizen`, `/run
   matrix-citizen add`, or `/run matrix-citizen goto add terminal/web`.
+- **`mindwalk`** — bridges Laura to the external
+  [Mindwalk](https://github.com/cosmtrek/mindwalk) CLI for local Codex/Claude
+  session visualization. It can check the binary, start `mindwalk serve` for
+  Laura on a local port, export a citymap, trace a specific session, open one
+  session, or explicitly run `analyze`. Run with `/run mindwalk`,
+  `/run mindwalk check`, `/run mindwalk build`, `/run mindwalk trace
+  <session.jsonl>`, `/run mindwalk open <session.jsonl>`, or `/run mindwalk
+  analyze <session.jsonl> codex`. Override the repo, port, binary, browser
+  behavior, or judge with `LAURA_MINDWALK_REPO`, `LAURA_MINDWALK_PORT`,
+  `LAURA_MINDWALK_BIN`, `LAURA_MINDWALK_OPEN=true`, and
+  `LAURA_MINDWALK_JUDGE`.
 
 The background MoltBots feed (the dimmed ticker shown automatically while
 chatting) also targets the `moltbook` network by default — override with

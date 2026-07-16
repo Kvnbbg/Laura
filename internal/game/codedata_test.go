@@ -25,6 +25,8 @@ func TestNormalizeTrackAliases(t *testing.T) {
 		"db":               "sql",
 		"design":           "system",
 		"data engineering": "de",
+		"golang":           "go",
+		"backend go":       "go",
 	}
 	for in, want := range cases {
 		if got := NormalizeTrack(in); got != want {
@@ -47,6 +49,29 @@ func TestFilterTrackRotatesAcrossTracks(t *testing.T) {
 			if q.Track != track {
 				t.Fatalf("FilterTrack(%s) returned quest from track %s", track, q.Track)
 			}
+		}
+	}
+}
+
+func TestGoTrackHasEngineeringConceptMissions(t *testing.T) {
+	engine := NewEngine()
+	pool := engine.FilterTrack("golang")
+	if len(pool) < 6 {
+		t.Fatalf("expected at least 6 Go missions, got %d", len(pool))
+	}
+	levels := map[int]bool{}
+	for _, q := range pool {
+		if q.Track != "go" || q.World != "go" {
+			t.Fatalf("expected Go mission to carry go track/world, got track=%q world=%q", q.Track, q.World)
+		}
+		if q.Explanation == "" {
+			t.Fatalf("expected Go mission %s to explain the engineering concept", q.ID)
+		}
+		levels[q.Level] = true
+	}
+	for _, level := range []int{1, 2, 3} {
+		if !levels[level] {
+			t.Fatalf("expected Go missions to include level %d, got levels %v", level, levels)
 		}
 	}
 }
@@ -107,7 +132,7 @@ func TestRandomTrackQuestAvoidUnknownTrack(t *testing.T) {
 }
 
 func TestWeakTopicsRanksAscending(t *testing.T) {
-	mastery := map[string]int{"dsa": 5, "sql": 0, "stats": 2, "ml": 5, "de": 1, "system": 3}
+	mastery := map[string]int{"dsa": 5, "sql": 0, "stats": 2, "ml": 5, "de": 1, "system": 3, "go": 4}
 	ranked := WeakTopics(mastery)
 	if len(ranked) != len(CodeDataTracks) {
 		t.Fatalf("expected %d tracks, got %d", len(CodeDataTracks), len(ranked))
@@ -118,6 +143,27 @@ func TestWeakTopicsRanksAscending(t *testing.T) {
 	for i := 1; i < len(ranked); i++ {
 		if mastery[ranked[i-1]] > mastery[ranked[i]] {
 			t.Fatalf("expected ascending mastery order, got %v", ranked)
+		}
+	}
+}
+
+func TestGoLearningPathExplainsEngineeringConcepts(t *testing.T) {
+	path, ok := LearningPath("golang")
+	if !ok {
+		t.Fatal("expected Go learning path")
+	}
+	if path.Track != "go" {
+		t.Fatalf("expected go path, got %q", path.Track)
+	}
+	if path.Explanation == "" {
+		t.Fatal("expected learning path explanation")
+	}
+	if len(path.Stages) < 6 {
+		t.Fatalf("expected at least 6 Go path stages, got %d", len(path.Stages))
+	}
+	for _, stage := range path.Stages {
+		if stage.Concept == "" || stage.Practice == "" {
+			t.Fatalf("expected stage %q to include concept and practice", stage.Title)
 		}
 	}
 }
