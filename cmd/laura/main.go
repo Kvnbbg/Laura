@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -52,7 +53,12 @@ func main() {
 		mindwalkSess   = flag.String("mindwalk-session", "", "Session JSONL path for mindwalk open|trace|analyze")
 		mindwalkPort   = flag.Int("mindwalk-port", 8766, "Local Mindwalk serve port")
 		mindwalkJudge  = flag.String("mindwalk-judge", "codex", "Mindwalk analyze judge: codex|claude")
-		mindwalkNoOpen = flag.Bool("mindwalk-no-open", true, "Pass --no-open to mindwalk serve/open")
+		mindwalkNoOpen       = flag.Bool("mindwalk-no-open", true, "Pass --no-open to mindwalk serve/open")
+		techandstreamSend    = flag.Bool("techandstream-send", false, "Build bridge payload and POST it to Techandstream")
+		techandstreamFetch   = flag.Bool("techandstream-fetch-articles", false, "Fetch the public Techandstream article registry")
+		techandstreamAPIKey  = flag.String("techandstream-api-key", "", "API key for Techandstream write endpoint (also TECHANDSTREAM_API_KEY)")
+		techandstreamBaseURL = flag.String("techandstream-base-url", "", "Techandstream base URL (also TECHANDSTREAM_BASE_URL)")
+		techandstreamTimeout = flag.Duration("techandstream-timeout", 15*time.Second, "HTTP timeout for Techandstream calls")
 	)
 	flag.Parse()
 	_ = noColor
@@ -103,6 +109,54 @@ func main() {
 			fmt.Fprintf(os.Stderr, "mindwalk bridge encode failed: %v\n", err)
 			os.Exit(1)
 		}
+		return
+	}
+	if *techandstreamFetch {
+		client, err := bridge.NewClient(bridge.ClientOptions{
+			BaseURL: *techandstreamBaseURL,
+			Timeout: *techandstreamTimeout,
+		})
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "techandstream client failed: %v\n", err)
+			os.Exit(1)
+		}
+		articles, err := client.FetchArticles(context.Background())
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "fetch articles failed: %v\n", err)
+			os.Exit(1)
+		}
+		encoder := json.NewEncoder(os.Stdout)
+		encoder.SetEscapeHTML(false)
+		encoder.SetIndent("", "  ")
+		if err := encoder.Encode(articles); err != nil {
+			fmt.Fprintf(os.Stderr, "encode articles failed: %v\n", err)
+			os.Exit(1)
+		}
+		return
+	}
+	if *techandstreamSend {
+		client, err := bridge.NewClient(bridge.ClientOptions{
+			BaseURL: *techandstreamBaseURL,
+			APIKey:  strings.TrimSpace(*techandstreamAPIKey),
+			Timeout: *techandstreamTimeout,
+		})
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "techandstream client failed: %v\n", err)
+			os.Exit(1)
+		}
+		payload := bridge.Build(bridge.Options{
+			Command:  *bridgeCommand,
+			Source:   *bridgeSource,
+			Target:   *bridgeTarget,
+			UserID:   *bridgeUser,
+			BotName:  *bridgeBot,
+			RepoPath: strings.TrimSpace(*bridgeRepo),
+		})
+		if err := client.SendMatrixProgress(context.Background(), payload); err != nil {
+			fmt.Fprintf(os.Stderr, "send matrix progress failed: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Println("Matrix progress sent to Techandstream for public-safe manual review.")
 		return
 	}
 

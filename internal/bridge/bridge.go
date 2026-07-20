@@ -36,6 +36,9 @@ var (
 		"public Moltbook page text",
 		"deterministic MatrixCitizen progress",
 		"reviewed MatrixCitizen preview metadata",
+		"curated external source summaries",
+		"reviewed social activity plans",
+		"durable workflow run summaries",
 	}
 
 	blockedPayload = []string{
@@ -124,6 +127,9 @@ type Payload struct {
 	Security            SecurityEnvelope `json:"security"`
 	OpenClaw            OpenClawHandoff  `json:"openclaw"`
 	Context             Context          `json:"context"`
+	BlogPostings        []BlogPosting    `json:"blogPostings"`
+	SocialPlan          SocialPlan       `json:"socialPlan"`
+	WorkflowRun         WorkflowRun      `json:"workflowRun"`
 	Messages            []Message        `json:"messages"`
 }
 
@@ -184,6 +190,9 @@ type Context struct {
 	MatrixProgress     ProgressSync     `json:"matrixProgress"`
 	MatrixActions      []ActionItem     `json:"matrixActions"`
 	MatrixRelayDrafts  []RelayDraft     `json:"matrixRelayDrafts"`
+	BlogPostings       []BlogPosting    `json:"blogPostings"`
+	SocialPlan         SocialPlan       `json:"socialPlan"`
+	WorkflowRun        WorkflowRun      `json:"workflowRun"`
 	OpenClaw           OpenClawHandoff  `json:"openclaw"`
 	Tags               []string         `json:"tags"`
 }
@@ -303,6 +312,9 @@ func Build(options Options) Payload {
 	progress := buildProgress(userID, citizenID, now)
 	actions := buildActionDeck(progress, channelPair)
 	relayDrafts := buildRelayDrafts(progress, botName)
+	blogPostings := BuildBlogPostings()
+	socialPlan := BuildSocialPlan()
+	workflowRun := BuildWorkflowRun()
 	route := BuildTechandstreamRoute(command, username, channelPair)
 	security := SecurityEnvelope{
 		SourceRepository:    SourceRepository,
@@ -339,6 +351,9 @@ func Build(options Options) Payload {
 		MatrixProgress:     progress.Sync,
 		MatrixActions:      actions,
 		MatrixRelayDrafts:  relayDrafts,
+		BlogPostings:       blogPostings,
+		SocialPlan:         socialPlan,
+		WorkflowRun:        workflowRun,
 		OpenClaw:           openclaw,
 		Tags:               []string{"Laura", "Go", "OpenClaw", "MatrixCitizen", "Techandstream"},
 	}
@@ -398,9 +413,12 @@ func Build(options Options) Payload {
 				"relayDrafts",
 			},
 		},
-		Security: security,
-		OpenClaw: openclaw,
-		Context:  context,
+		Security:     security,
+		OpenClaw:     openclaw,
+		Context:      context,
+		BlogPostings: blogPostings,
+		SocialPlan:   socialPlan,
+		WorkflowRun:  workflowRun,
 		Messages: []Message{
 			{
 				Role:    "user",

@@ -49,5 +49,11 @@ describe('Laura MoltBot Matrix bridge', () => {
     expect(plan.actionDeck.map((action) => action.command)).toEqual(['auto', 'add', 'goto add']);
     expect(plan.relayDrafts.some((draft) => draft.body.includes('no secrets'))).toBe(true);
     expect(plan.devFeed.map((signal) => signal.speaker)).toContain('Codex');
+    expect(plan.blogPostings.map((post) => post.id)).toEqual(['kill-ai-slop', 'data-landscape-guide-for-developers']);
+    expect(plan.blogPostings[0].moltBotPrompt).toContain('Kill AI Slop');
+    expect(plan.socialPlan.networks).toEqual(['moltbook', 'techandstream']);
+    expect(plan.socialPlan.steps.every((step) => step.writeMode === 'manual-publish-only')).toBe(true);
+    expect(plan.workflowRun.platform).toBe('Workflows');
+    expect(plan.workflowRun.steps.map((step) => step.id)).toContain('human-review');
   });
 });

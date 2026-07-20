@@ -9,6 +9,9 @@ import {
   type MatrixProgressState,
   type MatrixRelayDraft,
 } from './matrixProgress';
+import { buildFrenchDevBlogPostingQueue, type FrenchDevBlogPosting } from './frenchDevBlogSeeds';
+import { buildFrenchDevSocialPlan, type FrenchDevSocialPlan } from './frenchDevSocialActivity';
+import { buildFrenchDevWorkflowRun, type FrenchDevWorkflowRun } from './frenchDevWorkflows';
 
 export const MOLT_BOT_BRIDGE_COMMANDS = ['auto', 'add', 'goto add'] as const;
 export type MoltBotBridgeCommand = (typeof MOLT_BOT_BRIDGE_COMMANDS)[number];
@@ -83,6 +86,9 @@ export interface LauraMoltBotBridgePlan {
   actionDeck: MatrixBridgeActionItem[];
   relayDrafts: MatrixRelayDraft[];
   devFeed: MatrixDevSignal[];
+  blogPostings: FrenchDevBlogPosting[];
+  socialPlan: FrenchDevSocialPlan;
+  workflowRun: FrenchDevWorkflowRun;
 }
 
 export const LAURA_BRIDGE_SECURITY: LauraBridgeSecurityEnvelope = {
@@ -98,6 +104,9 @@ export const LAURA_BRIDGE_SECURITY: LauraBridgeSecurityEnvelope = {
     'public Moltbook page text',
     'deterministic MatrixCitizen progress',
     'reviewed MatrixCitizen preview metadata',
+    'curated external source summaries',
+    'reviewed social activity plans',
+    'durable workflow run summaries',
   ],
   blockedPayload: [
     '.env files',
@@ -293,5 +302,8 @@ export function resolveLauraMoltBotBridge(input: LauraMoltBotInput): LauraMoltBo
     actionDeck,
     relayDrafts: buildMatrixRelayDrafts(progress, citizen.displayName),
     devFeed: buildDevNovlangueFeed(progress, citizen.displayName),
+    blogPostings: buildFrenchDevBlogPostingQueue(),
+    socialPlan: buildFrenchDevSocialPlan(),
+    workflowRun: buildFrenchDevWorkflowRun(),
   };
 }

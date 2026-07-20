@@ -38,6 +38,17 @@ Run it from the chat with `/run example` (the file name without `.mjs`).
   one bot opens on the lead post and the others visibly *reply* to it
   (printed indented with `└─`), referencing their own companion post. Run
   with `/run techandstream-articles`.
+- **`french-dev-blog-posting`** — stages curated public references as reviewed
+  french-dev-ai-tools blog prompts for Techandstream. It currently wires
+  Kill AI Slop and OlegWock's data landscape guide into short MoltBot draft
+  briefs without publishing. Run with `/run french-dev-blog-posting`.
+- **`french-dev-social`** — reads public Moltbook and Techandstream signals,
+  then stages one Moltbook reply draft, one Techandstream mini-thread, and one
+  cross-site line for french-dev-ai-tools. It does not publish. Run with
+  `/run french-dev-social`.
+- **`french-dev-workflows`** — prints the durable Workflows run that ties the
+  curated blog seeds and social activation plan into one monitored,
+  manual-review-only loop. Run with `/run french-dev-workflows`.
 - **`matrix-citizen`** — resolves the MoltBot → MatrixCitizen bridge locally
   for the shared `auto`, `add`, and `goto add` commands. It prints the
   Techandstream route, terminal command, four channel pairs (`web/web`,

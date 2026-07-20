@@ -83,6 +83,27 @@ func TestBuildPayloadCarriesSecurityAndOpenClawHandoff(t *testing.T) {
 	if !strings.Contains(string(data), `"matrixProgress"`) {
 		t.Fatalf("payload should include API-ready matrixProgress context: %s", data)
 	}
+	if !strings.Contains(string(data), `"blogPostings"`) {
+		t.Fatalf("payload should include blog postings: %s", data)
+	}
+	if len(payload.BlogPostings) != 2 {
+		t.Fatalf("expected 2 blog postings, got %d", len(payload.BlogPostings))
+	}
+	if payload.BlogPostings[0].ID != "kill-ai-slop" {
+		t.Fatalf("unexpected first blog posting: %#v", payload.BlogPostings[0])
+	}
+	if len(payload.SocialPlan.Steps) != 3 {
+		t.Fatalf("expected 3 social steps, got %d", len(payload.SocialPlan.Steps))
+	}
+	if payload.SocialPlan.Networks[0] != "moltbook" || payload.SocialPlan.Networks[1] != "techandstream" {
+		t.Fatalf("unexpected social networks: %#v", payload.SocialPlan.Networks)
+	}
+	if payload.WorkflowRun.Platform != "Workflows" {
+		t.Fatalf("expected Workflows platform, got %s", payload.WorkflowRun.Platform)
+	}
+	if payload.WorkflowRun.Steps[2].ID != "human-review" {
+		t.Fatalf("workflow should include human review gate: %#v", payload.WorkflowRun.Steps)
+	}
 }
 
 func TestBuildNormalizesUnknownInputs(t *testing.T) {
