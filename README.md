@@ -44,7 +44,7 @@ npm install
 For the CLI-first experience, use the dedicated install section below:
 
 - [Install Laura CLI](#install-laura-cli)
-- Live web guide: https://laura-mpqxyyiau-kvnbbgs-projects.vercel.app/install-cli
+- Live web guide: https://techandstream.com/install-cli
 - Local web guide: `/install-cli` in the Laura app
 
 ## Running Locally
