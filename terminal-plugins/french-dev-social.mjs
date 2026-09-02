@@ -7,11 +7,14 @@ const REGISTRY_URL =
   process.env.TECHANDSTREAM_REGISTRY_URL || 'https://techandstream.com/article-registry.json';
 const MAX_TEXT_CHARS = 2400;
 
-function stripToText(html) {
+export function stripToText(html) {
   return html
-    .replace(/<!--[\s\S]*?-->/g, ' ')
-    .replace(/<script\b[\s\S]*?<\/script\s*>/gi, ' ')
-    .replace(/<style\b[\s\S]*?<\/style\s*>/gi, ' ')
+    // One alternation, scanned left to right, so whichever construct opens
+    // first wins. Stripping in separate passes is order-dependent and unsafe
+    // either way: comments-first lets a stray `<!--` inside a script body run
+    // past `</script>` and leak raw JS into the prompt, while scripts-first
+    // lets a commented-out `<script>` swallow the visible text after it.
+    .replace(/<!--[\s\S]*?-->|<script\b[\s\S]*?<\/script\s*>|<style\b[\s\S]*?<\/style\s*>/gi, ' ')
     .replace(/<[^>]+>/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
