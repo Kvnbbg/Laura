@@ -9,4 +9,4 @@ describe('Web3 merge desk', () => {
     expect(screen.getByText(/laura orchestrates/i)).toBeInTheDocument();
     expect(screen.getByText(/custody/i)).toBeInTheDocument();
   });
-};
+});
