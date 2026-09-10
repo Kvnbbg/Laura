@@ -2,10 +2,10 @@
 
 ## Original Author And Maintainer
 
-- Kevin Marville / Techandstream
+- Kevin Marville / Techandstream (@techandstream)
   - Project: Laura
   - Source: https://github.com/Kvnbbg/Laura
-  - Public ecosystem target: https://techandstream.com
+  - Public sites: https://techandstream.com · https://kvnbbg.fr · https://kvnbbg-creations.io
 
 ## Contributors
 

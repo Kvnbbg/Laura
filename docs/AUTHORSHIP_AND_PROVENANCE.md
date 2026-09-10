@@ -5,11 +5,24 @@ modify, and redistribute the code when they follow the license. It does not
 mean they can strip attribution, remove the NOTICE file from redistributions,
 or present modified work as an official Kevin Marville / Techandstream release.
 
+## Copyright marks
+
+- Author: Kevin Marville
+- Brand: @techandstream
+- Sites: https://techandstream.com · https://kvnbbg.fr · https://kvnbbg-creations.io
+- Watermark file: `WATERMARK.md`
+- Legal notice: `NOTICE`
+
+Short watermark:
+
+`© Kevin Marville · @techandstream · techandstream.com · kvnbbg.fr · kvnbbg-creations.io`
+
 ## Provenance Signals
 
 - `LICENSE` is Apache-2.0.
 - `NOTICE` identifies the original Laura work and must be retained in covered
   redistributions.
+- `WATERMARK.md` is the public attribution string for UI, CLI, and media.
 - `AUTHORS.md` names the original author and maintainer.
 - `CITATION.cff` gives tools and researchers a structured citation.
 - `.github/CODEOWNERS` keeps repository review ownership explicit.
