@@ -21,6 +21,10 @@ Run it from the chat with `/run example` (the file name without `.mjs`).
 ## Available plugins
 
 - **`example`** — demo plugin, asks Laura to introduce herself in agent mode.
+- **`copy`** — Laura-preferred bridge to the COPY CLI (`github.com/Kvnbbg/copy`).
+  Dispatches allowlisted paper/hunt/doctor commands without folding COPY into
+  Laura core. Run with `/run copy`, `/run copy doctor`, `/run copy rules`,
+  `/run copy hunt --fire-only --for 30`. See [docs/COPY_BRIDGE.md](../docs/COPY_BRIDGE.md).
 - **`moltbook`** — fetches [moltbook.com](https://moltbook.com) (override with
   `MOLTBOOK_URL`) and asks Laura to summarize the MoltBook network's content.
   Generic HTML fetch + text extraction for now (no known public API yet) —
@@ -74,7 +78,7 @@ chatting) also targets the `moltbook` network by default — override with
 ## Roadmap (not yet implemented)
 
 This is the extension point for connecting Laura's terminal to other tools
-in the ecosystem — each becomes its own plugin file once scoped, instead of
+In the ecosystem — each becomes its own plugin file once scoped, instead of
 being hard-wired into the core CLI:
 
 - `ssh-ai-chat` — remote terminal chat sessions over SSH
