@@ -37,36 +37,36 @@ type CopySecurity struct {
 }
 
 type CopyContext struct {
-	Activity        string         `json:"activity"`
-	Repository      string         `json:"repository"`
-	Tool            string         `json:"tool"`
-	Contract        string         `json:"contract"`
+	Activity        string          `json:"activity"`
+	Repository      string          `json:"repository"`
+	Tool            string          `json:"tool"`
+	Contract        string          `json:"contract"`
 	OpenClaw        OpenClawHandoff `json:"openclaw"`
-	Security        CopySecurity   `json:"security"`
-	RecommendedNext []string       `json:"recommendedNext"`
-	Tags            []string       `json:"tags"`
+	Security        CopySecurity    `json:"security"`
+	RecommendedNext []string        `json:"recommendedNext"`
+	Tags            []string        `json:"tags"`
 }
 
 type CopyPayload struct {
-	SchemaVersion       string        `json:"schemaVersion"`
-	Name                string        `json:"name"`
-	Contract            string        `json:"contract"`
-	Tool                string        `json:"tool"`
-	ToolRepositoryURL   string        `json:"toolRepositoryUrl"`
-	SourceRepository    string        `json:"sourceRepository"`
-	SourceRepositoryURL string        `json:"sourceRepositoryUrl"`
-	Command             string        `json:"command"`
-	Args                []string      `json:"args,omitempty"`
-	BinPath             string        `json:"binPath,omitempty"`
-	RepoPath            string        `json:"repoPath,omitempty"`
-	InstallCommand      string        `json:"installCommand"`
-	CLICommands         []string      `json:"cliCommands"`
-	PluginCommand       string        `json:"pluginCommand"`
-	Security            CopySecurity  `json:"security"`
+	SchemaVersion       string          `json:"schemaVersion"`
+	Name                string          `json:"name"`
+	Contract            string          `json:"contract"`
+	Tool                string          `json:"tool"`
+	ToolRepositoryURL   string          `json:"toolRepositoryUrl"`
+	SourceRepository    string          `json:"sourceRepository"`
+	SourceRepositoryURL string          `json:"sourceRepositoryUrl"`
+	Command             string          `json:"command"`
+	Args                []string        `json:"args,omitempty"`
+	BinPath             string          `json:"binPath,omitempty"`
+	RepoPath            string          `json:"repoPath,omitempty"`
+	InstallCommand      string          `json:"installCommand"`
+	CLICommands         []string        `json:"cliCommands"`
+	PluginCommand       string          `json:"pluginCommand"`
+	Security            CopySecurity    `json:"security"`
 	OpenClaw            OpenClawHandoff `json:"openclaw"`
-	Context             CopyContext   `json:"context"`
-	Messages            []Message     `json:"messages"`
-	GeneratedAt         string        `json:"generatedAt"`
+	Context             CopyContext     `json:"context"`
+	Messages            []Message       `json:"messages"`
+	GeneratedAt         string          `json:"generatedAt"`
 }
 
 func BuildCopy(options CopyOptions) CopyPayload {
@@ -91,7 +91,7 @@ func BuildCopy(options CopyOptions) CopyPayload {
 			"public market symbols",
 		},
 		BlockedPayload: []string{
-			live wallet connect",
+			"live wallet connect",
 			"signing keys",
 			"unallowlisted subcommands",
 			"automatic installation",
@@ -173,7 +173,7 @@ func sanitizeCopyArgs(args []string) []string {
 		if arg == "" {
 			continue
 		}
-		if strings.HasPrefix(arg, "-") || !strings.ContainsAny(arg, " 	\n;&|`$()") {
+		if strings.HasPrefix(arg, "-") || !strings.ContainsAny(arg, " \t\n;&|`$()") {
 			out = append(out, arg)
 		}
 	}
@@ -185,7 +185,7 @@ func buildCopyCommands(command string, args []string, bin, repo string) []string
 	if strings.TrimSpace(bin) != "" {
 		exe = shellQuote(bin)
 	} else if strings.TrimSpace(repo) != "" {
-		exe = "node " + shellQuote(strings.TrimRight(repo, "/") + "/bin/copy.mjs")
+		exe = "node " + shellQuote(strings.TrimRight(repo, "/")+"/bin/copy.mjs")
 	}
 	parts := append([]string{command}, args...)
 	return []string{fmt.Sprintf("%s %s", exe, strings.Join(parts, " "))}
