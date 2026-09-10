@@ -609,10 +609,34 @@ const Contact: React.FC = () => {
           )}
         </div>
 
-        {/* Footer Trust Signals */}
+        {/* Mentions de bas de page.
+            La version précédente annonçait « Protected by reCAPTCHA » alors que
+            reCAPTCHA n'est utilisé nulle part dans ce dépôt, et citait une
+            Privacy Policy et des Terms qui n'étaient ni liés ni existants. Un
+            signal de confiance inventé coûte plus qu'il ne rapporte : il suffit
+            qu'une personne vérifie pour que tout le reste devienne suspect.
+            Les deux liens mènent maintenant à des textes réels. */}
         <div className="mt-16 text-center">
           <p className="text-sm text-slate-500">
-            Protected by reCAPTCHA and subject to our Privacy Policy and Terms of Service.
+            Vos messages sont envoyés par votre propre client mail — nous ne les stockons pas.
+            {" "}
+            <a
+              href="https://techandstream.com/legal/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              Confidentialité
+            </a>
+            {" · "}
+            <a
+              href="https://techandstream.com/legal/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              Conditions
+            </a>
           </p>
         </div>
       </div>

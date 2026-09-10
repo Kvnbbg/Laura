@@ -1,4 +1,11 @@
-<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
+<!-- Ce document est issu d'une conversation avec Perplexity, recopiée telle
+     quelle. Le logo Perplexity qui l'ouvrait a été retiré : c'est une marque
+     déposée, pointée qui plus est sur leur CDN, et ce dépôt est distribué sous
+     Apache-2.0 — redistribuer la marque d'un tiers sous sa propre licence
+     permissive n'est pas une chose qu'on fait par inadvertance deux fois. -->
+
+> Origine : conversation Perplexity, reprise à titre de notes de travail.
+> Perplexity est une marque de Perplexity AI, Inc., citée ici sans affiliation.
 
 # exemples de templates github react, go, flutter, php, css, typescript, utilie a prend en pour nos projets entreprise et business rentable sustainable, and tech efficient modern, no bugs, scalable, friendly and professional, sign in, MERN Stack, GEO+SEO, full and extended and competittive: Les « templates » (ou boilerplates) sur GitHub sont d'excellents points de départ pour éviter de reconfigurer un projet de zéro. Ils incluent souvent les meilleures pratiques d'architecture, le linting, les tests et l'intégration continue.
 

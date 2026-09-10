@@ -1,4 +1,11 @@
-<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
+<!-- Ce document est issu d'une conversation avec Perplexity, recopiée telle
+     quelle. Le logo Perplexity qui l'ouvrait a été retiré : c'est une marque
+     déposée, pointée qui plus est sur leur CDN, et ce dépôt est distribué sous
+     Apache-2.0 — redistribuer la marque d'un tiers sous sa propre licence
+     permissive n'est pas une chose qu'on fait par inadvertance deux fois. -->
+
+> Origine : conversation Perplexity, reprise à titre de notes de travail.
+> Perplexity est une marque de Perplexity AI, Inc., citée ici sans affiliation.
 
 # jeu fun a faire sur son terminal
 
