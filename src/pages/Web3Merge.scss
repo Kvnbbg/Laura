@@ -1,0 +1,23 @@
+.web3-merge-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem 0 3rem;
+}
+
+.web3-merge-page .eyebrow {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  opacity: 0.72;
+}
+
+.web3-merge-page .planes {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.web3-merge-page code {
+  font-size: 0.9em;
+}
