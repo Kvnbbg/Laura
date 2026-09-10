@@ -14,6 +14,7 @@ const Navigation = () => {
     { to: '/dashboard', label: 'Dashboard' },
     { to: '/growth', label: 'Growth Lab' },
     { to: '/eco-hub', label: 'Eco Hub' },
+    { to: '/web3', label: 'Web3' },
     { to: '/install-cli', label: 'CLI Install' },
     { to: '/open-source', label: 'Open Source' },
     { to: '/matrix-citizen', label: 'Matrix' },
