@@ -566,7 +566,7 @@ const Contact: React.FC = () => {
                   <h3 className="mb-4 text-lg font-semibold text-white">Direct Contact</h3>
                   <div className="space-y-4">
                     <a 
-                      href="mailto:hello@laura-cosmic.com" 
+                      href="mailto:contact@techandstream.com" 
                       className="group flex items-center gap-4 rounded-lg p-3 transition-colors hover:bg-slate-800"
                     >
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10 text-purple-400">
@@ -574,7 +574,7 @@ const Contact: React.FC = () => {
                       </div>
                       <div>
                         <p className="font-medium text-slate-200 group-hover:text-white">Email Us</p>
-                        <p className="text-sm text-slate-400">hello@laura-cosmic.com</p>
+                        <p className="text-sm text-slate-400">contact@techandstream.com</p>
                       </div>
                     </a>
 

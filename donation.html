@@ -429,6 +429,20 @@ color: #777;
 <input class="modal-input" type="number" id="challengeInput" placeholder="?" inputmode="numeric" autocomplete="off" min="0" max="99"/>
 <div class="modal-error" id="modalError"></div>
 
+<!-- Mention légale, placée AVANT le bouton et non en pied de page.
+     Une personne qui donne doit savoir à qui, et comment nous joindre, au
+     moment où elle décide — pas après avoir payé. Le lien ouvrait Stripe
+     directement, sans que rien n'identifie l'encaisseur. -->
+<p class="modal-legal" style="font-size:12px;line-height:1.5;opacity:.75;margin:10px 0 14px;text-align:left;">
+  Don collecté par <strong>Kevin Marville</strong> (Tech &amp; Stream), traité par Stripe.
+  Nous ne voyons ni ne conservons aucun numéro de carte.
+  Une question ou une demande de remboursement&nbsp;?
+  <a href="mailto:contact@techandstream.com" style="color:inherit;">contact@techandstream.com</a> —
+  réponse sous 1 à 2 jours ouvrés.
+  <a href="https://techandstream.com/legal/terms" target="_blank" rel="noopener noreferrer" style="color:inherit;">Conditions</a> ·
+  <a href="https://techandstream.com/legal/privacy" target="_blank" rel="noopener noreferrer" style="color:inherit;">Confidentialité</a>
+</p>
+
 <div class="modal-btns" id="actionBtns" style="display:none;">
   <button class="btn-donate" id="btnDonate">💛 Faire un don</button>
   <button class="btn-site"   id="btnSite">🌐 Visiter le site</button>

@@ -4,5 +4,32 @@
       "source": "/(.*)",
       "destination": "/index.html"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/privacy-policy",
+      "destination": "https://techandstream.com/legal/privacy",
+      "permanent": false
+    },
+    {
+      "source": "/privacy",
+      "destination": "https://techandstream.com/legal/privacy",
+      "permanent": false
+    },
+    {
+      "source": "/terms-of-service",
+      "destination": "https://techandstream.com/legal/terms",
+      "permanent": false
+    },
+    {
+      "source": "/terms",
+      "destination": "https://techandstream.com/legal/terms",
+      "permanent": false
+    },
+    {
+      "source": "/support",
+      "destination": "https://techandstream.com/support",
+      "permanent": false
+    }
   ]
 }
