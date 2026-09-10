@@ -1,0 +1,8 @@
+# Côte Amalfitaine — bon plan éco depuis la France
+
+**Stream TechAndStream:** advises / tips / forums  
+**Date:** 2026-09-10
+
+La côte amalfitaine, perle de l’Italie, séduit par ses villages colorés perchés sur des falaises abruptes, ses eaux turquoise et ses citronniers odorants. Maiori, point de départ économique, offre une plage abordable et un accès facile à Amalfi, Capri ou Sorrente. Pour un voyage éco depuis la France, prenez un vol low-cost vers Naples (Ryanair/easyJet, 50-150 € A/R depuis Paris/Lyon, bagage cabine). De l’aéroport, l’Alibus (5 €) rejoint Napoli Centrale, puis la Circumvesuviana (4 €) ou un ferry (15-20 €) mène à Maiori/Sorrente. Sur place, privilégiez ferries (Alicost, 12-25 €) et bus SITA (2-5 €) pour relier Amalfi, Ravello, Positano ou Capri, évitant voiture et pollution. Budget 5-7 jours (hors logement) : 300-500 €. Hébergements à Maiori (B&B dès 50 €) sont moins chers qu’à Positano. Septembre est idéal pour moins de foule.
+
+Amalfi, cœur vibrant, est la base parfaite pour randonner sur les sentiers CAI 300, offrant des vues époustouflantes sur Capri et le golfe. Le Sentier des Dieux (7 km, 3h, modéré) vers Positano, depuis Agerola (bus 2 €), dévoile falaises et mer scintillante ; Amalfi-Maiori (10 km, 3-4h) via Minori traverse vignes et sanctuaires ; Amalfi-Ravello (6 km, 2h) grimpe vers des villas historiques. Gratuits et balisés, ces chemins demandent eau et bonnes chaussures. À Capri (ferry 25 € A/R), marchez vers Anacapri (bus local 2 €) ; à Sorrente, flânez dans les limoneraies. Astuces éco : utilisez l’app AllTrails, buvez aux fontaines, soutenez les locaux avec un limoncello bio (5 €). Ce plan allie nature, culture et budget maîtrisé.
