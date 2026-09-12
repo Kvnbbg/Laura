@@ -1,6 +1,5 @@
 /**
- * Pilot kit for sibling agent tooling (install hints + status only).
- * Repos: tigerless cost-xray / paper-radar / seo-ops, Anakin CLI, AO.
+ * Ecosystem pilots: tigerless, anakin, AO + pointer to /run agents for autonomes.
  */
 import { spawnSync } from 'node:child_process';
 
@@ -38,7 +37,20 @@ const TOOLS = {
     repo: 'https://github.com/Untrivial-ai/agent-orchestrator',
     bin: 'ao',
     install:
-      'Download desktop app from https://github.com/Untrivial-ai/agent-orchestrator/releases — Laura does not auto-install GUI apps.',
+      'Download desktop app from https://github.com/Untrivial-ai/agent-orchestrator/releases',
+  },
+  hermes: {
+    repo: 'https://github.com/NousResearch/hermes-agent',
+    bin: 'hermes',
+    install:
+      '# review: https://hermes-agent.nousresearch.com/\n# curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash',
+    statusArgs: ['status'],
+  },
+  openclaw: {
+    repo: 'https://github.com/openclaw/openclaw',
+    bin: 'openclaw',
+    install: 'npx openclaw@latest',
+    statusArgs: ['doctor'],
   },
 };
 
@@ -49,27 +61,26 @@ function which(cmd) {
 
 export default {
   name: 'ecosystem',
-  description: 'Status + install hints for agent-memory, cost-xray, paper-radar, seo-ops, anakin-cli, AO.',
+  description: 'Status + install hints: memory, cost-xray, anakin, hermes, openclaw, AO…',
   async run({ args = [], print }) {
     const name = (args[0] || 'list').toLowerCase();
     if (name === 'list' || name === 'help') {
-      print('Ecosystem pilots (Laura suggests; you run installs):');
+      print('Ecosystem + agents (voir aussi /run agents list):');
       for (const [k, v] of Object.entries(TOOLS)) {
         print(`• ${k} — ${which(v.bin) ? 'bin OK' : 'missing'} — ${v.repo}`);
       }
-      print('Usage: /run ecosystem <name> [status|install-hint]');
+      print('Autonomous map: /run agents list');
       return;
     }
     const tool = TOOLS[name];
     if (!tool) {
-      print(`Unknown tool ${name}. /run ecosystem list`);
+      print(`Unknown ${name}. /run ecosystem list  |  /run agents list`);
       return;
     }
     const action = (args[1] || 'status').toLowerCase();
     print(`${name}: ${tool.repo}`);
     print(`binary: ${tool.bin} → ${which(tool.bin) ? 'present' : 'not on PATH'}`);
     if (action === 'install' || action === 'install-hint') {
-      print('Install (review before running):');
       print(tool.install);
       return;
     }
@@ -78,8 +89,6 @@ export default {
       print((r.stdout || r.stderr || '').trim() || '(no status output)');
     } else if (!which(tool.bin)) {
       print(`Try: /run ecosystem ${name} install-hint`);
-    } else {
-      print('No status subcommand; binary is on PATH.');
     }
   },
 };
