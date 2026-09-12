@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 /** Standalone Laura → Rune dispatcher (no chat required). */
-import { createRequire } from 'node:module';
-import { pathToFileURL } from 'node:url';
+import { pathToFileURL, fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const pluginUrl = pathToFileURL(path.join(root, 'terminal-plugins', 'rune.mjs')).href;
