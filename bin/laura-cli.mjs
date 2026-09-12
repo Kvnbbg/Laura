@@ -27,14 +27,14 @@ const magenta = (text) => `\x1b[35m${text}\x1b[0m`;
 const history = [
   {
     role: 'system',
-    content: 'You are chatting with Laura through her terminal interface.',
+    content:
+      'You are Laura, terminal-first companion. Your Grimoire lists tools: rune (IDE), copy (paper desk), rustfx (Rust web3), mindwalk, grimoire. ' +
+      'When the user says to launch Rune, point them to /grimoire lancer rune or /run rune run and explain why (GPU keyboard IDE, stay out of the browser). ' +
+      'You prefer Mistral or a capable local Ollama model (qwen2.5:3b, phi3:mini, llama3.2:3b). qwen:1.5b is allowed if LAURA_LOCAL_MODEL is set but is too small for multi-step agent work—say so honestly. ' +
+      'Propose install commands (apt, ollama pull, git clone, make) but never claim you executed them; the operator copies and runs. Stay focused in the terminal.',
   },
 ];
 
-// Repeatable, non-conversational calls (feed ticks, plugin look-ups) get a
-// short-lived cache so re-running the same query doesn't re-pay the full
-// round trip. Personal `chat` turns are never cached — they depend on
-// history and must always be fresh.
 const responseCache = new Map();
 
 const cacheKey = (content, mode, context) => `${mode}::${content}::${JSON.stringify(context)}`;
@@ -84,9 +84,6 @@ async function callBridge(content, { mode = 'chat', context = {} } = {}) {
   return json;
 }
 
-// Streams the assistant's reply token-by-token via /api/chat/stream
-// (skips the RAG lookup server-side for speed). Returns the final
-// accumulated text, or throws so the caller can fall back to callBridge.
 async function streamChat(content, onToken) {
   const messages = [...history, { role: 'user', content }];
 
@@ -127,8 +124,7 @@ async function streamChat(content, onToken) {
           onToken(delta);
         }
       } catch {
-        // Ignore malformed/partial SSE chunks — the stream self-corrects
-        // on the next complete `data:` line.
+        // ignore partial SSE
       }
     }
   }
@@ -151,15 +147,14 @@ function startBackgroundFeed(rl) {
 
   const tick = async () => {
     try {
-      const reply = await callBridge('Quoi de neuf sur le réseau MoltBook ?', {
+      const reply = await callBridge('Quoi de neuf sur le r\u00e9seau MoltBook ?', {
         mode: 'social',
         context: { network: FEED_NETWORK, botName: 'MoltBot', activity: 'mini-social activity' },
       });
       printNetworkThoughts(reply?.networkThoughts);
       rl.prompt(true);
     } catch {
-      // Background feed is best-effort; stay silent on failure so it
-      // never disrupts the foreground chat.
+      // best-effort
     }
   };
 
@@ -213,17 +208,13 @@ async function runPluginCommand(command, rl) {
   rl.prompt(true);
 }
 
-// Read-only research for an unfamiliar tool/package: checks the npm
-// registry and GitHub's public search API (both unauthenticated, no
-// installs), then asks Laura to propose the exact install command.
-// Laura only ever *suggests* — the user reviews and runs it themselves.
 async function suggestInstall(name, print) {
   if (!name) {
     print(dim('Usage: /install <package-or-tool-name>'));
     return;
   }
 
-  print(dim(`Looking up "${name}" (npm registry + GitHub, read-only)…`));
+  print(dim(`Looking up "${name}" (npm registry + GitHub, read-only)\u2026`));
   const findings = [];
 
   try {
@@ -234,26 +225,31 @@ async function suggestInstall(name, print) {
       const pkg = await npmRes.json();
       const latest = pkg?.['dist-tags']?.latest;
       const description = pkg?.description;
-      if (latest) findings.push(`npm package "${pkg?.name || name}"@${latest}${description ? ` — ${description}` : ''}`);
+      if (latest)
+        findings.push(
+          `npm package "${pkg?.name || name}"@${latest}${description ? ` \u2014 ${description}` : ''}`,
+        );
     }
   } catch {
-    // npm lookup is best-effort
+    // best-effort
   }
 
   try {
     const ghRes = await fetch(
       `https://api.github.com/search/repositories?q=${encodeURIComponent(name)}&per_page=1`,
-      { headers: { accept: 'application/vnd.github+json', 'user-agent': 'laura-terminal/1.0' } }
+      { headers: { accept: 'application/vnd.github+json', 'user-agent': 'laura-terminal/1.0' } },
     );
     if (ghRes.ok) {
       const data = await ghRes.json();
       const repo = data?.items?.[0];
       if (repo?.full_name) {
-        findings.push(`GitHub repo "${repo.full_name}"${repo.description ? ` — ${repo.description}` : ''} (${repo.html_url})`);
+        findings.push(
+          `GitHub repo "${repo.full_name}"${repo.description ? ` \u2014 ${repo.description}` : ''} (${repo.html_url})`,
+        );
       }
     }
   } catch {
-    // GitHub lookup is best-effort
+    // best-effort
   }
 
   const findingsText = findings.length
@@ -262,45 +258,53 @@ async function suggestInstall(name, print) {
 
   try {
     const reply = await callBridge(
-      `Un développeur cherche à installer ou utiliser "${name}" mais ne connaît pas la bonne commande. ` +
-        `Voici ce qu'une recherche en lecture seule a trouvé:\n${findingsText}\n\n` +
-        `Propose la commande d'installation EXACTE la plus probable (npm install, go install, pip install, brew install, apt, etc. selon le contexte), ` +
-        `en une ligne de code, et une phrase d'explication. Ne dis jamais d'exécuter quoi que ce soit automatiquement — ` +
-        `c'est l'utilisateur qui copiera-collera et lancera la commande lui-même.`,
-      { mode: 'agent', context: { activity: 'install suggestion', tags: ['code', 'tooling'] } }
+      `Un d\u00e9veloppeur cherche \u00e0 installer ou utiliser "${name}" mais ne conna\u00eet pas la bonne commande. ` +
+        `Voici ce qu'une recherche en lecture seule a trouv\u00e9:\n${findingsText}\n\n` +
+        `Propose la commande d'installation EXACTE la plus probable (npm install, go install, pip install, brew install, apt, ollama pull, etc.), ` +
+        `en une ligne de code, et une phrase d'explication. Ne dis jamais d'ex\u00e9cuter quoi que ce soit automatiquement.`,
+      { mode: 'agent', context: { activity: 'install suggestion', tags: ['code', 'tooling'] } },
     );
     print('');
-    print(magenta('laura ›') + ' ' + (reply?.message?.content || findingsText));
+    print(magenta('laura \u203a') + ' ' + (reply?.message?.content || findingsText));
   } catch {
     print(findingsText);
   }
-  print(dim('\n→ Review the command above before running it yourself. Laura never installs anything automatically.'));
+  print(
+    dim(
+      '\n\u2192 Review the command above before running it yourself. Laura never installs anything automatically.',
+    ),
+  );
 }
 
 function printHelp() {
   process.stdout.write(
     [
       '',
-      cyan('Laura terminal — commands:'),
+      cyan('Laura terminal \u2014 commands:'),
       '  /help            show this message',
+      '  /grimoire        open Laura\'s tool spellbook (Rune, LLM policy, improve)',
+      '  /grimoire rune   propose + launch Rune from the Grimoire',
+      '  /grimoire llm    why Mistral / Ollama / not qwen:1.5b by default',
+      '  /grimoire improve  suggest install commands (never auto-run)',
       '  /plugins         list available plugins (terminal-plugins/*.mjs)',
       '  /run <plugin>    run a plugin by file name (without .mjs)',
-      '  /install <name>  look up a package/tool and let Laura suggest the install command',
-      '                   (read-only research — Laura never downloads or runs anything herself)',
+      '  /install <name>  look up a package/tool; Laura suggests the install command',
       '  /quit            exit',
       `  Anything else is sent to Laura via ${API_URL}`,
       '',
-    ].join('\n')
+    ].join('\n'),
   );
 }
 
 async function main() {
-  process.stdout.write(`${magenta('Laura terminal — type /help for commands, /quit to exit.')}\n`);
+  process.stdout.write(
+    `${magenta('Laura terminal \u2014 type /help or /grimoire, /quit to exit.')}\n`,
+  );
 
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
-    prompt: cyan('you › '),
+    prompt: cyan('you \u203a '),
   });
 
   const feedTimer = startBackgroundFeed(rl);
@@ -318,12 +322,19 @@ async function main() {
       printHelp();
       return rl.prompt();
     }
+    if (input === '/grimoire' || input.startsWith('/grimoire ')) {
+      const rest = input === '/grimoire' ? '' : input.slice('/grimoire '.length).trim();
+      await runPluginCommand(rest ? `grimoire ${rest}` : 'grimoire', rl);
+      return;
+    }
     if (input === '/plugins') {
       const plugins = loadPlugins();
       if (plugins.length === 0) {
         process.stdout.write(`${dim('No plugins found in terminal-plugins/.')}\n`);
       } else {
-        process.stdout.write(`${dim(`Plugins: ${plugins.map((p) => p.file.replace(/\.mjs$/, '')).join(', ')}`)}\n`);
+        process.stdout.write(
+          `${dim(`Plugins: ${plugins.map((p) => p.file.replace(/\.mjs$/, '')).join(', ')}`)}\n`,
+        );
       }
       return rl.prompt();
     }
@@ -343,7 +354,7 @@ async function main() {
       try {
         const full = await streamChat(input, (token) => {
           if (!wrote) {
-            process.stdout.write(`${magenta('laura ›')} `);
+            process.stdout.write(`${magenta('laura \u203a')} `);
             wrote = true;
           }
           process.stdout.write(token);
@@ -353,8 +364,6 @@ async function main() {
         return rl.prompt();
       } catch {
         if (wrote) process.stdout.write('\n');
-        // Fall through to the non-streaming bridge call below — streaming
-        // is a speed optimization, not a hard requirement.
       }
     }
 
@@ -362,7 +371,7 @@ async function main() {
       const reply = await callBridge(input);
       const content = reply?.message?.content || '(no response)';
       history.push({ role: 'assistant', content });
-      process.stdout.write(`${magenta('laura ›')} ${content}\n`);
+      process.stdout.write(`${magenta('laura \u203a')} ${content}\n`);
     } catch (error) {
       process.stdout.write(`${dim(`Error talking to ${API_URL}: ${error.message}`)}\n`);
       process.stdout.write(`${dim('Is the proxy running? Try: npm run dev:server')}\n`);
