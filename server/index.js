@@ -1,1 +1,1 @@
-PLACEHOLDER
+import './laura-server.mjs';
