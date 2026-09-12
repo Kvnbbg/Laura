@@ -1,7 +1,5 @@
 /**
- * Laura API core: Ollama multi-model + optional Mistral stream.
- * Full historic RAG server lived in index.js; this module restores terminal chat
- * and multi-model switching after a bad overwrite. Merge carefully with main.
+ * Laura API core: Ollama multi-model + optional Mistral + local memory RAG.
  */
 import express from 'express';
 import cors from 'cors';
@@ -11,6 +9,7 @@ import {
   listOllamaTags,
   chatOllama,
 } from './ollama-models.mjs';
+import { buildRagContext } from './memory-rag.mjs';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 4000;
@@ -21,6 +20,7 @@ const HOST =
 
 const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY || '';
 const MISTRAL_MODEL = process.env.MISTRAL_MODEL || 'mistral-small';
+const RAG_ENABLED = process.env.LAURA_RAG !== '0';
 const ollamaConfig = getOllamaConfig();
 const OLLAMA_URL = ollamaConfig.url;
 const OLLAMA_MODEL = ollamaConfig.defaultModel;
@@ -30,13 +30,35 @@ app.use(cors({ origin: true }));
 app.use(express.json({ limit: '1mb' }));
 
 const systemPrompt =
-  'You are Laura, terminal-first. Propose commands; never claim you executed installs. Prefer capable local models over tiny 1.5b for multi-step work.';
+  'You are Laura, terminal-first. Use long-term memory snippets when provided. Propose commands; never claim you executed installs. Prefer capable local models over tiny 1.5b for multi-step work.';
+
+async function withRagSystem(messages) {
+  const lastUser = [...messages].reverse().find((m) => m?.role === 'user')?.content || '';
+  let sys = systemPrompt;
+  let ragMeta = null;
+  if (RAG_ENABLED && lastUser) {
+    try {
+      const { context, result } = await buildRagContext(lastUser, { limit: 5 });
+      if (context) {
+        sys = `${systemPrompt}\n\n${context}`;
+        ragMeta = { mode: result.mode, hits: result.hits.length, store: result.store };
+      }
+    } catch {
+      /* memory optional */
+    }
+  }
+  return {
+    messages: [{ role: 'system', content: sys }, ...messages.filter((m) => m.role !== 'system')],
+    ragMeta,
+  };
+}
 
 app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
     ollamaDefault: OLLAMA_MODEL || null,
     mistral: Boolean(MISTRAL_API_KEY),
+    rag: RAG_ENABLED,
   });
 });
 
@@ -53,6 +75,7 @@ app.get('/api/models', async (_req, res) => {
       installed: tags,
       mistralConfigured: Boolean(MISTRAL_API_KEY),
       mistralModel: MISTRAL_API_KEY ? MISTRAL_MODEL : null,
+      rag: RAG_ENABLED,
     });
   } catch (error) {
     res.status(502).json({
@@ -64,6 +87,16 @@ app.get('/api/models', async (_req, res) => {
   }
 });
 
+app.post('/api/memory/recall', async (req, res) => {
+  try {
+    const q = String(req.body?.query || '');
+    const { context, result } = await buildRagContext(q, { limit: Number(req.body?.limit) || 6 });
+    res.json({ context, ...result });
+  } catch (error) {
+    res.status(500).json({ message: String(error?.message || error) });
+  }
+});
+
 app.post('/api/chat', async (req, res) => {
   try {
     const messages = req.body?.messages;
@@ -72,20 +105,18 @@ app.post('/api/chat', async (req, res) => {
     }
     const requested = typeof req.body?.model === 'string' ? req.body.model : '';
     const resolved = resolveOllamaModel(requested, ollamaConfig);
+    const { messages: fullMessages, ragMeta } = await withRagSystem(messages);
 
     if (!MISTRAL_API_KEY && resolved.ok) {
       const content = await chatOllama({
         config: ollamaConfig,
         model: resolved.model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...messages.filter((m) => m.role !== 'system'),
-        ],
+        messages: fullMessages,
         stream: false,
       });
       return res.json({
         message: { role: 'assistant', content },
-        bridge: { provider: 'ollama', model: resolved.model },
+        bridge: { provider: 'ollama', model: resolved.model, rag: ragMeta },
       });
     }
 
@@ -96,7 +127,7 @@ app.post('/api/chat', async (req, res) => {
           content:
             'Aucun cerveau actif. Définis OLLAMA_MODEL / LAURA_LOCAL_MODEL ou MISTRAL_API_KEY. Voir /api/models et docs/OLLAMA_MULTI.md.',
         },
-        bridge: { provider: 'local-fallback' },
+        bridge: { provider: 'local-fallback', rag: ragMeta },
       });
     }
 
@@ -108,7 +139,7 @@ app.post('/api/chat', async (req, res) => {
       },
       body: JSON.stringify({
         model: MISTRAL_MODEL,
-        messages: [{ role: 'system', content: systemPrompt }, ...messages],
+        messages: fullMessages,
         temperature: 0.4,
       }),
     });
@@ -119,7 +150,7 @@ app.post('/api/chat', async (req, res) => {
     const content = payload?.choices?.[0]?.message?.content || '';
     return res.json({
       message: { role: 'assistant', content },
-      bridge: { provider: 'mistral', model: MISTRAL_MODEL },
+      bridge: { provider: 'mistral', model: MISTRAL_MODEL, rag: ragMeta },
     });
   } catch (error) {
     res.status(500).json({ message: String(error?.message || error) });
@@ -132,10 +163,7 @@ app.post('/api/chat/stream', async (req, res) => {
     if (!Array.isArray(messages)) {
       return res.status(400).json({ message: 'Messages payload is required.' });
     }
-    const fullMessages = [
-      { role: 'system', content: systemPrompt },
-      ...messages.filter((m) => m.role !== 'system'),
-    ];
+    const { messages: fullMessages } = await withRagSystem(messages);
     const requested = typeof req.body?.model === 'string' ? req.body.model : '';
     const resolved = resolveOllamaModel(requested, ollamaConfig);
 
@@ -237,6 +265,13 @@ app.post('/api/chat/stream', async (req, res) => {
 
 app.listen(PORT, HOST, () => {
   process.stdout.write(
-    `${JSON.stringify({ level: 'info', message: 'Laura API listening', host: HOST, port: PORT, ollama: OLLAMA_MODEL || null })}\n`,
+    `${JSON.stringify({
+      level: 'info',
+      message: 'Laura API listening',
+      host: HOST,
+      port: PORT,
+      ollama: OLLAMA_MODEL || null,
+      rag: RAG_ENABLED,
+    })}\n`,
   );
 });
