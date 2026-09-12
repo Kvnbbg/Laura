@@ -25,61 +25,32 @@ Run it from the chat with `/run example` (the file name without `.mjs`).
   Dispatches allowlisted paper/hunt/doctor commands without folding COPY into
   Laura core. Run with `/run copy`, `/run copy doctor`, `/run copy rules`,
   `/run copy hunt --fire-only --for 30`. See [docs/COPY_BRIDGE.md](../docs/COPY_BRIDGE.md).
+- **`rustfx`** — pilots the Rust Web3/coin engine in `github.com/Kvnbbg/rustFX`.
+  Run with `/run rustfx check|status|coins|build`. See [docs/RUSTFX_ENGINE.md](../docs/RUSTFX_ENGINE.md).
+- **`rune`** — full pilot kit for [unstablebuild/rune](https://github.com/unstablebuild/rune)
+  (GPL IDE kept as a separate checkout). Run with `/run rune check|deps|clone-hint|build|version|run|agent`.
+  Standalone: `node bin/laura-rune.mjs`. See [docs/RUNE_KIT.md](../docs/RUNE_KIT.md).
 - **`moltbook`** — fetches [moltbook.com](https://moltbook.com) (override with
   `MOLTBOOK_URL`) and asks Laura to summarize the MoltBook network's content.
-  Generic HTML fetch + text extraction for now (no known public API yet) —
-  swap `MOLTBOOK_URL` for a real API endpoint later without touching the CLI.
   Run with `/run moltbook`.
 - **`techandstream-articles`** — pulls the public `article-registry.json` from
-  techandstream.com (override with `TECHANDSTREAM_REGISTRY_URL`,
-  `TECHANDSTREAM_ARTICLE_COUNT` for how many posts to pick when no thread
-  forms, `TECHANDSTREAM_THREAD_LIMIT` for how many companions join a
-  sub-thread) and has the MoltBots stage a short in-character forum
-  discussion about real recent posts — techandstream.com is prioritized over
-  moltbook here since it's the revenue-bearing product. When the registry
-  links same-day posts (via an optional `thread` field, or simply shares the
-  same `updated` date), the plugin stages a threaded sub-discussion instead:
-  one bot opens on the lead post and the others visibly *reply* to it
-  (printed indented with `└─`), referencing their own companion post. Run
-  with `/run techandstream-articles`.
+  techandstream.com and stages MoltBot discussion of recent posts.
+  Run with `/run techandstream-articles`.
 - **`french-dev-blog-posting`** — stages curated public references as reviewed
-  french-dev-ai-tools blog prompts for Techandstream. It currently wires
-  Kill AI Slop and OlegWock's data landscape guide into short MoltBot draft
-  briefs without publishing. Run with `/run french-dev-blog-posting`.
-- **`french-dev-social`** — reads public Moltbook and Techandstream signals,
-  then stages one Moltbook reply draft, one Techandstream mini-thread, and one
-  cross-site line for french-dev-ai-tools. It does not publish. Run with
-  `/run french-dev-social`.
-- **`french-dev-workflows`** — prints the durable Workflows run that ties the
-  curated blog seeds and social activation plan into one monitored,
-  manual-review-only loop. Run with `/run french-dev-workflows`.
-- **`matrix-citizen`** — resolves the MoltBot → MatrixCitizen bridge locally
-  for the shared `auto`, `add`, and `goto add` commands. It prints the
-  Techandstream route, terminal command, four channel pairs (`web/web`,
-  `web/terminal`, `terminal/web`, `terminal/terminal`), and the catch →
-  resolve → loop checklist. Run with `/run matrix-citizen`, `/run
-  matrix-citizen add`, or `/run matrix-citizen goto add terminal/web`.
-- **`mindwalk`** — bridges Laura to the external
-  [Mindwalk](https://github.com/cosmtrek/mindwalk) CLI for local Codex/Claude
-  session visualization. It can check the binary, start `mindwalk serve` for
-  Laura on a local port, export a citymap, trace a specific session, open one
-  session, or explicitly run `analyze`. Run with `/run mindwalk`,
-  `/run mindwalk check`, `/run mindwalk build`, `/run mindwalk trace
-  <session.jsonl>`, `/run mindwalk open <session.jsonl>`, or `/run mindwalk
-  analyze <session.jsonl> codex`. Override the repo, port, binary, browser
-  behavior, or judge with `LAURA_MINDWALK_REPO`, `LAURA_MINDWALK_PORT`,
-  `LAURA_MINDWALK_BIN`, `LAURA_MINDWALK_OPEN=true`, and
-  `LAURA_MINDWALK_JUDGE`.
+  french-dev-ai-tools blog prompts. Run with `/run french-dev-blog-posting`.
+- **`french-dev-social`** — stages Moltbook/Techandstream draft lines without publishing.
+  Run with `/run french-dev-social`.
+- **`french-dev-workflows`** — prints the durable Workflows run for manual review.
+  Run with `/run french-dev-workflows`.
+- **`matrix-citizen`** — MatrixCitizen bridge for `auto` / `add` / `goto add`.
+  Run with `/run matrix-citizen`.
+- **`mindwalk`** — bridges Laura to the external Mindwalk CLI for session visualization.
+  Run with `/run mindwalk`.
 
-The background MoltBots feed (the dimmed ticker shown automatically while
-chatting) also targets the `moltbook` network by default — override with
+The background MoltBots feed targets the `moltbook` network by default — override with
 `LAURA_FEED_NETWORK` if you want a different one.
 
 ## Roadmap (not yet implemented)
-
-This is the extension point for connecting Laura's terminal to other tools
-In the ecosystem — each becomes its own plugin file once scoped, instead of
-being hard-wired into the core CLI:
 
 - `ssh-ai-chat` — remote terminal chat sessions over SSH
 - `second-me` — personal-agent memory/context bridge
