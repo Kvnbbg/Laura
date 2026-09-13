@@ -11,6 +11,7 @@ import Growth from './pages/Growth';
 import EcoHub from './pages/EcoHub';
 import OpenSource from './pages/OpenSource';
 import InstallCli from './pages/InstallCli';
+import Web3Merge from './pages/Web3Merge';
 import NotFound from './pages/NotFound';
 import './styles/main.scss';
 
@@ -39,6 +40,7 @@ const App = () => {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/growth" element={<Growth />} />
             <Route path="/eco-hub" element={<EcoHub />} />
+            <Route path="/web3" element={<Web3Merge />} />
             <Route path="/open-source" element={<OpenSource />} />
             <Route path="/install-cli" element={<InstallCli />} />
             <Route path="/moltbots" element={<OpenSource />} />
