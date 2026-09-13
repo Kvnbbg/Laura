@@ -1,66 +1,96 @@
-/** Laura protocol guide — always ends with next commands. */
+/** MCP + A2A + SQL checkpoints — always end with next commands. */
 export default {
   name: 'protocols',
-  description: 'MCP vs A2A, Agent Cards, next commands so the user is never lost.',
+  description: 'MCP, A2A, SQL checkpoints — guided commands so the user is never lost.',
   async run({ args = [], print }) {
     const topic = (args[0] || 'list').toLowerCase();
+    const sub = (args[1] || '').toLowerCase();
 
     if (topic === 'list' || topic === 'help') {
-      print('Protocoles agents — Laura te guide, tu colles les commandes.');
+      print('Protocoles & persistance — Laura donne les commandes.');
       print('  /run protocols mcp');
       print('  /run protocols a2a');
       print('  /run protocols compare');
       print('  /run protocols card');
-      print('Docs: docs/A2A_PROTOCOL.md  docs/LANGGRAPH_CHECKPOINTS.md');
-      print('Si tu es perdu: /run guide lost');
+      print('  /run protocols sql');
+      print('  /run protocols sql sqlite');
+      print('  /run protocols sql postgres');
+      print('Docs: docs/MCP_PROTOCOL.md  docs/SQL_CHECKPOINTS.md  docs/A2A_PROTOCOL.md');
+      print('Perdu ? /run guide lost');
       return;
     }
 
     if (topic === 'mcp') {
-      print('MCP = agent → outils/données (vertical).');
-      print('Exemples: filesystem, DB, search, GitHub server.');
+      print('=== MCP (Model Context Protocol) ===');
+      print('Architecture: Host → Client → Server (JSON-RPC).');
+      print('Primitives serveur:');
+      print('  Tools      — le modèle appelle (actions)');
+      print('  Resources  — contexte / données');
+      print('  Prompts    — templates UX');
+      print('Transport: stdio (local) | Streamable HTTP (remote)');
+      print('Vertical: agent → outils. Horizontal agents = A2A.');
       print('Prochaines commandes:');
-      print('  # lister des serveurs MCP déjà installés sur ta machine');
-      print('  which npx && npx -y @modelcontextprotocol/server-filesystem --help');
-      print('  /run memory status');
+      print('  pip install mcp && python -c "import mcp; print(\"ok\")"');
+      print('  npx -y @modelcontextprotocol/server-filesystem --help');
       print('  /run protocols compare');
+      print('  cat docs/MCP_PROTOCOL.md  # si repo Laura cloné');
       return;
     }
 
     if (topic === 'a2a') {
-      print('A2A = agent ↔ agent (horizontal, process séparés).');
-      print('Primitives: Agent Card, Message, Task, Artifacts.');
-      print('Transport: JSON-RPC over HTTP(S), SSE, push.');
+      print('=== A2A (Agent2Agent) ===');
+      print('Agent Card + Message + Task + Artifacts.');
+      print('Cross-process / cross-vendor. MCP reste pour les tools.');
       print('Prochaines commandes:');
       print('  pip install a2a-sdk');
       print('  python -c "import a2a; print(\"ok\")"');
-      print('  # ADK optional: pip install google-adk');
-      print('  # adk api_server --a2a');
       print('  /run protocols card');
-      print('  /run orchestra plan collab multi-agent cross-service');
+      print('  /run orchestra plan peer A2A + tools MCP');
       return;
     }
 
     if (topic === 'compare') {
-      print('MCP  → USB-C des outils (un agent enrichit son monde).');
-      print('A2A  → carte de visite + délégation (agents pairs).');
-      print('LangGraph checkpoints → état *d’un* workflow (thread_id).');
-      print('Les trois se combinent: graphe local + MCP tools + A2A peers.');
+      print('MCP  = USB-C des outils (vertical)');
+      print('A2A  = délégation entre agents (horizontal)');
+      print('SQL checkpoints = état d’un graphe LangGraph (thread_id)');
+      print('Laura RAG = mémoire faits Markdown (pas un checkpointer)');
       print('Prochaines commandes:');
       print('  /run protocols mcp');
-      print('  /run protocols a2a');
+      print('  /run protocols sql');
       print('  /run guide next');
       return;
     }
 
     if (topic === 'card') {
-      print('Agent Card (découverte A2A) décrit name, skills, url, I/O modes.');
-      print('Souvent servi sous un chemin well-known agent-card.json.');
-      print('Sans card valide, un client A2A ne peut pas déléguer proprement.');
-      print('Prochaines commandes:');
-      print('  # inspecter une card si tu as une URL');
-      print('  # curl -s "$AGENT_URL/.well-known/agent-card.json" | head');
+      print('Agent Card A2A: name, skills, url, I/O modes.');
+      print('  curl -s "$AGENT_URL/.well-known/agent-card.json" | head');
       print('  /run agents list');
+      return;
+    }
+
+    if (topic === 'sql' || topic === 'checkpoint' || topic === 'checkpoints') {
+      if (sub === 'postgres' || sub === 'pg') {
+        print('=== PostgresSaver (prod) ===');
+        print('  pip install -U psycopg psycopg-pool langgraph langgraph-checkpoint-postgres');
+        print('  export LG_DB="postgresql://USER:PASS@127.0.0.1:5432/DB?sslmode=disable"');
+        print('  # première fois: checkpointer.setup() obligatoire');
+        print('  # connexion manuelle: autocommit=True + row_factory=dict_row');
+        print('  # thread_id max ~255 chars');
+        print('Doc: docs/SQL_CHECKPOINTS.md');
+        print('Ensuite: /run protocols sql sqlite');
+        return;
+      }
+      if (sub === 'sqlite' || sub === '') {
+        print('=== SqliteSaver (dev local) ===');
+        print('  pip install -U langgraph langgraph-checkpoint-sqlite');
+        print('  python -c "from langgraph.checkpoint.sqlite import SqliteSaver; print(\"ok\")"');
+        print('  # fichier typique: checkpoints.sqlite');
+        print('  # conn = sqlite3.connect("checkpoints.sqlite", check_same_thread=False)');
+        print('Prod multi-process → /run protocols sql postgres');
+        print('Doc: docs/SQL_CHECKPOINTS.md');
+        return;
+      }
+      print('Usage: /run protocols sql [sqlite|postgres]');
       return;
     }
 
