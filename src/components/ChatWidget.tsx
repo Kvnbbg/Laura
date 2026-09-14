@@ -61,12 +61,26 @@ const parseMessageSegments = (content: string): MessageSegment[] => {
   return segments.length ? segments : [{ type: 'text', value: content }];
 };
 
+// Parse-and-allowlist rather than pattern-match: `new URL` rejects malformed
+// candidates the split regex would still hand to href, and the protocol check
+// is an explicit allowlist instead of a prefix test. Anything that fails falls
+// through and renders as plain text.
+const safeHttpUrl = (raw: string): string | null => {
+  try {
+    const url = new URL(raw);
+    return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : null;
+  } catch {
+    return null;
+  }
+};
+
 const renderTextWithLinks = (value: string) => {
   const parts = value.split(/(https?:\/\/[^\s)]+)/g);
   return parts.map((part, index) => {
-    if (/^https?:\/\//.test(part)) {
+    const href = safeHttpUrl(part);
+    if (href) {
       return (
-        <a key={`${part}-${index}`} href={part} target="_blank" rel="noreferrer noopener">
+        <a key={`${part}-${index}`} href={href} target="_blank" rel="noreferrer noopener">
           {part}
         </a>
       );
