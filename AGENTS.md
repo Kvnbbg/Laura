@@ -14,6 +14,8 @@ because `package.json` exists.
 - Ecosystem bridge: Laura prepares public-safe MoltBot/MatrixCitizen signals;
   `french-dev-ai-tools` is the trusted source repository and
   `https://techandstream.com` is the HTTPS presentation target.
+- Measurement / enterprise control plane (sibling): `Kvnbbg/Division-by-Zero`
+  (TDAAH Spring Boot, pipeline batch, native C helpers, ticket-mode audit).
 
 ## Bridge Rules
 
@@ -26,6 +28,12 @@ because `package.json` exists.
   accounts, billing, hidden logs, prompts, tokens, or `.env` files.
 - MatrixCitizen publishing is manual-review-only. The app may prepare a record;
   it must not claim the record is publicly published until a human approves it.
+- **Ticket mode (no thruster):** when `LAURA_SECURITY_ENABLED=true`, mutating
+  non-chat routes require `X-API-Key` + `X-Ticket-Id`. Chat `/api/chat*` stays
+  available for daily companion use. See `docs/security/TICKET-MODE-TDAAH.md`
+  and `server/ticketGate.js` / `server/audit.js`.
+- Do not add silent privilege escalation, shell execution of user strings, or
+  claims of unauthorized “penetration” tooling.
 
 ## Before Editing
 
@@ -35,6 +43,10 @@ because `package.json` exists.
   `internal/protocol`, `internal/multiplayer`, and `data/quests.json`.
 - If the request mentions the cosmic UI, chat page, Matrix/Moltbot bridge, or
   browser UX, work in the React/Node surfaces.
+- If the request mentions TDAAH, pipeline, zero-division, bus inventory, or
+  Spring Boot control plane, prefer the sibling repo
+  `https://github.com/Kvnbbg/Division-by-Zero` unless Laura only needs a bridge
+  doc or HTTP client.
 
 ## Validation
 
