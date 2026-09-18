@@ -56,7 +56,10 @@ export const streamChatMessage = async (
     if (!response.ok || !response.body) {
       throw new AppError('CHAT_STREAM_FAILED', 'Chat stream unavailable', {
         userMessage: 'Streaming is temporarily unavailable.',
-        details: { status: response.status },
+        details: {
+          status: response.status,
+          correlationId: response.headers.get('X-Correlation-Id'),
+        },
       });
     }
 
