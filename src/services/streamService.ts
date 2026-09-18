@@ -66,10 +66,12 @@ export const streamChatMessage = async (
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
+    let done = false;
 
-    while (true) {
-      const { value, done } = await reader.read();
-      buffer += decoder.decode(value ?? new Uint8Array(), { stream: !done });
+    while (!done) {
+      const result = await reader.read();
+      done = result.done;
+      buffer += decoder.decode(result.value ?? new Uint8Array(), { stream: !done });
       const lines = buffer.split(/\r?\n/);
       buffer = lines.pop() ?? '';
 
@@ -78,13 +80,10 @@ export const streamChatMessage = async (
         if (parsed === '__DONE__') return;
         if (parsed) callbacks.onDelta(parsed);
       }
-
-      if (done) {
-        const parsed = parseSseLine(buffer);
-        if (parsed && parsed !== '__DONE__') callbacks.onDelta(parsed);
-        return;
-      }
     }
+
+    const parsed = parseSseLine(buffer);
+    if (parsed && parsed !== '__DONE__') callbacks.onDelta(parsed);
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') {
       throw new AppError('CHAT_STREAM_TIMEOUT', 'Chat stream timed out', {
