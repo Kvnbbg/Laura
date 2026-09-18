@@ -27,7 +27,8 @@
     "serve": "sirv dist --host 0.0.0.0 --port ${PORT:-3000} --cors --single",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write .",
-    "test": "vitest"
+    "test": "vitest",
+    "test:server-security": "node scripts/server-security-contract.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
