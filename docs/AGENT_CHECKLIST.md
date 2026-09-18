@@ -7,9 +7,9 @@ Status values: PASS / FAIL / PARTIAL / NOT APPLICABLE / BLOCKED.
 |---|---|---|
 | Working tree clean at session start | PASS | `git status` clean on `main` |
 | Stack detected | PASS | Vite + React 18 + TS (frontend), Express proxy (`server/index.js`), Go terminal bridge (`laura_quest_main.go`, `cmd/`, `internal/`) |
-| Package manager identified | PASS | npm (`package-lock.json`) |
-| Build tool identified | PASS | Vite 7 (`vite.config.ts`), `tsc && vite build` |
-| Test tool identified | PASS | Vitest 3 + @testing-library/react, jsdom; 6 test files under `src/` |
+| Package manager identified | PASS | npm (`package.json`); repository currently has no committed `package-lock.json`, so CI uses `npm install` rather than `npm ci` |
+| Build tool identified | PASS | Vite 8 (`package.json` / `vite.config.ts`), `tsc && vite build` |
+| Test tool identified | PASS | Vitest 4 + @testing-library/react, jsdom; test suite under `src/` |
 | Lint tool identified | PASS | ESLint 8 (`.eslintrc.cjs`), `--max-warnings 0` |
 | `.env.example` present and documented | PASS | Documents `VITE_*` chat/contact vars + server-only `MISTRAL_API_KEY` |
 | Supabase usage | NOT APPLICABLE | No `supabase/` directory, no Supabase deps |
