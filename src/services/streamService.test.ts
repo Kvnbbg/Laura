@@ -37,10 +37,17 @@ describe('streamChatMessage', () => {
   });
 
   it('rejects non-stream responses', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 503 }));
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: false,
+      status: 503,
+      headers: new Headers({ 'X-Correlation-Id': 'stream-503' }),
+    }));
     await expect(
       streamChatMessage([{ role: 'user', content: 'Hi' }], { onDelta: vi.fn() }, config)
-    ).rejects.toMatchObject({ code: 'CHAT_STREAM_FAILED' });
+    ).rejects.toMatchObject({
+      code: 'CHAT_STREAM_FAILED',
+      details: { status: 503, correlationId: 'stream-503' },
+    });
     vi.unstubAllGlobals();
   });
 });
