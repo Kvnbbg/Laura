@@ -1,6 +1,7 @@
 import { getConfig, type AppConfig } from '../config/env';
 import { AppError } from '../utils/errors';
 import { getDocumentSessionHeaders } from './documentSession';
+import { streamChatMessage } from './streamService';
 import { fetchWithTimeout } from './http';
 
 export type ChatRole = 'system' | 'user' | 'assistant';
@@ -153,6 +154,27 @@ export const sendChatMessage = async (
   }
 
   try {
+    // Prefer SSE for progressive UI, but keep the established JSON endpoint as a
+    // transparent fallback so provider outages or unsupported streaming never
+    // remove the existing chat path.
+    let streamedContent = '';
+    try {
+      await streamChatMessage(
+        messages,
+        { onDelta: (delta) => { streamedContent += delta; } },
+        config
+      );
+      if (streamedContent) {
+        return {
+          message: { role: 'assistant', content: streamedContent },
+          citations: [],
+          thinkingFeedback: ['Réponse reçue en streaming'],
+        };
+      }
+    } catch {
+      // The classic endpoint below remains the compatibility path.
+    }
+
     const response = await fetchWithTimeout(
       config.chatEndpoint,
       {
