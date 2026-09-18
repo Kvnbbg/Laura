@@ -29,7 +29,7 @@ Laura est une application single-page en TypeScript + React qui présente une UI
 
 ## Prerequisites
 
-- Node.js 18+ (see `.nvmrc`)
+- Node.js 22+ (see `.nvmrc`; required by the current Vite toolchain)
 - npm 9+ (or compatible)
 - Go 1.22+ for the production CLI (`cmd/laura`)
 
