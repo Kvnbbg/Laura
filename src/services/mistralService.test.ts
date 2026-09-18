@@ -100,6 +100,28 @@ describe('sendChatMessage', () => {
     vi.unstubAllGlobals();
   });
 
+  it('forwards SSE deltas to the caller while preserving the final response', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      body: new ReadableStream<Uint8Array>({
+        start(controller) {
+          controller.enqueue(new TextEncoder().encode('data: {"choices":[{"delta":{"content":"Hel"}}]}\\n\\ndata: {"choices":[{"delta":{"content":"lo"}}]}\\n\\ndata: [DONE]\\n\\n'));
+          controller.close();
+        },
+      }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const deltas: string[] = [];
+    const response = await sendChatMessage([{ role: 'user', content: 'Hi' }], baseConfig, {
+      onDelta: (delta) => deltas.push(delta),
+    });
+
+    expect(deltas).toEqual(['Hel', 'lo']);
+    expect(response.message.content).toBe('Hello');
+    vi.unstubAllGlobals();
+  });
+
   it('falls back to the JSON endpoint when streaming fails', async () => {
     const fetchMock = vi.fn()
       .mockResolvedValueOnce({ ok: false, status: 503 })
