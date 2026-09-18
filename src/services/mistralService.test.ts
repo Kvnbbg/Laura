@@ -81,4 +81,43 @@ describe('sendChatMessage', () => {
       )
     ).rejects.toBeInstanceOf(AppError);
   });
+  it('prefers the SSE transport when it yields content', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      body: new ReadableStream<Uint8Array>({
+        start(controller) {
+          controller.enqueue(new TextEncoder().encode('data: {"choices":[{"delta":{"content":"streamed"}}]}\\n\\ndata: [DONE]\\n\\n'));
+          controller.close();
+        },
+      }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const response = await sendChatMessage([{ role: 'user', content: 'Hi' }], baseConfig);
+
+    expect(response.message.content).toBe('streamed');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    vi.unstubAllGlobals();
+  });
+
+  it('falls back to the JSON endpoint when streaming fails', async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({ ok: false, status: 503 })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          message: { role: 'assistant', content: 'classic fallback' },
+          citations: [],
+          thinkingFeedback: [],
+        }),
+      });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const response = await sendChatMessage([{ role: 'user', content: 'Hi' }], baseConfig);
+
+    expect(response.message.content).toBe('classic fallback');
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    vi.unstubAllGlobals();
+  });
+
 });
