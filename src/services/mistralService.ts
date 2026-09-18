@@ -18,6 +18,10 @@ export type ChatResponse = {
   thinkingFeedback: string[];
 };
 
+export type ChatStreamCallbacks = {
+  onDelta?: (delta: string) => void;
+};
+
 type ChatPayload = {
   messages: ChatMessage[];
 };
@@ -130,7 +134,8 @@ const parseChatReply = (payload: unknown): ChatResponse => {
 
 export const sendChatMessage = async (
   messages: ChatMessage[],
-  config: AppConfig = getConfig()
+  config: AppConfig = getConfig(),
+  callbacks: ChatStreamCallbacks = {}
 ): Promise<ChatResponse> => {
   if (!Array.isArray(messages) || messages.length === 0) {
     throw new AppError('CHAT_EMPTY', 'No chat messages provided', {
@@ -161,7 +166,12 @@ export const sendChatMessage = async (
     try {
       await streamChatMessage(
         messages,
-        { onDelta: (delta) => { streamedContent += delta; } },
+        {
+          onDelta: (delta) => {
+            streamedContent += delta;
+            callbacks.onDelta?.(delta);
+          },
+        },
         config
       );
       if (streamedContent) {
