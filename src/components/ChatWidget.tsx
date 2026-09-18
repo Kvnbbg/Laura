@@ -155,22 +155,40 @@ const ChatWidget = ({ variant = 'floating' }: ChatWidgetProps) => {
     }
 
     const userMessage: ChatMessage = { role: 'user', content: trimmed };
+    const streamingMessage: ChatMessage = { role: 'assistant', content: '' };
     const nextMessages = [...messages, userMessage];
-    setMessages(nextMessages);
+    setMessages([...nextMessages, streamingMessage]);
     setInputValue('');
     setStatus('sending');
     setThinkingFeedback(DEFAULT_THINKING_FEEDBACK);
 
     try {
-      const response = await sendChatMessage(nextMessages);
-      setMessages((prev) => [
-        ...prev,
-        {
+      const response = await sendChatMessage(nextMessages, config, {
+        onDelta: (delta) => {
+          setMessages((prev) => {
+            const next = [...prev];
+            const index = next.length - 1;
+            const current = next[index];
+            if (!current || current.role !== 'assistant') return prev;
+            next[index] = { ...current, content: `${current.content}${delta}` };
+            return next;
+          });
+        },
+      });
+      setMessages((prev) => {
+        const next = [...prev];
+        const index = next.length - 1;
+        const current = next[index];
+        const assistantMessage: ChatMessage = {
           ...response.message,
           thinkingFeedback: response.thinkingFeedback,
-          citations: response.citations,
-        },
-      ]);
+        };
+        if (current?.role === 'assistant') {
+          next[index] = assistantMessage;
+          return next;
+        }
+        return [...next, assistantMessage];
+      });
       setStatus('idle');
       setThinkingFeedback([]);
     } catch (error) {
