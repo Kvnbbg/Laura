@@ -1,0 +1,27 @@
+name: Power Gate
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+      - run: npm ci
+      - run: npm run lint --if-present
+      - run: npm test -- --run
+      - run: npm run build
+      - run: go test ./...
+      - run: test -f LICENSE
+      - run: test -f NOTICE
+      - run: test -f SECURITY.md
+      - run: test -f AUTHORS.md
+      - run: test -f CITATION.cff
