@@ -23,6 +23,7 @@ jobs:
       - run: npm run build
       - run: npm run security:scan
       - run: npm run test:server-security
+      - run: npm run test:server-integration
 
   go:
     name: Go CLI checks
