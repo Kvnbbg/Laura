@@ -102,6 +102,53 @@ button {
   cursor: pointer;
 }
 
+// Mobile-first safety: no horizontal scroll, fluid media, touch targets
+html,
+body {
+  overflow-x: clip;
+}
+
+img,
+video,
+iframe,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: $font-size-3xl;
+    overflow-wrap: anywhere;
+  }
+
+  h2 {
+    font-size: $font-size-2xl;
+  }
+
+  :is(button, a, [role='button'], input, select, textarea) {
+    min-height: 44px;
+  }
+
+  :is([class*='grid'], table) {
+    grid-template-columns: 1fr !important;
+    display: grid;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  table,
+  thead,
+  tbody,
+  th,
+  td,
+  tr {
+    display: block;
+    max-width: 100%;
+  }
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
