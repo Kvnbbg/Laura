@@ -1,63 +1,63 @@
 # Laura terminal plugins
 
 Drop a `.mjs` file here to extend the terminal chat (`npm run chat`). Each
-plugin is an ES module with a default export shaped like:
+plugin is an ES module with a default export:
 
 ```js
 export default {
   name: 'example',
   description: 'One-line summary shown in /plugins',
-  async run({ callBridge, print }) {
-    // callBridge(content, { mode, context }) talks to the same /api/chat
-    // bridge as the chat itself (mode: 'chat' | 'agent' | 'broadcast' | 'social').
-    // print(line) writes a line to the terminal.
+  async run({ callBridge, print, args }) {
     print('Hello from the example plugin!');
   },
 };
 ```
 
-Run it from the chat with `/run example` (the file name without `.mjs`).
+Run with `/run <name>` (filename without `.mjs`).
 
-## Available plugins
+Shared helpers (DRY, no compile deps): [`lib/safe-cli.mjs`](./lib/safe-cli.mjs)
+— `which`, `runBin` (argv only), `installHint`, `binMap`.
 
-- **`example`** — demo plugin, asks Laura to introduce herself in agent mode.
-- **`copy`** — Laura-preferred bridge to the COPY CLI (`github.com/Kvnbbg/copy`).
-  Dispatches allowlisted paper/hunt/doctor commands without folding COPY into
-  Laura core. Run with `/run copy`, `/run copy doctor`, `/run copy rules`,
-  `/run copy hunt --fire-only --for 30`. See [docs/COPY_BRIDGE.md](../docs/COPY_BRIDGE.md).
-- **`rustfx`** — pilots the Rust Web3/coin engine in `github.com/Kvnbbg/rustFX`.
-  Run with `/run rustfx check|status|coins|build`. See [docs/RUSTFX_ENGINE.md](../docs/RUSTFX_ENGINE.md).
-- **`rune`** — full pilot kit for [unstablebuild/rune](https://github.com/unstablebuild/rune)
-  (GPL IDE kept as a separate checkout). Run with `/run rune check|deps|clone-hint|build|version|run|agent`.
-  Standalone: `node bin/laura-rune.mjs`. See [docs/RUNE_KIT.md](../docs/RUNE_KIT.md).
-- **`moltbook`** — fetches [moltbook.com](https://moltbook.com) (override with
-  `MOLTBOOK_URL`) and asks Laura to summarize the MoltBook network's content.
-  Run with `/run moltbook`.
-- **`techandstream-articles`** — pulls the public `article-registry.json` from
-  techandstream.com and stages MoltBot discussion of recent posts.
-  Run with `/run techandstream-articles`.
-- **`french-dev-blog-posting`** — stages curated public references as reviewed
-  french-dev-ai-tools blog prompts. Run with `/run french-dev-blog-posting`.
-- **`french-dev-social`** — stages Moltbook/Techandstream draft lines without publishing.
-  Run with `/run french-dev-social`.
-- **`french-dev-workflows`** — prints the durable Workflows run for manual review.
-  Run with `/run french-dev-workflows`.
-- **`matrix-citizen`** — MatrixCitizen bridge for `auto` / `add` / `goto add`.
-  Run with `/run matrix-citizen`.
-- **`mindwalk`** — bridges Laura to the external Mindwalk CLI for session visualization.
-  Run with `/run mindwalk`.
+## Core orchestration (symbiosis)
 
-The background MoltBots feed targets the `moltbook` network by default — override with
-`LAURA_FEED_NETWORK` if you want a different one.
+| Plugin | Role |
+| --- | --- |
+| **symbiosis** | Registry + health + next steps |
+| **guide** | Never-lost command paths |
+| **protocols** | MCP, A2A, SQL checkpoints |
+| **memory** | Local Markdown RAG + optional `mem` CLI |
+| **orchestra** | Multi-agent plan JSON (no arbitrary spawn) |
+| **agents** | Hermes, OpenClaw, Pico, Pi, AO, Aider… |
+| **ecosystem** | Tigerless / Anakin / cost-xray pilots |
+| **grimoire** | Spellbook + install hints |
 
-## Roadmap (not yet implemented)
+## Bridges (external CLIs)
 
-- `ssh-ai-chat` — remote terminal chat sessions over SSH
-- `second-me` — personal-agent memory/context bridge
-- `bluesky-video` — social video feed integration
-- `wp-malware-scanner` — security scan trigger + report viewer
-- `bookish-octo-invention` — layered content/automation pipeline
-- `chroma` — vector store / embeddings backend
+| Plugin | Role |
+| --- | --- |
+| **copy** | COPY paper/hunt bridge — [docs/COPY_BRIDGE.md](../docs/COPY_BRIDGE.md) |
+| **rustfx** | rustFX Web3 engine — [docs/RUSTFX_ENGINE.md](../docs/RUSTFX_ENGINE.md) |
+| **rune** | Rune IDE pilot — [docs/RUNE_KIT.md](../docs/RUNE_KIT.md) |
+| **mindwalk** | Mindwalk session bridge |
 
-Keep each plugin self-contained: its own auth/config via env vars, no
-shared mutable state with the core CLI beyond `callBridge`/`print`.
+## Content / social staging
+
+`moltbook`, `techandstream-articles`, `french-dev-*`, `matrix-citizen` — stage
+drafts; do not publish without human review.
+
+## Health
+
+```bash
+node scripts/plugin-health.mjs
+/run symbiosis status
+/run symbiosis next
+```
+
+## Rules
+
+1. Self-contained env config  
+2. No shared mutable state beyond `print` / `callBridge`  
+3. Never auto-run remote installers — print hints only  
+4. End user-facing output with copy-paste next commands  
+
+Map: [docs/SYMBIOSIS.md](../docs/SYMBIOSIS.md)
