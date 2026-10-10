@@ -1,5 +1,6 @@
 /**
  * Laura API core: Ollama multi-model + optional Mistral + local memory RAG.
+ * Zero extra compile deps beyond express/cors already in the app.
  */
 import express from 'express';
 import cors from 'cors';
@@ -29,8 +30,14 @@ app.disable('x-powered-by');
 app.use(cors({ origin: true }));
 app.use(express.json({ limit: '1mb' }));
 
-const systemPrompt =
-  'You are Laura, terminal-first. Use long-term memory snippets when provided. Propose commands; never claim you executed installs. Prefer capable local models over tiny 1.5b for multi-step work.';
+const systemPrompt = [
+  'You are Laura, terminal-first orchestrator.',
+  'Be clear and helpful (chatty is fine) but NEVER leave the user without next steps.',
+  'Every reply MUST end with concrete copy-paste commands using /run … or shell one-liners.',
+  'Prefer: /run guide next, /run symbiosis status, /run memory recall …, /run orchestra plan …, /run protocols compare.',
+  'Propose install commands as text only; never claim you executed installs or remote pipes.',
+  'Use long-term memory snippets when provided. Prefer capable local models over tiny 1.5b for multi-step work.',
+].join(' ');
 
 async function withRagSystem(messages) {
   const lastUser = [...messages].reverse().find((m) => m?.role === 'user')?.content || '';
@@ -59,6 +66,7 @@ app.get('/api/health', (_req, res) => {
     ollamaDefault: OLLAMA_MODEL || null,
     mistral: Boolean(MISTRAL_API_KEY),
     rag: RAG_ENABLED,
+    symbiosis: 'docs/SYMBIOSIS.md',
   });
 });
 
@@ -124,8 +132,14 @@ app.post('/api/chat', async (req, res) => {
       return res.json({
         message: {
           role: 'assistant',
-          content:
-            'Aucun cerveau actif. Définis OLLAMA_MODEL / LAURA_LOCAL_MODEL ou MISTRAL_API_KEY. Voir /api/models et docs/OLLAMA_MULTI.md.',
+          content: [
+            'Aucun cerveau actif.',
+            'export OLLAMA_MODEL=qwen2.5:3b',
+            'export LAURA_RAG=1',
+            '/run symbiosis status',
+            '/run guide next',
+            'Voir docs/OLLAMA_MULTI.md et docs/SYMBIOSIS.md',
+          ].join('\n'),
         },
         bridge: { provider: 'local-fallback', rag: ragMeta },
       });
@@ -179,7 +193,7 @@ app.post('/api/chat/stream', async (req, res) => {
         body: JSON.stringify({ model: resolved.model, messages: fullMessages, stream: true }),
       });
       if (!upstream.ok || !upstream.body) {
-        res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: 'Ollama stream failed.' } }] })}\n\n`);
+        res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: 'Ollama stream failed. /run symbiosis status' } }] })}\n\n`);
         res.write('data: [DONE]\n\n');
         return res.end();
       }
@@ -215,7 +229,7 @@ app.post('/api/chat/stream', async (req, res) => {
 
     if (!MISTRAL_API_KEY) {
       const msg =
-        'Configure OLLAMA_MODEL (ex: qwen2.5:3b) ou MISTRAL_API_KEY. /model list dans le terminal.';
+        'Configure OLLAMA_MODEL (ex: qwen2.5:3b) ou MISTRAL_API_KEY.\n/run symbiosis status\n/run guide next';
       res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: msg } }] })}\n\n`);
       res.write('data: [DONE]\n\n');
       return res.end();
