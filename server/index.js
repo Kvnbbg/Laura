@@ -737,7 +737,10 @@ app.post('/api/documents', upload.array('files'), async (req, res) => {
     const sessionId = requireDocumentSessionId(req, res);
     if (!sessionId) return;
 
-    const files = req.files ?? [];
+    // Not `?? []`: that guards null/undefined but not type. multer yields an
+    // object (not an array) for .fields()/.single(), and `undefined > MAX` is
+    // false, so both size limits below would silently stop enforcing.
+    const files = Array.isArray(req.files) ? req.files : [];
     if (!files.length) {
       return res.status(400).json({ message: 'No files uploaded.' });
     }

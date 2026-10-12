@@ -22,6 +22,19 @@ const skipFiles = new Set([
   'yarn.lock',
 ]);
 
+/**
+ * Les tests d'un détecteur contiennent, par construction, des échantillons de
+ * ce qu'il détecte : securityScanRules.test.ts porte un `/home/…` et un
+ * `file:///…` comme cas attendus. Les scanner revient à signaler le garde
+ * parce qu'il connaît le visage du voleur.
+ *
+ * L'exclusion porte sur les fichiers de TEST, jamais sur du code livré : un
+ * secret déposé dans un `.test.ts` n'est pas publié, et le scan des sources et
+ * des artefacts reste entier.
+ */
+const estFichierDeTest = (nom) =>
+  /\.(test|spec)\.[cm]?[jt]sx?$/.test(nom) || nom === '__tests__';
+
 const findings = [];
 
 const codePrefixes = [
@@ -91,9 +104,22 @@ const rules = [
   },
   {
     id: 'public-local-or-private-origin',
+    // Ce qu'on cherche : une adresse de DÉVELOPPEMENT laissée dans un artefact
+    // publié — `http://localhost:5173/api`, une IP privée, un chemin absolu de
+    // la machine du développeur.
+    //
+    // Ce qu'on ne cherche pas : `http://localhost` NU, sans port ni chemin.
+    // C'est la base de repli de react-router lorsque `location.origin` vaut la
+    // chaîne « null » (contexte bac à sable), inlinée dans chaque bundle. Elle
+    // ne joint rien et ne révèle rien.
+    //
+    // La distinction n'est pas cosmétique : sans elle, le scan échouait à
+    // CHAQUE exécution sur du code de bibliothèque. Un contrôle qui crie au
+    // loup en permanence cesse d'être lu, et c'est alors la vraie fuite qui
+    // passe — le bruit coûte plus cher que l'absence de règle.
     test: (line, file) =>
       isPublicArtifact(file) &&
-      /(localhost|127\.0\.0\.1|0\.0\.0\.0|192\.168\.|10\.0\.|172\.(1[6-9]|2\d|3[01])\.|\/home\/|file:\/\/)/.test(line),
+      /(localhost[:/][\w-]|127\.0\.0\.1|0\.0\.0\.0|192\.168\.\d{1,3}\.\d|10\.0\.\d{1,3}\.\d|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d|\/home\/[a-z]|file:\/\/\/)/.test(line),
   },
   {
     id: 'public-hidden-admin-claim',
@@ -104,7 +130,7 @@ const rules = [
 ];
 
 function shouldSkipDir(dirent) {
-  return !dirent.isDirectory() || skipDirs.has(dirent.name);
+  return !dirent.isDirectory() || skipDirs.has(dirent.name) || estFichierDeTest(dirent.name);
 }
 
 function walk(dir) {
@@ -117,7 +143,7 @@ function walk(dir) {
       }
       continue;
     }
-    if (!entry.isFile() || skipFiles.has(entry.name)) {
+    if (!entry.isFile() || skipFiles.has(entry.name) || estFichierDeTest(entry.name)) {
       continue;
     }
     scanFile(fullPath);

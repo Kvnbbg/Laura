@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+# Least privilege: this workflow only builds and tests, it never writes back.
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
